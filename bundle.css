@@ -213,20 +213,19 @@ button.component:hover {
     top: auto;
     bottom: 0;
     width: 100%;
-    height: calc(90px + env(safe-area-inset-bottom));
-    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+    height: calc(80px + env(safe-area-inset-bottom));
+    padding-bottom: calc(4px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--line-color);
     border-right: none;
     flex-direction: row;
     justify-content: space-between;
     gap: 0;
-    padding-bottom: 0;
     overflow-y: visible;
   }
   .nav-bar.component::before,
   .nav-bar.component::after {
     content: '';
-    margin: 0 -8px;
+    margin: 0 -1%;
   }
 }
 .nav-bar.component > h1.logo {
@@ -251,6 +250,11 @@ button.component:hover {
 }
 .nav-bar.component > a.menu > .icon {
   font-size: 42px;
+}
+@container (width < 1280px) {
+  .nav-bar.component > a.menu > .icon {
+    font-size: 36px;
+  }
 }
 .nav-bar.component > a.menu.active {
   color: var(--primary-color);
@@ -932,5 +936,6 @@ button.component:hover {
   --content-bg-color: #1d2733;
   --primary-color: #50a7ea;
   --secondary-color: #b2c0d1;
+  --line-color: #24303f;
 }
 
