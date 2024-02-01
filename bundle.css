@@ -121,6 +121,7 @@ meter {
   --text-color: #fff;
   --line-color: #252527;
   --primary-color: #C1A87D;
+  --secondary-color: #fff;
   --error-color: #FF0000;
   --warning-color: #FFA500;
   --warning-bg-color: rgba(255, 165, 0, 0.12);
@@ -225,6 +226,7 @@ button.component:hover {
   .nav-bar.component::before,
   .nav-bar.component::after {
     content: '';
+    margin: 0 -8px;
   }
 }
 .nav-bar.component > h1.logo {
@@ -245,6 +247,7 @@ button.component:hover {
   gap: 4px;
   align-items: center;
   font-size: 12px;
+  color: var(--secondary-color);
 }
 .nav-bar.component > a.menu > .icon {
   font-size: 42px;
@@ -927,5 +930,7 @@ button.component:hover {
 :root {
   --document-bg-color: #141c27;
   --content-bg-color: #1d2733;
+  --primary-color: #50a7ea;
+  --secondary-color: #b2c0d1;
 }
 
