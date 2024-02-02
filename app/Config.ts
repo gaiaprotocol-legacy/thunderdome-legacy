@@ -3,4 +3,7 @@ export default interface Config {
 
   supabaseUrl: string;
   supabaseAnonKey: string;
+
+  blockchain: { chainId: number; name: string; rpc: string };
+  walletConnectProjectId: string;
 }

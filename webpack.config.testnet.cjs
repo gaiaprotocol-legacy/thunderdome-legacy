@@ -4,7 +4,7 @@ const { ProvidePlugin } = require('webpack');
 
 module.exports = {
     entry: {
-        'bundle': './app/dev.ts',
+        'bundle': './app/testnet.ts',
         __less: './public/style/main.less'
     },
     module: {

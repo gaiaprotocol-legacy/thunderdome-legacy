@@ -1,23 +1,10 @@
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { ProvidePlugin } = require('webpack');
 
 module.exports = {
-    mode: 'production',
-    optimization: {
-        minimize: true,
-        minimizer: [new TerserPlugin({
-            terserOptions: {
-                output: {
-                    comments: false,
-                },
-            },
-            extractComments: false,
-        })],
-    },
     entry: {
-        'bundle': './app/prod.ts',
+        'bundle': './app/development.ts',
         __less: './public/style/main.less'
     },
     module: {
