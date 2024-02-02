@@ -14,6 +14,436 @@ CREATE SCHEMA IF NOT EXISTS "public";
 
 ALTER SCHEMA "public" OWNER TO "pg_database_owner";
 
+CREATE OR REPLACE FUNCTION "public"."parse_creator_key_event"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$DECLARE
+    v_receiver UUID;
+    v_triggerer UUID;
+    owner_data RECORD;
+BEGIN
+    IF new.event_name = 'Trade' THEN
+
+        -- add activity
+        insert into creator_key_activities (
+            block_number, log_index, tx, wallet_address, creator_address, activity_name, args
+        ) values (
+            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
+        );
+
+        -- notify
+        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
+            SELECT owner FROM creator_keys WHERE creator_address = new.args[2]
+        ));
+        v_triggerer := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
+        IF v_receiver IS NOT NULL AND v_receiver != v_triggerer THEN
+            insert into notifications (
+                user_id, triggerer, type, key_type, reference_key, amount
+            ) values (
+                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, 1, new.args[2], new.args[4]::numeric
+            );
+        END IF;
+
+        -- buy
+        IF new.args[3] = 'true' THEN
+            
+            -- update key info
+            update creator_keys set
+                supply = new.args[8]::numeric,
+                last_fetched_price = new.args[5]::numeric,
+                total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                is_price_up = true,
+                last_purchased_at = now()
+            where creator_address = new.args[2];
+
+            -- update key holder info
+            insert into creator_key_holders (
+                creator_address, wallet_address, last_fetched_balance
+            ) values (
+                new.args[2], new.args[1], new.args[4]::numeric
+            ) on conflict (creator_address, wallet_address) do update
+                set last_fetched_balance = creator_key_holders.last_fetched_balance + new.args[4]::numeric;
+            
+            -- if key holder is new, add to key holder count
+            IF NOT FOUND THEN
+                update creator_keys set
+                    holder_count = holder_count + 1
+                where creator_address = new.args[2];
+            END IF;
+            
+            -- update wallet's total key balance
+            insert into user_wallets (
+                wallet_address, total_key_balance
+            ) values (
+                new.args[1], new.args[4]::numeric
+            ) on conflict (wallet_address) do update
+                set total_key_balance = user_wallets.total_key_balance + new.args[4]::numeric;
+
+        -- sell
+        ELSE
+            -- update key info
+            update creator_keys set
+                supply = new.args[8]::numeric,
+                last_fetched_price = new.args[5]::numeric,
+                total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                is_price_up = false
+            where creator_address = new.args[2];
+
+            -- update key holder info
+            WITH updated AS (
+                UPDATE creator_key_holders
+                SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
+                WHERE creator_address = new.args[2]
+                AND wallet_address = new.args[1]
+                RETURNING wallet_address, last_fetched_balance
+            )
+            DELETE FROM creator_key_holders
+            WHERE (wallet_address, last_fetched_balance) IN (
+                SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
+            );
+
+            -- if key holder is gone, subtract from key holder count
+            IF FOUND THEN
+                update creator_keys set
+                    holder_count = holder_count - 1
+                where creator_address = new.args[2];
+            END IF;
+            
+            -- update wallet's total key balance
+            update user_wallets set
+                total_key_balance = total_key_balance - new.args[4]::numeric
+            where wallet_address = new.args[1];
+        END IF;
+    END IF;
+    RETURN NULL;
+end;$$;
+
+ALTER FUNCTION "public"."parse_creator_key_event"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."parse_group_key_event"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$DECLARE
+    v_receiver UUID;
+    v_triggerer UUID;
+    owner_data RECORD;
+BEGIN
+    IF new.event_name = 'GroupCreated' THEN
+        
+        -- add activity
+        insert into group_key_activities (
+            block_number, log_index, tx, wallet_address, group_id, activity_name, args
+        ) values (
+            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
+        );
+
+        -- add key info
+        insert into group_keys (
+            group_id, owner, name, symbol
+        ) values (
+            new.args[2], new.args[1], new.args[3], new.args[4]
+        );
+
+        -- add key holder info
+        insert into group_key_holders (
+            group_id, wallet_address, last_fetched_balance
+        ) values (
+            new.args[2], new.args[1], new.args[4]::numeric
+        );
+        
+        -- update wallet's total key balance
+        insert into user_wallets (
+            wallet_address, total_key_balance
+        ) values (
+            new.args[1], new.args[4]::numeric
+        ) on conflict (wallet_address) do update
+            set total_key_balance = user_wallets.total_key_balance + new.args[4]::numeric;
+
+        -- notify
+        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
+        IF v_receiver IS NOT NULL THEN
+            insert into notifications (
+                user_id, type, group_id
+            ) values (
+                v_receiver, 0, new.args[2]
+            );
+        END IF;
+
+    ELSIF new.event_name = 'Trade' THEN
+
+        -- add activity
+        insert into group_key_activities (
+            block_number, log_index, tx, wallet_address, group_id, activity_name, args
+        ) values (
+            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
+        );
+
+        -- notify
+        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
+            SELECT owner FROM group_keys WHERE group_id = new.args[2]
+        ));
+        v_triggerer := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
+        IF v_receiver IS NOT NULL AND v_receiver != v_triggerer THEN
+            insert into notifications (
+                user_id, triggerer, type, key_type, reference_key, amount
+            ) values (
+                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, 1, new.args[2], new.args[4]::numeric
+            );
+        END IF;
+
+        -- buy
+        IF new.args[3] = 'true' THEN
+            
+            -- update key info
+            update group_keys set
+                supply = new.args[8]::numeric,
+                last_fetched_price = new.args[5]::numeric,
+                total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                is_price_up = true,
+                last_purchased_at = now()
+            where group_id = new.args[2];
+
+            -- update key holder info
+            insert into group_key_holders (
+                group_id, wallet_address, last_fetched_balance
+            ) values (
+                new.args[2], new.args[1], new.args[4]::numeric
+            ) on conflict (group_id, wallet_address) do update
+                set last_fetched_balance = group_key_holders.last_fetched_balance + new.args[4]::numeric;
+            
+            -- if key holder is new, add to key holder count
+            IF NOT FOUND THEN
+                update group_keys set
+                    holder_count = holder_count + 1
+                where group_id = new.args[2];
+            END IF;
+            
+            -- update wallet's total key balance
+            insert into user_wallets (
+                wallet_address, total_key_balance
+            ) values (
+                new.args[1], new.args[4]::numeric
+            ) on conflict (wallet_address) do update
+                set total_key_balance = user_wallets.total_key_balance + new.args[4]::numeric;
+
+        -- sell
+        ELSE
+            -- update key info
+            update group_keys set
+                supply = new.args[8]::numeric,
+                last_fetched_price = new.args[5]::numeric,
+                total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                is_price_up = false
+            where group_id = new.args[2];
+
+            -- update key holder info
+            WITH updated AS (
+                UPDATE group_key_holders
+                SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
+                WHERE group_id = new.args[2]
+                AND wallet_address = new.args[1]
+                RETURNING wallet_address, last_fetched_balance
+            )
+            DELETE FROM group_key_holders
+            WHERE (wallet_address, last_fetched_balance) IN (
+                SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
+            );
+
+            -- if key holder is gone, subtract from key holder count
+            IF FOUND THEN
+                update group_keys set
+                    holder_count = holder_count - 1
+                where group_id = new.args[2];
+            END IF;
+            
+            -- update wallet's total key balance
+            update user_wallets set
+                total_key_balance = total_key_balance - new.args[4]::numeric
+            where wallet_address = new.args[1];
+        END IF;
+    END IF;
+    RETURN NULL;
+end;$$;
+
+ALTER FUNCTION "public"."parse_group_key_event"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."parse_topic_key_event"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$DECLARE
+    v_receiver UUID;
+    v_triggerer UUID;
+    owner_data RECORD;
+BEGIN
+    IF new.event_name = 'Trade' THEN
+
+        -- add activity
+        insert into topic_key_activities (
+            block_number, log_index, tx, wallet_address, topic, activity_name, args
+        ) values (
+            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
+        );
+
+        -- notify
+        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
+            SELECT owner FROM topic_keys WHERE topic = new.args[2]
+        ));
+        v_triggerer := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
+        IF v_receiver IS NOT NULL AND v_receiver != v_triggerer THEN
+            insert into notifications (
+                user_id, triggerer, type, key_type, reference_key, amount
+            ) values (
+                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, 1, new.args[2], new.args[4]::numeric
+            );
+        END IF;
+
+        -- buy
+        IF new.args[3] = 'true' THEN
+            
+            -- update key info
+            update topic_keys set
+                supply = new.args[8]::numeric,
+                last_fetched_price = new.args[5]::numeric,
+                total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                is_price_up = true,
+                last_purchased_at = now()
+            where topic = new.args[2];
+
+            -- update key holder info
+            insert into topic_key_holders (
+                topic, wallet_address, last_fetched_balance
+            ) values (
+                new.args[2], new.args[1], new.args[4]::numeric
+            ) on conflict (topic, wallet_address) do update
+                set last_fetched_balance = topic_key_holders.last_fetched_balance + new.args[4]::numeric;
+            
+            -- if key holder is new, add to key holder count
+            IF NOT FOUND THEN
+                update topic_keys set
+                    holder_count = holder_count + 1
+                where topic = new.args[2];
+            END IF;
+            
+            -- update wallet's total key balance
+            insert into user_wallets (
+                wallet_address, total_key_balance
+            ) values (
+                new.args[1], new.args[4]::numeric
+            ) on conflict (wallet_address) do update
+                set total_key_balance = user_wallets.total_key_balance + new.args[4]::numeric;
+
+        -- sell
+        ELSE
+            -- update key info
+            update topic_keys set
+                supply = new.args[8]::numeric,
+                last_fetched_price = new.args[5]::numeric,
+                total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                is_price_up = false
+            where topic = new.args[2];
+
+            -- update key holder info
+            WITH updated AS (
+                UPDATE topic_key_holders
+                SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
+                WHERE topic = new.args[2]
+                AND wallet_address = new.args[1]
+                RETURNING wallet_address, last_fetched_balance
+            )
+            DELETE FROM topic_key_holders
+            WHERE (wallet_address, last_fetched_balance) IN (
+                SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
+            );
+
+            -- if key holder is gone, subtract from key holder count
+            IF FOUND THEN
+                update topic_keys set
+                    holder_count = holder_count - 1
+                where topic = new.args[2];
+            END IF;
+            
+            -- update wallet's total key balance
+            update user_wallets set
+                total_key_balance = total_key_balance - new.args[4]::numeric
+            where wallet_address = new.args[1];
+        END IF;
+    END IF;
+    RETURN NULL;
+end;$$;
+
+ALTER FUNCTION "public"."parse_topic_key_event"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_creator_key_last_message"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update creator_keys
+    set
+        last_message = (SELECT display_name FROM public.users_public WHERE user_id = new.author) || ': ' || new.message,
+        last_message_sent_at = now()
+    where
+        creator_address = new.creator_address;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."set_creator_key_last_message"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_updated_at"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$BEGIN
+  new.updated_at := now();
+  RETURN new;
+END;$$;
+
+ALTER FUNCTION "public"."set_updated_at"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_user_metadata_to_public"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+begin
+  if strpos(new.raw_user_meta_data ->> 'iss', 'twitter') > 0 then
+    insert into public.users_public (user_id, display_name, avatar, avatar_thumb, avatar_stored, x_username)
+    values (
+      new.id,
+      new.raw_user_meta_data ->> 'full_name',
+      case 
+        when strpos(new.raw_user_meta_data ->> 'avatar_url', '_normal') > 0 then
+          replace(new.raw_user_meta_data ->> 'avatar_url', '_normal', '')
+        else
+          new.raw_user_meta_data ->> 'avatar_url'
+      end,
+      new.raw_user_meta_data ->> 'avatar_url',
+      false,
+      new.raw_user_meta_data ->> 'user_name'
+    ) on conflict (user_id) do update
+    set
+      display_name = new.raw_user_meta_data ->> 'full_name',
+      avatar = case 
+        when strpos(new.raw_user_meta_data ->> 'avatar_url', '_normal') > 0 then
+          replace(new.raw_user_meta_data ->> 'avatar_url', '_normal', '')
+        else
+          new.raw_user_meta_data ->> 'avatar_url'
+      end,
+      avatar_thumb = new.raw_user_meta_data ->> 'avatar_url',
+      avatar_stored = false,
+      x_username = new.raw_user_meta_data ->> 'user_name';
+  else
+    insert into public.users_public (user_id, display_name, avatar, avatar_thumb, avatar_stored)
+    values (
+      new.id,
+      new.raw_user_meta_data ->> 'full_name',
+      new.raw_user_meta_data ->> 'avatar_url',
+      false
+    ) on conflict (user_id) do update
+    set
+      display_name = new.raw_user_meta_data ->> 'full_name',
+      avatar = new.raw_user_meta_data ->> 'avatar_url',
+      avatar_thumb = new.raw_user_meta_data ->> 'avatar_url',
+      avatar_stored = false;
+  end if;
+  return new;
+end;
+$$;
+
+ALTER FUNCTION "public"."set_user_metadata_to_public"() OWNER TO "postgres";
+
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
@@ -385,6 +815,32 @@ ALTER TABLE ONLY "public"."users_public"
 ALTER TABLE ONLY "public"."wallet_linking_nonces"
     ADD CONSTRAINT "wallet_linking_nonces_pkey" PRIMARY KEY ("user_id");
 
+CREATE TRIGGER parse_creator_key_event AFTER INSERT ON public.creator_key_events FOR EACH ROW EXECUTE FUNCTION public.parse_creator_key_event();
+
+CREATE TRIGGER parse_group_key_event AFTER INSERT ON public.group_key_events FOR EACH ROW EXECUTE FUNCTION public.parse_group_key_event();
+
+CREATE TRIGGER parse_topic_key_event AFTER INSERT ON public.topic_key_events FOR EACH ROW EXECUTE FUNCTION public.parse_topic_key_event();
+
+CREATE TRIGGER set_creator_key_holders_updated_at BEFORE UPDATE ON public.creator_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_creator_key_last_message AFTER INSERT ON public.creator_chat_messages FOR EACH ROW EXECUTE FUNCTION public.set_creator_key_last_message();
+
+CREATE TRIGGER set_creator_keys_updated_at BEFORE UPDATE ON public.creator_keys FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_group_key_holders_updated_at BEFORE UPDATE ON public.group_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_group_keys_updated_at BEFORE UPDATE ON public.group_keys FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_topic_key_holders_updated_at BEFORE UPDATE ON public.topic_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_topic_keys_updated_at BEFORE UPDATE ON public.topic_keys FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_tracked_event_blocks_updated_at BEFORE UPDATE ON public.tracked_event_blocks FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_user_wallets_updated_at BEFORE UPDATE ON public.user_wallets FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_users_public_updated_at BEFORE UPDATE ON public.users_public FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
 ALTER TABLE ONLY "public"."creator_chat_messages"
     ADD CONSTRAINT "creator_chat_messages_author_fkey" FOREIGN KEY (author) REFERENCES public.users_public(user_id);
 
@@ -474,6 +930,30 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."parse_creator_key_event"() TO "anon";
+GRANT ALL ON FUNCTION "public"."parse_creator_key_event"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."parse_creator_key_event"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."parse_group_key_event"() TO "anon";
+GRANT ALL ON FUNCTION "public"."parse_group_key_event"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."parse_group_key_event"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."parse_topic_key_event"() TO "anon";
+GRANT ALL ON FUNCTION "public"."parse_topic_key_event"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."parse_topic_key_event"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_creator_key_last_message"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_creator_key_last_message"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_creator_key_last_message"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "service_role";
 
 GRANT ALL ON TABLE "public"."creator_chat_messages" TO "anon";
 GRANT ALL ON TABLE "public"."creator_chat_messages" TO "authenticated";
