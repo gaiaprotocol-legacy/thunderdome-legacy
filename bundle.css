@@ -198,7 +198,6 @@ button.component:hover {
   z-index: 999990;
   width: 90px;
   height: 100%;
-  background-color: var(--wrapper-bg-color);
   border-right: 1px solid var(--line-color);
   display: flex;
   flex-direction: column;
@@ -937,5 +936,197 @@ button.component:hover {
   --primary-color: #50a7ea;
   --secondary-color: #b2c0d1;
   --line-color: #24303f;
+}
+.layout {
+  height: 100%;
+}
+.layout > main {
+  width: 1280px;
+  margin: 0 auto;
+  padding-top: 56px;
+  padding-left: 90px;
+  display: flex;
+  height: 100%;
+  border-right: 1px solid var(--line-color);
+}
+@container (width < 1280px) {
+  .layout > main {
+    width: 100%;
+    padding-left: 0;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    border-right: none;
+  }
+}
+.layout > main > .content {
+  flex-grow: 1;
+  position: relative;
+  overflow-y: auto;
+}
+.layout > main > .sidebar {
+  flex-shrink: 0;
+}
+.title-bar {
+  position: fixed;
+  left: calc(50% - 1280px / 2 + 90px);
+  top: 0;
+  z-index: 1;
+  width: calc(1280px - 90px - 1px);
+  height: 56px;
+  border-bottom: 1px solid var(--line-color);
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+@container (width < 1280px) {
+  .title-bar {
+    left: 0;
+    width: 100%;
+  }
+}
+.title-bar > section.user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.title-bar-user-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--primary-color);
+  border-radius: 19px;
+  padding: 5px 10px 5px 5px;
+  cursor: pointer;
+}
+.title-bar-user-display:hover {
+  background-color: var(--primary-color);
+}
+.title-bar-user-display > .avatar {
+  width: 26px;
+  height: 26px;
+}
+.title-bar-user-display > .name {
+  font-size: 14px;
+  font-weight: bold;
+}
+.sidebar {
+  width: 380px;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-left: 1px solid var(--line-color);
+  padding-bottom: 120px;
+}
+@container (width < 1280px) {
+  .sidebar {
+    display: none;
+  }
+}
+.sidebar.hidden {
+  display: none;
+}
+.sidebar > section {
+  border-bottom: 1px solid var(--line-color);
+}
+.sidebar > section > header {
+  padding: 0 20px;
+  border-bottom: 1px solid var(--line-color);
+  height: 59px;
+  display: flex;
+  align-items: center;
+}
+.sidebar > section > header > h2 {
+  font-size: 16px;
+  font-weight: bold;
+}
+.sidebar > section > footer {
+  padding: 12px;
+}
+.side-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999998;
+  width: 100%;
+  height: 100%;
+  background-color: var(--popup-bg-color);
+}
+.side-panel > main {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  border-left: 1px solid var(--line-color);
+  background-color: var(--content-bg-color);
+  overflow-y: auto;
+  padding-bottom: 120px;
+}
+@container (width < 1280px) {
+  .side-panel > main {
+    width: 80%;
+  }
+}
+.side-panel > main > header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line-color);
+}
+.side-panel > main > header > .signed-user {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+}
+.side-panel > main > header > .signed-user > .info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.side-panel > main > header > .signed-user > .info > .name {
+  font-weight: bold;
+}
+.side-panel > main > header > .signed-user > .info > .x-username {
+  color: #595959;
+  font-size: 12px;
+}
+.side-panel > main > header > button.close {
+  margin-left: auto;
+  padding: 4px 6px;
+}
+.side-panel > main > section {
+  border-bottom: 1px solid var(--line-color);
+}
+.side-panel > main > section > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+.side-panel > main > section > header > h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.side-panel > main > section > header > button {
+  padding: 4px 6px;
+}
+.side-panel > main > section > .token-list {
+  border-top: 1px solid var(--line-color);
+}
+.side-panel > main > ul.menu {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-color);
+}
+.side-panel > main > ul.menu > li > a {
+  display: block;
+  padding: 8px 20px;
+}
+.side-panel > main > ul.menu > li > a:hover {
+  background-color: var(--hover-color);
 }
 
