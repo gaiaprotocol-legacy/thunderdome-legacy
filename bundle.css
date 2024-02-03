@@ -423,6 +423,10 @@ button.component:hover {
   padding: 10px 20px 0;
   max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs.component::-webkit-scrollbar {
+  display: none;
 }
 .tabs.component > .tab {
   cursor: pointer;
