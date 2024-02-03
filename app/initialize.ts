@@ -6,10 +6,13 @@ import {
   SplashLoader,
 } from "@common-module/app";
 import {
+  CreatorsView,
   Env,
   FSESFLayout,
   FSESFSignedUserManager,
+  GroupsView,
   inject_fsesf_msg,
+  TopicsView,
   WalletManager,
 } from "fsesf";
 import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
@@ -40,4 +43,15 @@ export default async function initialize(config: Config) {
   ]);
 
   Router.route("**", FSESFLayout);
+  Router.route([
+    "creators",
+    "creators/trending",
+    "creators/top",
+    "creators/new",
+  ], CreatorsView);
+  Router.route(
+    ["groups", "groups/trending", "groups/top", "groups/new"],
+    GroupsView,
+  );
+  Router.route("topics", TopicsView);
 }

@@ -14,125 +14,20 @@ CREATE SCHEMA IF NOT EXISTS "public";
 
 ALTER SCHEMA "public" OWNER TO "pg_database_owner";
 
-CREATE OR REPLACE FUNCTION "public"."parse_creator_key_event"() RETURNS trigger
+CREATE OR REPLACE FUNCTION "public"."parse_contract_event"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$DECLARE
     v_receiver UUID;
     v_triggerer UUID;
     owner_data RECORD;
 BEGIN
-    IF new.event_name = 'Trade' THEN
-
-        -- add activity
-        insert into creator_key_activities (
-            block_number, log_index, tx, wallet_address, creator_address, activity_name, args
-        ) values (
-            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
-        );
-
-        -- notify
-        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
-            SELECT owner FROM creator_keys WHERE creator_address = new.args[2]
-        ));
-        v_triggerer := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
-        IF v_receiver IS NOT NULL AND v_receiver != v_triggerer THEN
-            insert into notifications (
-                user_id, triggerer, type, key_type, reference_key, amount
-            ) values (
-                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, 1, new.args[2], new.args[4]::numeric
-            );
-        END IF;
-
-        -- buy
-        IF new.args[3] = 'true' THEN
-            
-            -- update key info
-            update creator_keys set
-                supply = new.args[8]::numeric,
-                last_fetched_price = new.args[5]::numeric,
-                total_trading_volume = total_trading_volume + new.args[5]::numeric,
-                is_price_up = true,
-                last_purchased_at = now()
-            where creator_address = new.args[2];
-
-            -- update key holder info
-            insert into creator_key_holders (
-                creator_address, wallet_address, last_fetched_balance
-            ) values (
-                new.args[2], new.args[1], new.args[4]::numeric
-            ) on conflict (creator_address, wallet_address) do update
-                set last_fetched_balance = creator_key_holders.last_fetched_balance + new.args[4]::numeric;
-            
-            -- if key holder is new, add to key holder count
-            IF NOT FOUND THEN
-                update creator_keys set
-                    holder_count = holder_count + 1
-                where creator_address = new.args[2];
-            END IF;
-            
-            -- update wallet's total key balance
-            insert into user_wallets (
-                wallet_address, total_key_balance
-            ) values (
-                new.args[1], new.args[4]::numeric
-            ) on conflict (wallet_address) do update
-                set total_key_balance = user_wallets.total_key_balance + new.args[4]::numeric;
-
-        -- sell
-        ELSE
-            -- update key info
-            update creator_keys set
-                supply = new.args[8]::numeric,
-                last_fetched_price = new.args[5]::numeric,
-                total_trading_volume = total_trading_volume + new.args[5]::numeric,
-                is_price_up = false
-            where creator_address = new.args[2];
-
-            -- update key holder info
-            WITH updated AS (
-                UPDATE creator_key_holders
-                SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
-                WHERE creator_address = new.args[2]
-                AND wallet_address = new.args[1]
-                RETURNING wallet_address, last_fetched_balance
-            )
-            DELETE FROM creator_key_holders
-            WHERE (wallet_address, last_fetched_balance) IN (
-                SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
-            );
-
-            -- if key holder is gone, subtract from key holder count
-            IF FOUND THEN
-                update creator_keys set
-                    holder_count = holder_count - 1
-                where creator_address = new.args[2];
-            END IF;
-            
-            -- update wallet's total key balance
-            update user_wallets set
-                total_key_balance = total_key_balance - new.args[4]::numeric
-            where wallet_address = new.args[1];
-        END IF;
-    END IF;
-    RETURN NULL;
-end;$$;
-
-ALTER FUNCTION "public"."parse_creator_key_event"() OWNER TO "postgres";
-
-CREATE OR REPLACE FUNCTION "public"."parse_group_key_event"() RETURNS trigger
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$DECLARE
-    v_receiver UUID;
-    v_triggerer UUID;
-    owner_data RECORD;
-BEGIN
-    IF new.event_name = 'GroupCreated' THEN
+    IF new.event_name = 'GroupCreated' AND new.key_type = 1 THEN
         
         -- add activity
-        insert into group_key_activities (
-            block_number, log_index, tx, wallet_address, group_id, activity_name, args
+        insert into activities (
+            block_number, log_index, tx, wallet_address, key_type, reference_key, activity_name, args
         ) values (
-            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
+            new.block_number, new.log_index, new.tx, new.args[1], 1, new.args[2], new.event_name, new.args
         );
 
         -- add key info
@@ -161,59 +56,124 @@ BEGIN
         v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
         IF v_receiver IS NOT NULL THEN
             insert into notifications (
-                user_id, type, group_id
+                user_id, type, key_type, reference_key
             ) values (
-                v_receiver, 0, new.args[2]
+                v_receiver, 0, 1, new.args[2]
             );
         END IF;
 
-    ELSIF new.event_name = 'Trade' THEN
+    ELSIF new.event_name = 'Trade' AND (
+        new.key_type = 0 OR new.key_type = 1 OR new.key_type = 2
+    ) THEN
 
         -- add activity
-        insert into group_key_activities (
-            block_number, log_index, tx, wallet_address, group_id, activity_name, args
+        insert into activities (
+            block_number, log_index, tx, wallet_address, key_type, reference_key, activity_name, args
         ) values (
-            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
+            new.block_number, new.log_index, new.tx, new.args[1], new.key_type, new.args[2], new.event_name, new.args
         );
 
         -- notify
-        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
-            SELECT owner FROM group_keys WHERE group_id = new.args[2]
-        ));
+        IF new.key_type = 0 THEN
+            --TODO:
+        ELSIF new.key_type = 1 THEN
+            v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
+                SELECT owner FROM group_keys WHERE group_id = new.args[2]
+            ));
+        ELSIF new.key_type = 2 THEN
+            --TODO:
+        END IF;
+
         v_triggerer := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
         IF v_receiver IS NOT NULL AND v_receiver != v_triggerer THEN
             insert into notifications (
                 user_id, triggerer, type, key_type, reference_key, amount
             ) values (
-                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, 1, new.args[2], new.args[4]::numeric
+                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, new.key_type, new.args[2], new.args[4]::numeric
             );
         END IF;
 
         -- buy
         IF new.args[3] = 'true' THEN
-            
-            -- update key info
-            update group_keys set
-                supply = new.args[8]::numeric,
-                last_fetched_price = new.args[5]::numeric,
-                total_trading_volume = total_trading_volume + new.args[5]::numeric,
-                is_price_up = true,
-                last_purchased_at = now()
-            where group_id = new.args[2];
 
-            -- update key holder info
-            insert into group_key_holders (
-                group_id, wallet_address, last_fetched_balance
-            ) values (
-                new.args[2], new.args[1], new.args[4]::numeric
-            ) on conflict (group_id, wallet_address) do update
-                set last_fetched_balance = group_key_holders.last_fetched_balance + new.args[4]::numeric;
-            
-            -- if key holder is new, add to key holder count
-            IF NOT FOUND THEN
+            IF new.key_type = 0 THEN
+                
+                -- update key info
+                update creator_keys set
+                    supply = new.args[8]::numeric,
+                    last_fetched_price = new.args[5]::numeric,
+                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    is_price_up = true,
+                    last_purchased_at = now()
+                where creator_address = new.args[2];
+
+                -- update key holder info
+                insert into creator_key_holders (
+                    creator_address, wallet_address, last_fetched_balance
+                ) values (
+                    new.args[2], new.args[1], new.args[4]::numeric
+                ) on conflict (creator_address, wallet_address) do update
+                    set last_fetched_balance = creator_key_holders.last_fetched_balance + new.args[4]::numeric;
+                
+                -- if key holder is new, add to key holder count
+                IF NOT FOUND THEN
+                    update creator_keys set
+                        holder_count = holder_count + 1
+                    where creator_address = new.args[2];
+                END IF;
+                
+            ELSIF new.key_type = 1 THEN
+                
+                -- update key info
                 update group_keys set
-                    holder_count = holder_count + 1
+                    supply = new.args[8]::numeric,
+                    last_fetched_price = new.args[5]::numeric,
+                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    is_price_up = true,
+                    last_purchased_at = now()
                 where group_id = new.args[2];
+
+                -- update key holder info
+                insert into group_key_holders (
+                    group_id, wallet_address, last_fetched_balance
+                ) values (
+                    new.args[2], new.args[1], new.args[4]::numeric
+                ) on conflict (group_id, wallet_address) do update
+                    set last_fetched_balance = group_key_holders.last_fetched_balance + new.args[4]::numeric;
+                
+                -- if key holder is new, add to key holder count
+                IF NOT FOUND THEN
+                    update group_keys set
+                        holder_count = holder_count + 1
+                    where group_id = new.args[2];
+                END IF;
+            
+            ELSIF new.key_type = 2 THEN
+                
+                -- update key info
+                update topic_keys set
+                    supply = new.args[8]::numeric,
+                    last_fetched_price = new.args[5]::numeric,
+                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    is_price_up = true,
+                    last_purchased_at = now()
+                where topic = new.args[2];
+
+                -- update key holder info
+                insert into topic_key_holders (
+                    topic, wallet_address, last_fetched_balance
+                ) values (
+                    new.args[2], new.args[1], new.args[4]::numeric
+                ) on conflict (topic, wallet_address) do update
+                    set last_fetched_balance = topic_key_holders.last_fetched_balance + new.args[4]::numeric;
+                
+                -- if key holder is new, add to key holder count
+                IF NOT FOUND THEN
+                    update topic_keys set
+                        holder_count = holder_count + 1
+                    where topic = new.args[2];
+                END IF;
+                
             END IF;
             
             -- update wallet's total key balance
@@ -226,32 +186,97 @@ BEGIN
 
         -- sell
         ELSE
-            -- update key info
-            update group_keys set
-                supply = new.args[8]::numeric,
-                last_fetched_price = new.args[5]::numeric,
-                total_trading_volume = total_trading_volume + new.args[5]::numeric,
-                is_price_up = false
-            where group_id = new.args[2];
 
-            -- update key holder info
-            WITH updated AS (
-                UPDATE group_key_holders
-                SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
-                WHERE group_id = new.args[2]
-                AND wallet_address = new.args[1]
-                RETURNING wallet_address, last_fetched_balance
-            )
-            DELETE FROM group_key_holders
-            WHERE (wallet_address, last_fetched_balance) IN (
-                SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
-            );
+            IF new.key_type = 0 THEN
+                
+                -- update key info
+                update creator_keys set
+                    supply = new.args[8]::numeric,
+                    last_fetched_price = new.args[5]::numeric,
+                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    is_price_up = false
+                where creator_address = new.args[2];
 
-            -- if key holder is gone, subtract from key holder count
-            IF FOUND THEN
+                -- update key holder info
+                WITH updated AS (
+                    UPDATE creator_key_holders
+                    SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
+                    WHERE creator_address = new.args[2]
+                    AND wallet_address = new.args[1]
+                    RETURNING wallet_address, last_fetched_balance
+                )
+                DELETE FROM creator_key_holders
+                WHERE (wallet_address, last_fetched_balance) IN (
+                    SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
+                );
+
+                -- if key holder is gone, subtract from key holder count
+                IF FOUND THEN
+                    update creator_keys set
+                        holder_count = holder_count - 1
+                    where creator_address = new.args[2];
+                END IF;
+
+            ELSIF new.key_type = 1 THEN
+                
+                -- update key info
                 update group_keys set
-                    holder_count = holder_count - 1
+                    supply = new.args[8]::numeric,
+                    last_fetched_price = new.args[5]::numeric,
+                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    is_price_up = false
                 where group_id = new.args[2];
+
+                -- update key holder info
+                WITH updated AS (
+                    UPDATE group_key_holders
+                    SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
+                    WHERE group_id = new.args[2]
+                    AND wallet_address = new.args[1]
+                    RETURNING wallet_address, last_fetched_balance
+                )
+                DELETE FROM group_key_holders
+                WHERE (wallet_address, last_fetched_balance) IN (
+                    SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
+                );
+
+                -- if key holder is gone, subtract from key holder count
+                IF FOUND THEN
+                    update group_keys set
+                        holder_count = holder_count - 1
+                    where group_id = new.args[2];
+                END IF;
+            
+            ELSIF new.key_type = 2 THEN
+                
+                -- update key info
+                update topic_keys set
+                    supply = new.args[8]::numeric,
+                    last_fetched_price = new.args[5]::numeric,
+                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    is_price_up = false
+                where topic = new.args[2];
+
+                -- update key holder info
+                WITH updated AS (
+                    UPDATE topic_key_holders
+                    SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
+                    WHERE topic = new.args[2]
+                    AND wallet_address = new.args[1]
+                    RETURNING wallet_address, last_fetched_balance
+                )
+                DELETE FROM topic_key_holders
+                WHERE (wallet_address, last_fetched_balance) IN (
+                    SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
+                );
+
+                -- if key holder is gone, subtract from key holder count
+                IF FOUND THEN
+                    update topic_keys set
+                        holder_count = holder_count - 1
+                    where topic = new.args[2];
+                END IF;
+                
             END IF;
             
             -- update wallet's total key balance
@@ -263,112 +288,7 @@ BEGIN
     RETURN NULL;
 end;$$;
 
-ALTER FUNCTION "public"."parse_group_key_event"() OWNER TO "postgres";
-
-CREATE OR REPLACE FUNCTION "public"."parse_topic_key_event"() RETURNS trigger
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$DECLARE
-    v_receiver UUID;
-    v_triggerer UUID;
-    owner_data RECORD;
-BEGIN
-    IF new.event_name = 'Trade' THEN
-
-        -- add activity
-        insert into topic_key_activities (
-            block_number, log_index, tx, wallet_address, topic, activity_name, args
-        ) values (
-            new.block_number, new.log_index, new.tx, new.args[1], new.args[2], new.event_name, new.args
-        );
-
-        -- notify
-        v_receiver := (SELECT user_id FROM users_public WHERE wallet_address = (
-            SELECT owner FROM topic_keys WHERE topic = new.args[2]
-        ));
-        v_triggerer := (SELECT user_id FROM users_public WHERE wallet_address = new.args[1]);
-        IF v_receiver IS NOT NULL AND v_receiver != v_triggerer THEN
-            insert into notifications (
-                user_id, triggerer, type, key_type, reference_key, amount
-            ) values (
-                v_receiver, v_triggerer, CASE WHEN new.args[3] = 'true' THEN 1 ELSE 2 END, 1, new.args[2], new.args[4]::numeric
-            );
-        END IF;
-
-        -- buy
-        IF new.args[3] = 'true' THEN
-            
-            -- update key info
-            update topic_keys set
-                supply = new.args[8]::numeric,
-                last_fetched_price = new.args[5]::numeric,
-                total_trading_volume = total_trading_volume + new.args[5]::numeric,
-                is_price_up = true,
-                last_purchased_at = now()
-            where topic = new.args[2];
-
-            -- update key holder info
-            insert into topic_key_holders (
-                topic, wallet_address, last_fetched_balance
-            ) values (
-                new.args[2], new.args[1], new.args[4]::numeric
-            ) on conflict (topic, wallet_address) do update
-                set last_fetched_balance = topic_key_holders.last_fetched_balance + new.args[4]::numeric;
-            
-            -- if key holder is new, add to key holder count
-            IF NOT FOUND THEN
-                update topic_keys set
-                    holder_count = holder_count + 1
-                where topic = new.args[2];
-            END IF;
-            
-            -- update wallet's total key balance
-            insert into user_wallets (
-                wallet_address, total_key_balance
-            ) values (
-                new.args[1], new.args[4]::numeric
-            ) on conflict (wallet_address) do update
-                set total_key_balance = user_wallets.total_key_balance + new.args[4]::numeric;
-
-        -- sell
-        ELSE
-            -- update key info
-            update topic_keys set
-                supply = new.args[8]::numeric,
-                last_fetched_price = new.args[5]::numeric,
-                total_trading_volume = total_trading_volume + new.args[5]::numeric,
-                is_price_up = false
-            where topic = new.args[2];
-
-            -- update key holder info
-            WITH updated AS (
-                UPDATE topic_key_holders
-                SET last_fetched_balance = last_fetched_balance - new.args[4]::numeric
-                WHERE topic = new.args[2]
-                AND wallet_address = new.args[1]
-                RETURNING wallet_address, last_fetched_balance
-            )
-            DELETE FROM topic_key_holders
-            WHERE (wallet_address, last_fetched_balance) IN (
-                SELECT wallet_address, last_fetched_balance FROM updated WHERE last_fetched_balance = 0
-            );
-
-            -- if key holder is gone, subtract from key holder count
-            IF FOUND THEN
-                update topic_keys set
-                    holder_count = holder_count - 1
-                where topic = new.args[2];
-            END IF;
-            
-            -- update wallet's total key balance
-            update user_wallets set
-                total_key_balance = total_key_balance - new.args[4]::numeric
-            where wallet_address = new.args[1];
-        END IF;
-    END IF;
-    RETURN NULL;
-end;$$;
-
-ALTER FUNCTION "public"."parse_topic_key_event"() OWNER TO "postgres";
+ALTER FUNCTION "public"."parse_contract_event"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."set_creator_key_last_message"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -383,6 +303,34 @@ CREATE OR REPLACE FUNCTION "public"."set_creator_key_last_message"() RETURNS tri
 end;$$;
 
 ALTER FUNCTION "public"."set_creator_key_last_message"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_group_key_last_message"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update group_keys
+    set
+        last_message = (SELECT display_name FROM public.users_public WHERE user_id = new.author) || ': ' || new.message,
+        last_message_sent_at = now()
+    where
+        group_id = new.group_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."set_group_key_last_message"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_topic_key_last_message"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update topic_keys
+    set
+        last_message = (SELECT display_name FROM public.users_public WHERE user_id = new.author) || ': ' || new.message,
+        last_message_sent_at = now()
+    where
+        topic = new.topic;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."set_topic_key_last_message"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."set_updated_at"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -448,6 +396,33 @@ SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
 
+CREATE TABLE IF NOT EXISTS "public"."activities" (
+    "block_number" bigint NOT NULL,
+    "log_index" bigint NOT NULL,
+    "tx" text NOT NULL,
+    "wallet_address" text NOT NULL,
+    "key_type" smallint,
+    "reference_key" text,
+    "activity_name" text NOT NULL,
+    "args" text[],
+    "created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+
+ALTER TABLE "public"."activities" OWNER TO "postgres";
+
+CREATE TABLE IF NOT EXISTS "public"."contract_events" (
+    "block_number" bigint NOT NULL,
+    "log_index" bigint NOT NULL,
+    "event_type" smallint NOT NULL,
+    "args" text[] DEFAULT '{}'::text[] NOT NULL,
+    "wallet_address" text NOT NULL,
+    "key_type" smallint,
+    "reference_key" text,
+    "created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+
+ALTER TABLE "public"."contract_events" OWNER TO "postgres";
+
 CREATE TABLE IF NOT EXISTS "public"."creator_chat_messages" (
     "id" bigint NOT NULL,
     "creator_address" text NOT NULL,
@@ -468,31 +443,6 @@ ALTER TABLE "public"."creator_chat_messages" ALTER COLUMN "id" ADD GENERATED BY 
     NO MAXVALUE
     CACHE 1
 );
-
-CREATE TABLE IF NOT EXISTS "public"."creator_key_activities" (
-    "block_number" bigint NOT NULL,
-    "log_index" bigint NOT NULL,
-    "tx" text NOT NULL,
-    "wallet_address" text NOT NULL,
-    "creator_address" text NOT NULL,
-    "activity_name" text NOT NULL,
-    "args" text[],
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE "public"."creator_key_activities" OWNER TO "postgres";
-
-CREATE TABLE IF NOT EXISTS "public"."creator_key_events" (
-    "block_number" bigint NOT NULL,
-    "log_index" bigint NOT NULL,
-    "event_type" smallint NOT NULL,
-    "args" text[] DEFAULT '{}'::text[] NOT NULL,
-    "wallet_address" text NOT NULL,
-    "creator_address" text NOT NULL,
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE "public"."creator_key_events" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "public"."creator_key_holders" (
     "creator_address" text NOT NULL,
@@ -540,31 +490,6 @@ ALTER TABLE "public"."group_chat_messages" ALTER COLUMN "id" ADD GENERATED BY DE
     NO MAXVALUE
     CACHE 1
 );
-
-CREATE TABLE IF NOT EXISTS "public"."group_key_activities" (
-    "block_number" bigint NOT NULL,
-    "log_index" bigint NOT NULL,
-    "tx" text NOT NULL,
-    "wallet_address" text NOT NULL,
-    "group_id" text NOT NULL,
-    "activity_name" text NOT NULL,
-    "args" text[],
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE "public"."group_key_activities" OWNER TO "postgres";
-
-CREATE TABLE IF NOT EXISTS "public"."group_key_events" (
-    "block_number" bigint NOT NULL,
-    "log_index" bigint NOT NULL,
-    "event_type" smallint NOT NULL,
-    "args" text[] DEFAULT '{}'::text[] NOT NULL,
-    "wallet_address" text NOT NULL,
-    "group_id" text NOT NULL,
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE "public"."group_key_events" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "public"."group_key_holders" (
     "group_id" text NOT NULL,
@@ -650,31 +575,6 @@ ALTER TABLE "public"."topic_chat_messages" ALTER COLUMN "id" ADD GENERATED BY DE
     CACHE 1
 );
 
-CREATE TABLE IF NOT EXISTS "public"."topic_key_activities" (
-    "block_number" bigint NOT NULL,
-    "log_index" bigint NOT NULL,
-    "tx" text NOT NULL,
-    "wallet_address" text NOT NULL,
-    "topic" text NOT NULL,
-    "activity_name" text NOT NULL,
-    "args" text[],
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE "public"."topic_key_activities" OWNER TO "postgres";
-
-CREATE TABLE IF NOT EXISTS "public"."topic_key_events" (
-    "block_number" bigint NOT NULL,
-    "log_index" bigint NOT NULL,
-    "event_type" smallint NOT NULL,
-    "args" text[] DEFAULT '{}'::text[] NOT NULL,
-    "wallet_address" text NOT NULL,
-    "topic" text NOT NULL,
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
-
-ALTER TABLE "public"."topic_key_events" OWNER TO "postgres";
-
 CREATE TABLE IF NOT EXISTS "public"."topic_key_holders" (
     "topic" text NOT NULL,
     "wallet_address" text NOT NULL,
@@ -752,14 +652,14 @@ CREATE TABLE IF NOT EXISTS "public"."wallet_linking_nonces" (
 
 ALTER TABLE "public"."wallet_linking_nonces" OWNER TO "postgres";
 
+ALTER TABLE ONLY "public"."activities"
+    ADD CONSTRAINT "activities_pkey" PRIMARY KEY ("block_number", "log_index");
+
+ALTER TABLE ONLY "public"."contract_events"
+    ADD CONSTRAINT "contract_events_pkey" PRIMARY KEY ("block_number", "log_index");
+
 ALTER TABLE ONLY "public"."creator_chat_messages"
     ADD CONSTRAINT "creator_chat_messages_pkey" PRIMARY KEY ("id");
-
-ALTER TABLE ONLY "public"."creator_key_activities"
-    ADD CONSTRAINT "creator_key_activities_pkey" PRIMARY KEY ("block_number", "log_index");
-
-ALTER TABLE ONLY "public"."creator_key_events"
-    ADD CONSTRAINT "creator_key_events_pkey" PRIMARY KEY ("block_number", "log_index");
 
 ALTER TABLE ONLY "public"."creator_key_holders"
     ADD CONSTRAINT "creator_key_holders_pkey" PRIMARY KEY ("creator_address", "wallet_address");
@@ -769,12 +669,6 @@ ALTER TABLE ONLY "public"."creator_keys"
 
 ALTER TABLE ONLY "public"."group_chat_messages"
     ADD CONSTRAINT "group_chat_messages_pkey" PRIMARY KEY ("id");
-
-ALTER TABLE ONLY "public"."group_key_activities"
-    ADD CONSTRAINT "group_key_activities_pkey" PRIMARY KEY ("block_number", "log_index");
-
-ALTER TABLE ONLY "public"."group_key_events"
-    ADD CONSTRAINT "group_key_events_pkey" PRIMARY KEY ("block_number", "log_index");
 
 ALTER TABLE ONLY "public"."group_key_holders"
     ADD CONSTRAINT "group_key_holders_pkey" PRIMARY KEY ("group_id", "wallet_address");
@@ -787,12 +681,6 @@ ALTER TABLE ONLY "public"."notifications"
 
 ALTER TABLE ONLY "public"."topic_chat_messages"
     ADD CONSTRAINT "topic_chat_messages_pkey" PRIMARY KEY ("id");
-
-ALTER TABLE ONLY "public"."topic_key_activities"
-    ADD CONSTRAINT "topic_key_activities_pkey" PRIMARY KEY ("block_number", "log_index");
-
-ALTER TABLE ONLY "public"."topic_key_events"
-    ADD CONSTRAINT "topic_key_events_pkey" PRIMARY KEY ("block_number", "log_index");
 
 ALTER TABLE ONLY "public"."topic_key_holders"
     ADD CONSTRAINT "topic_key_holders_pkey" PRIMARY KEY ("topic", "wallet_address");
@@ -815,11 +703,7 @@ ALTER TABLE ONLY "public"."users_public"
 ALTER TABLE ONLY "public"."wallet_linking_nonces"
     ADD CONSTRAINT "wallet_linking_nonces_pkey" PRIMARY KEY ("user_id");
 
-CREATE TRIGGER parse_creator_key_event AFTER INSERT ON public.creator_key_events FOR EACH ROW EXECUTE FUNCTION public.parse_creator_key_event();
-
-CREATE TRIGGER parse_group_key_event AFTER INSERT ON public.group_key_events FOR EACH ROW EXECUTE FUNCTION public.parse_group_key_event();
-
-CREATE TRIGGER parse_topic_key_event AFTER INSERT ON public.topic_key_events FOR EACH ROW EXECUTE FUNCTION public.parse_topic_key_event();
+CREATE TRIGGER parse_contract_event AFTER INSERT ON public.contract_events FOR EACH ROW EXECUTE FUNCTION public.parse_contract_event();
 
 CREATE TRIGGER set_creator_key_holders_updated_at BEFORE UPDATE ON public.creator_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
@@ -829,9 +713,13 @@ CREATE TRIGGER set_creator_keys_updated_at BEFORE UPDATE ON public.creator_keys 
 
 CREATE TRIGGER set_group_key_holders_updated_at BEFORE UPDATE ON public.group_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
+CREATE TRIGGER set_group_key_last_message AFTER INSERT ON public.group_chat_messages FOR EACH ROW EXECUTE FUNCTION public.set_group_key_last_message();
+
 CREATE TRIGGER set_group_keys_updated_at BEFORE UPDATE ON public.group_keys FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 CREATE TRIGGER set_topic_key_holders_updated_at BEFORE UPDATE ON public.topic_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_topic_key_last_message AFTER INSERT ON public.topic_chat_messages FOR EACH ROW EXECUTE FUNCTION public.set_topic_key_last_message();
 
 CREATE TRIGGER set_topic_keys_updated_at BEFORE UPDATE ON public.topic_keys FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
@@ -862,6 +750,8 @@ ALTER TABLE ONLY "public"."users_public"
 ALTER TABLE ONLY "public"."wallet_linking_nonces"
     ADD CONSTRAINT "wallet_linking_nonces_user_id_fkey" FOREIGN KEY (user_id) REFERENCES public.users_public(user_id);
 
+ALTER TABLE "public"."activities" ENABLE ROW LEVEL SECURITY;
+
 CREATE POLICY "can view only user" ON "public"."notifications" FOR SELECT TO authenticated USING ((user_id = auth.uid()));
 
 CREATE POLICY "can write only authed" ON "public"."creator_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message IS NOT NULL) AND (message <> ''::text) AND (length(message) <= 1000)) OR ((message IS NULL) AND (rich IS NOT NULL))) AND (author = auth.uid())));
@@ -870,21 +760,15 @@ CREATE POLICY "can write only authed" ON "public"."group_chat_messages" FOR INSE
 
 CREATE POLICY "can write only authed" ON "public"."topic_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message IS NOT NULL) AND (message <> ''::text) AND (length(message) <= 1000)) OR ((message IS NULL) AND (rich IS NOT NULL))) AND (author = auth.uid())));
 
+ALTER TABLE "public"."contract_events" ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE "public"."creator_chat_messages" ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "public"."creator_key_activities" ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "public"."creator_key_events" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."creator_key_holders" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."creator_keys" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."group_chat_messages" ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "public"."group_key_activities" ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "public"."group_key_events" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."group_key_holders" ENABLE ROW LEVEL SECURITY;
 
@@ -893,10 +777,6 @@ ALTER TABLE "public"."group_keys" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."notifications" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."topic_chat_messages" ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "public"."topic_key_activities" ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE "public"."topic_key_events" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."topic_key_holders" ENABLE ROW LEVEL SECURITY;
 
@@ -908,17 +788,13 @@ ALTER TABLE "public"."user_wallets" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."users_public" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "view everyone" ON "public"."creator_chat_messages" FOR SELECT USING (true);
+CREATE POLICY "view everyone" ON "public"."contract_events" FOR SELECT USING (true);
 
-CREATE POLICY "view everyone" ON "public"."creator_key_events" FOR SELECT USING (true);
+CREATE POLICY "view everyone" ON "public"."creator_chat_messages" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."group_chat_messages" FOR SELECT USING (true);
 
-CREATE POLICY "view everyone" ON "public"."group_key_events" FOR SELECT USING (true);
-
 CREATE POLICY "view everyone" ON "public"."topic_chat_messages" FOR SELECT USING (true);
-
-CREATE POLICY "view everyone" ON "public"."topic_key_events" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."user_wallets" FOR SELECT USING (true);
 
@@ -931,21 +807,21 @@ GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
 
-GRANT ALL ON FUNCTION "public"."parse_creator_key_event"() TO "anon";
-GRANT ALL ON FUNCTION "public"."parse_creator_key_event"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."parse_creator_key_event"() TO "service_role";
-
-GRANT ALL ON FUNCTION "public"."parse_group_key_event"() TO "anon";
-GRANT ALL ON FUNCTION "public"."parse_group_key_event"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."parse_group_key_event"() TO "service_role";
-
-GRANT ALL ON FUNCTION "public"."parse_topic_key_event"() TO "anon";
-GRANT ALL ON FUNCTION "public"."parse_topic_key_event"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."parse_topic_key_event"() TO "service_role";
+GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "anon";
+GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."set_creator_key_last_message"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_creator_key_last_message"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_creator_key_last_message"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_group_key_last_message"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_group_key_last_message"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_group_key_last_message"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_topic_key_last_message"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_topic_key_last_message"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_topic_key_last_message"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "authenticated";
@@ -955,6 +831,14 @@ GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "service_role";
 
+GRANT ALL ON TABLE "public"."activities" TO "anon";
+GRANT ALL ON TABLE "public"."activities" TO "authenticated";
+GRANT ALL ON TABLE "public"."activities" TO "service_role";
+
+GRANT ALL ON TABLE "public"."contract_events" TO "anon";
+GRANT ALL ON TABLE "public"."contract_events" TO "authenticated";
+GRANT ALL ON TABLE "public"."contract_events" TO "service_role";
+
 GRANT ALL ON TABLE "public"."creator_chat_messages" TO "anon";
 GRANT ALL ON TABLE "public"."creator_chat_messages" TO "authenticated";
 GRANT ALL ON TABLE "public"."creator_chat_messages" TO "service_role";
@@ -962,14 +846,6 @@ GRANT ALL ON TABLE "public"."creator_chat_messages" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."creator_chat_messages_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."creator_chat_messages_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."creator_chat_messages_id_seq" TO "service_role";
-
-GRANT ALL ON TABLE "public"."creator_key_activities" TO "anon";
-GRANT ALL ON TABLE "public"."creator_key_activities" TO "authenticated";
-GRANT ALL ON TABLE "public"."creator_key_activities" TO "service_role";
-
-GRANT ALL ON TABLE "public"."creator_key_events" TO "anon";
-GRANT ALL ON TABLE "public"."creator_key_events" TO "authenticated";
-GRANT ALL ON TABLE "public"."creator_key_events" TO "service_role";
 
 GRANT ALL ON TABLE "public"."creator_key_holders" TO "anon";
 GRANT ALL ON TABLE "public"."creator_key_holders" TO "authenticated";
@@ -986,14 +862,6 @@ GRANT ALL ON TABLE "public"."group_chat_messages" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."group_chat_messages_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."group_chat_messages_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."group_chat_messages_id_seq" TO "service_role";
-
-GRANT ALL ON TABLE "public"."group_key_activities" TO "anon";
-GRANT ALL ON TABLE "public"."group_key_activities" TO "authenticated";
-GRANT ALL ON TABLE "public"."group_key_activities" TO "service_role";
-
-GRANT ALL ON TABLE "public"."group_key_events" TO "anon";
-GRANT ALL ON TABLE "public"."group_key_events" TO "authenticated";
-GRANT ALL ON TABLE "public"."group_key_events" TO "service_role";
 
 GRANT ALL ON TABLE "public"."group_key_holders" TO "anon";
 GRANT ALL ON TABLE "public"."group_key_holders" TO "authenticated";
@@ -1018,14 +886,6 @@ GRANT ALL ON TABLE "public"."topic_chat_messages" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."topic_chat_messages_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."topic_chat_messages_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."topic_chat_messages_id_seq" TO "service_role";
-
-GRANT ALL ON TABLE "public"."topic_key_activities" TO "anon";
-GRANT ALL ON TABLE "public"."topic_key_activities" TO "authenticated";
-GRANT ALL ON TABLE "public"."topic_key_activities" TO "service_role";
-
-GRANT ALL ON TABLE "public"."topic_key_events" TO "anon";
-GRANT ALL ON TABLE "public"."topic_key_events" TO "authenticated";
-GRANT ALL ON TABLE "public"."topic_key_events" TO "service_role";
 
 GRANT ALL ON TABLE "public"."topic_key_holders" TO "anon";
 GRANT ALL ON TABLE "public"."topic_key_holders" TO "authenticated";
