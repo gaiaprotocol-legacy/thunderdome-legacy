@@ -962,7 +962,7 @@ button.component:hover {
   position: relative;
   overflow-y: auto;
 }
-.layout > main > .sidebar {
+.layout > main > .activity-section {
   flex-shrink: 0;
 }
 .title-bar {
@@ -1011,7 +1011,7 @@ button.component:hover {
   font-size: 14px;
   font-weight: bold;
 }
-.sidebar {
+.activity-section {
   width: 380px;
   overflow-y: auto;
   position: sticky;
@@ -1021,28 +1021,28 @@ button.component:hover {
   padding-bottom: 120px;
 }
 @container (width < 1280px) {
-  .sidebar {
+  .activity-section {
     display: none;
   }
 }
-.sidebar.hidden {
+.activity-section.hidden {
   display: none;
 }
-.sidebar > section {
+.activity-section > section {
   border-bottom: 1px solid var(--line-color);
 }
-.sidebar > section > header {
+.activity-section > section > header {
   padding: 0 20px;
   border-bottom: 1px solid var(--line-color);
   height: 59px;
   display: flex;
   align-items: center;
 }
-.sidebar > section > header > h2 {
+.activity-section > section > header > h2 {
   font-size: 16px;
   font-weight: bold;
 }
-.sidebar > section > footer {
+.activity-section > section > footer {
   padding: 12px;
 }
 .side-panel {
