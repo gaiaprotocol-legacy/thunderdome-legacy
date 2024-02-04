@@ -27,7 +27,10 @@ inject_fsesf_msg();
 MaterialIconSystem.launch();
 
 export default async function initialize(config: Config) {
-  Env.blockchain = config.blockchain;
+  Env.blockchain = {
+    ...config.blockchain,
+    symbolDom: el("img", { src: "/images/ftm.svg" }),
+  };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
 
   AppInitializer.initialize(

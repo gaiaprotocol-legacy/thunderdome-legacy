@@ -172,6 +172,14 @@ button {
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 24;
 }
+.avatar {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #252527;
+  background-size: cover;
+}
 button.component {
   cursor: pointer;
   display: flex;
@@ -583,20 +591,6 @@ button.component:hover {
 .warning-message-box.component > i {
   font-size: 24px;
 }
-.avatar {
-  flex-shrink: 0;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: #252527;
-  background-size: cover;
-}
-@container (width < 1280px) {
-  .avatar {
-    width: 34px;
-    height: 34px;
-  }
-}
 .post-display.social-component {
   position: relative;
   display: flex;
@@ -620,12 +614,6 @@ button.component:hover {
   background-color: #252527;
   background-size: cover;
   cursor: pointer;
-}
-@container (width < 1280px) {
-  .post-display.social-component .author-avatar {
-    width: 34px;
-    height: 34px;
-  }
 }
 .post-display.social-component .author {
   display: flex;
@@ -706,12 +694,6 @@ button.component:hover {
   background-size: cover;
   cursor: pointer;
 }
-@container (width < 1280px) {
-  .post-content-display.social-component .author-avatar {
-    width: 34px;
-    height: 34px;
-  }
-}
 .post-content-display.social-component .author {
   padding-top: 4px;
   display: flex;
@@ -750,12 +732,6 @@ button.component:hover {
   border-radius: 50%;
   background-color: #252527;
   background-size: cover;
-}
-@container (width < 1280px) {
-  .post-form.social-component > main > .author-avatar {
-    width: 34px;
-    height: 34px;
-  }
 }
 .post-form.social-component > main > form {
   flex-grow: 1;
@@ -820,12 +796,6 @@ button.component:hover {
   width: 34px;
   height: 34px;
   cursor: pointer;
-}
-@container (width < 1280px) {
-  .chat-message-list-item > .author-avatar {
-    width: 34px;
-    height: 34px;
-  }
 }
 .chat-message-list-item > main {
   display: flex;
@@ -1141,7 +1111,7 @@ button.component:hover {
   background-color: var(--hover-color);
 }
 .topics-view {
-  width: 410px;
+  width: 380px;
   height: 100%;
   overflow-y: scroll;
   border-right: 1px solid var(--line-color);
@@ -1164,7 +1134,7 @@ button.component:hover {
   height: calc(100% - 60px);
 }
 .my-creators-view {
-  width: 410px;
+  width: 380px;
   height: 100%;
   overflow-y: scroll;
   border-right: 1px solid var(--line-color);
@@ -1187,7 +1157,7 @@ button.component:hover {
   height: calc(100% - 60px);
 }
 .my-groups-view {
-  width: 410px;
+  width: 380px;
   height: 100%;
   overflow-y: scroll;
   border-right: 1px solid var(--line-color);
