@@ -1,3 +1,6 @@
+/*!***********************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
+  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -98,6 +101,9 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
+  \*********************************************************************************************************************************************/
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -516,11 +522,16 @@ button.component:hover {
   display: block;
 }
 .checkbox.component {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.checkbox.component > .checkmark-container {
   position: relative;
   height: 27px;
   width: 27px;
 }
-.checkbox.component > .checkmark {
+.checkbox.component > .checkmark-container > .checkmark {
   position: absolute;
   top: 0;
   left: 0;
@@ -529,7 +540,7 @@ button.component:hover {
   border: 1px solid var(--primary-color);
   border-radius: 50%;
 }
-.checkbox.component > .checkmark:after {
+.checkbox.component > .checkmark-container > .checkmark:after {
   display: none;
   content: "";
   position: absolute;
@@ -543,11 +554,14 @@ button.component:hover {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
 }
-.checkbox.component > input:checked ~ .checkmark {
+.checkbox.component > .checkmark-container > input:checked ~ .checkmark {
   background-color: #fff;
 }
-.checkbox.component > input:checked ~ .checkmark:after {
+.checkbox.component > .checkmark-container > input:checked ~ .checkmark:after {
   display: block;
+}
+.checkbox.component > label {
+  cursor: default;
 }
 .file-drop-area.component.highlight {
   outline: 2px dotted var(--primary-color);
@@ -911,25 +925,26 @@ button.component:hover {
   --primary-color: #50a7ea;
   --secondary-color: #b2c0d1;
   --line-color: #24303f;
+  --disable-color: rgba(128, 128, 128, 0.5);
   --last-message-color: #b4c2d3;
 }
 @font-face {
   font-family: 'Proto Mono';
-  src: url('../../../fsesf/style/fonts/ProtoMono-Light.otf');
+  src: url('/fonts/ProtoMono-Light.otf');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Proto Mono';
-  src: url('../../../fsesf/style/fonts/ProtoMono-Regular.otf');
+  src: url('/fonts/ProtoMono-Regular.otf');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Proto Mono';
-  src: url('../../../fsesf/style/fonts/ProtoMono-Bold.otf');
+  src: url('/fonts/ProtoMono-Bold.otf');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -1239,9 +1254,39 @@ button.component:hover {
 }
 .topics-view > header {
   border-bottom: 1px solid var(--line-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 10px;
+}
+.topics-view > header > .topic-search-form {
+  flex-grow: 1;
+}
+.topics-view > header > .checkbox > label {
+  font-size: 12px;
+}
+.topic-search-form > label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+.topic-search-form > label > .icon {
+  cursor: default;
+}
+.topic-search-form > label > input {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 320px;
+  height: 100%;
+}
+.topic-search-form > label > input::placeholder {
+  font-size: 12px;
+  font-style: italic;
 }
 .topic-chat-room-header {
-  height: 60px;
+  height: 56px;
   border-bottom: 1px solid var(--line-color);
   padding: 0 20px;
   display: flex;
@@ -1262,6 +1307,7 @@ button.component:hover {
   display: flex;
   align-items: center;
   font-size: 16px;
+  font-family: 'Proto Mono';
 }
 .topic-chat-room-header > h1 > .image {
   width: 24px;
@@ -1271,6 +1317,7 @@ button.component:hover {
 .topic-chat-room-list-item > main > header > h3 {
   margin-top: -2px;
   margin-left: -2px;
+  font-family: 'Proto Mono';
 }
 .topic-chat-room-list-item > main > header > h3 > .image {
   width: 24px;
