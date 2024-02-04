@@ -14,6 +14,19 @@ CREATE SCHEMA IF NOT EXISTS "public";
 
 ALTER SCHEMA "public" OWNER TO "pg_database_owner";
 
+CREATE OR REPLACE FUNCTION "public"."create_creator_key"() RETURNS trigger
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  insert into creator_keys (
+    creator_address
+  ) values (
+    new.wallet_address
+  ) on conflict (creator_address) do nothing;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."create_creator_key"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."parse_contract_event"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$DECLARE
@@ -321,12 +334,18 @@ ALTER FUNCTION "public"."set_group_key_last_message"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."set_topic_key_last_message"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$begin
-  update topic_keys
+  insert into topic_keys (
+    topic,
+    last_message,
+    last_message_sent_at
+  ) values (
+    new.topic,
+    (SELECT display_name FROM public.users_public WHERE user_id = new.author) || ': ' || new.message,
+    now()
+  ) on conflict (topic) do update
     set
         last_message = (SELECT display_name FROM public.users_public WHERE user_id = new.author) || ': ' || new.message,
-        last_message_sent_at = now()
-    where
-        topic = new.topic;
+        last_message_sent_at = now();
   return null;
 end;$$;
 
@@ -702,6 +721,8 @@ ALTER TABLE ONLY "public"."users_public"
 ALTER TABLE ONLY "public"."wallet_linking_nonces"
     ADD CONSTRAINT "wallet_linking_nonces_pkey" PRIMARY KEY ("user_id");
 
+CREATE TRIGGER create_creator_key AFTER UPDATE ON public.users_public FOR EACH ROW EXECUTE FUNCTION public.create_creator_key();
+
 CREATE TRIGGER parse_contract_event AFTER INSERT ON public.contract_events FOR EACH ROW EXECUTE FUNCTION public.parse_contract_event();
 
 CREATE TRIGGER set_creator_key_holders_updated_at BEFORE UPDATE ON public.creator_key_holders FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
@@ -805,6 +826,10 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "anon";
+GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "anon";
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "authenticated";
