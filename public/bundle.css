@@ -918,6 +918,27 @@ button.component:hover {
   --secondary-color: #b2c0d1;
   --line-color: #24303f;
 }
+@font-face {
+  font-family: 'Proto Mono';
+  src: url('../../../fsesf/style/fonts/ProtoMono-Light.otf');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Proto Mono';
+  src: url('../../../fsesf/style/fonts/ProtoMono-Regular.otf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Proto Mono';
+  src: url('../../../fsesf/style/fonts/ProtoMono-Bold.otf');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 .layout {
   height: 100%;
 }
