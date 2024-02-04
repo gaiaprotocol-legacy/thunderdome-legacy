@@ -1,5 +1,6 @@
 import {
   AppInitializer,
+  AuthUtil,
   el,
   MaterialIconSystem,
   Router,
@@ -12,6 +13,9 @@ import {
   FSESFSignedUserManager,
   GroupsView,
   inject_fsesf_msg,
+  MyCreatorsView,
+  MyGroupsView,
+  PointsView,
   TopicsView,
   WalletManager,
 } from "fsesf";
@@ -43,15 +47,23 @@ export default async function initialize(config: Config) {
   ]);
 
   Router.route("**", FSESFLayout);
+
   Router.route([
     "creators",
     "creators/trending",
     "creators/top",
     "creators/new",
   ], CreatorsView);
+  Router.route("creators", MyCreatorsView);
+
   Router.route(
     ["groups", "groups/trending", "groups/top", "groups/new"],
     GroupsView,
   );
+  Router.route("groups", MyGroupsView);
+
   Router.route("topics", TopicsView);
+  Router.route(["points", "points/leaderboard"], PointsView);
+
+  AuthUtil.checkEmailAccess();
 }
