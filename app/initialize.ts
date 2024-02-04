@@ -16,6 +16,7 @@ import {
   MyCreatorsView,
   MyGroupsView,
   PointsView,
+  TopicChatRoomView,
   TopicsView,
   WalletManager,
 } from "fsesf";
@@ -32,6 +33,7 @@ export default async function initialize(config: Config) {
     symbolDom: el("img", { src: "/images/ftm.svg" }),
   };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
+  Env.defaultTopic = "thunderdome";
 
   AppInitializer.initialize(
     config.supabaseUrl,
@@ -53,6 +55,7 @@ export default async function initialize(config: Config) {
 
   Router.route([
     "creators",
+    "creator/{creatorXUsername}",
     "creators/trending",
     "creators/top",
     "creators/new",
@@ -60,12 +63,19 @@ export default async function initialize(config: Config) {
   Router.route("creators", MyCreatorsView);
 
   Router.route(
-    ["groups", "groups/trending", "groups/top", "groups/new"],
+    [
+      "groups",
+      "group/{groupId}",
+      "groups/trending",
+      "groups/top",
+      "groups/new",
+    ],
     GroupsView,
   );
   Router.route("groups", MyGroupsView);
 
-  Router.route("topics", TopicsView);
+  Router.route(["topics", "topic/{topic}"], TopicsView);
+  Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
   Router.route(["points", "points/leaderboard"], PointsView);
 
   AuthUtil.checkEmailAccess();
