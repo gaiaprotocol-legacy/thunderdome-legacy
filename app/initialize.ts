@@ -30,7 +30,7 @@ MaterialIconSystem.launch();
 export default async function initialize(config: Config) {
   Env.blockchain = {
     ...config.blockchain,
-    symbolDom: el("img", { src: "/images/ftm.svg" }),
+    symbolDisplay: "FTM",
   };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
   Env.defaultTopic = "thunderdome";
