@@ -28,7 +28,7 @@ export interface TopicKeysInterface extends Interface {
     nameOrSignature:
       | "batchClaimHolderFees"
       | "batchClaimableHolderFees"
-      | "buyTopic"
+      | "buyKeys"
       | "claimHolderFee"
       | "claimableHolderFee"
       | "getBuyPrice"
@@ -43,7 +43,7 @@ export interface TopicKeysInterface extends Interface {
       | "protocolFeeDestination"
       | "protocolFeePercent"
       | "renounceOwnership"
-      | "sellTopic"
+      | "sellKeys"
       | "setHolderFeePercent"
       | "setProtocolFeeDestination"
       | "setProtocolFeePercent"
@@ -71,7 +71,7 @@ export interface TopicKeysInterface extends Interface {
     values: [string[], AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "buyTopic",
+    functionFragment: "buyKeys",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -128,7 +128,7 @@ export interface TopicKeysInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "sellTopic",
+    functionFragment: "sellKeys",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -157,7 +157,7 @@ export interface TopicKeysInterface extends Interface {
     functionFragment: "batchClaimableHolderFees",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "buyTopic", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "buyKeys", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimHolderFee",
     data: BytesLike
@@ -202,7 +202,7 @@ export interface TopicKeysInterface extends Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "sellTopic", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "sellKeys", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setHolderFeePercent",
     data: BytesLike
@@ -393,7 +393,7 @@ export interface TopicKeys extends BaseContract {
     "view"
   >;
 
-  buyTopic: TypedContractMethod<
+  buyKeys: TypedContractMethod<
     [topic: string, amount: BigNumberish],
     [void],
     "payable"
@@ -464,7 +464,7 @@ export interface TopicKeys extends BaseContract {
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
-  sellTopic: TypedContractMethod<
+  sellKeys: TypedContractMethod<
     [topic: string, amount: BigNumberish],
     [void],
     "nonpayable"
@@ -515,7 +515,7 @@ export interface TopicKeys extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "buyTopic"
+    nameOrSignature: "buyKeys"
   ): TypedContractMethod<
     [topic: string, amount: BigNumberish],
     [void],
@@ -601,7 +601,7 @@ export interface TopicKeys extends BaseContract {
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "sellTopic"
+    nameOrSignature: "sellKeys"
   ): TypedContractMethod<
     [topic: string, amount: BigNumberish],
     [void],
