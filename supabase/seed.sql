@@ -808,13 +808,29 @@ ALTER TABLE ONLY "public"."wallet_linking_nonces"
 
 ALTER TABLE "public"."activities" ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "can view only holder or owner" ON "public"."group_chat_messages" FOR SELECT TO authenticated USING (((( SELECT group_keys.owner
+   FROM public.group_keys
+  WHERE (group_keys.group_id = group_chat_messages.group_id)) = ( SELECT users_public.wallet_address
+   FROM public.users_public
+  WHERE (users_public.user_id = auth.uid()))) OR ((1)::numeric <= ( SELECT group_key_holders.last_fetched_balance
+   FROM public.group_key_holders
+  WHERE ((group_key_holders.group_id = group_chat_messages.group_id) AND (group_key_holders.wallet_address = ( SELECT users_public.wallet_address
+           FROM public.users_public
+          WHERE (users_public.user_id = auth.uid()))))))));
+
 CREATE POLICY "can view only user" ON "public"."notifications" FOR SELECT TO authenticated USING ((user_id = auth.uid()));
 
-CREATE POLICY "can write only authed" ON "public"."creator_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message IS NOT NULL) AND (message <> ''::text) AND (length(message) <= 1000)) OR ((message IS NULL) AND (rich IS NOT NULL))) AND (author = auth.uid())));
-
-CREATE POLICY "can write only authed" ON "public"."group_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message IS NOT NULL) AND (message <> ''::text) AND (length(message) <= 1000)) OR ((message IS NULL) AND (rich IS NOT NULL))) AND (author = auth.uid())));
-
 CREATE POLICY "can write only authed" ON "public"."topic_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message IS NOT NULL) AND (message <> ''::text) AND (length(message) <= 1000)) OR ((message IS NULL) AND (rich IS NOT NULL))) AND (author = auth.uid())));
+
+CREATE POLICY "can write only holder or owner" ON "public"."group_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message <> ''::text) AND (length(message) < 1000)) OR (rich IS NOT NULL)) AND (author = auth.uid()) AND ((( SELECT group_keys.owner
+   FROM public.group_keys
+  WHERE (group_keys.group_id = group_chat_messages.group_id)) = ( SELECT users_public.wallet_address
+   FROM public.users_public
+  WHERE (users_public.user_id = auth.uid()))) OR ((1)::numeric <= ( SELECT group_key_holders.last_fetched_balance
+   FROM public.group_key_holders
+  WHERE ((group_key_holders.group_id = group_chat_messages.group_id) AND (group_key_holders.wallet_address = ( SELECT users_public.wallet_address
+           FROM public.users_public
+          WHERE (users_public.user_id = auth.uid())))))))));
 
 ALTER TABLE "public"."contract_events" ENABLE ROW LEVEL SECURITY;
 
@@ -846,10 +862,6 @@ ALTER TABLE "public"."users_public" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "view everyone" ON "public"."contract_events" FOR SELECT USING (true);
 
-CREATE POLICY "view everyone" ON "public"."creator_chat_messages" FOR SELECT USING (true);
-
-CREATE POLICY "view everyone" ON "public"."group_chat_messages" FOR SELECT USING (true);
-
 CREATE POLICY "view everyone" ON "public"."topic_chat_messages" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."topic_keys" FOR SELECT USING (true);
@@ -858,7 +870,23 @@ CREATE POLICY "view everyone" ON "public"."user_wallets" FOR SELECT USING (true)
 
 CREATE POLICY "view everyone" ON "public"."users_public" FOR SELECT USING (true);
 
+CREATE POLICY "view only holder or owner" ON "public"."creator_chat_messages" FOR SELECT TO authenticated USING (((creator_address = ( SELECT users_public.wallet_address
+   FROM public.users_public
+  WHERE (users_public.user_id = auth.uid()))) OR ((1)::numeric <= ( SELECT creator_key_holders.last_fetched_balance
+   FROM public.creator_key_holders
+  WHERE ((creator_key_holders.creator_address = creator_chat_messages.creator_address) AND (creator_key_holders.wallet_address = ( SELECT users_public.wallet_address
+           FROM public.users_public
+          WHERE (users_public.user_id = auth.uid()))))))));
+
 ALTER TABLE "public"."wallet_linking_nonces" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "write only holder or owner" ON "public"."creator_chat_messages" FOR INSERT TO authenticated WITH CHECK (((((message <> ''::text) AND (length(message) < 1000)) OR (rich IS NOT NULL)) AND (author = auth.uid()) AND ((creator_address = ( SELECT users_public.wallet_address
+   FROM public.users_public
+  WHERE (users_public.user_id = auth.uid()))) OR ((1)::numeric <= ( SELECT creator_key_holders.last_fetched_balance
+   FROM public.creator_key_holders
+  WHERE ((creator_key_holders.creator_address = creator_chat_messages.creator_address) AND (creator_key_holders.wallet_address = ( SELECT users_public.wallet_address
+           FROM public.users_public
+          WHERE (users_public.user_id = auth.uid())))))))));
 
 GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
