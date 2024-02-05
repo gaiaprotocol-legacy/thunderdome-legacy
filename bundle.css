@@ -593,6 +593,9 @@ button.component:hover {
 .warning-message-box.component > i {
   font-size: 24px;
 }
+.warning-message-box.component > p > a {
+  text-decoration: underline;
+}
 .post-display.social-component {
   position: relative;
   display: flex;
@@ -1367,5 +1370,44 @@ button.component:hover {
     overflow-y: visible;
     border-right: none;
   }
+}
+@font-face {
+  font-family: 'Mona-Sans-ExtraBoldWide';
+  src: url('/fonts/Mona-Sans-ExtraBoldWide.ttf') format('woff2');
+}
+.about-view {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.about-view > section {
+  border-radius: 8px;
+  background-color: #1a212c;
+  overflow: hidden;
+}
+.about-view > section > h2 {
+  border-bottom: 1px solid var(--line-color);
+  padding: 14px 20px;
+  background-color: #24303f;
+  font-family: 'Mona-Sans-ExtraBoldWide';
+}
+.about-view > section > p {
+  padding: 20px;
+}
+.about-view > section > p::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+.about-view > section > p > img {
+  width: 80px;
+  float: left;
+  margin-right: 14px;
+}
+.about-view > section > p > b {
+  font-weight: bold;
+  font-style: italic;
+  color: var(--primary-color);
 }
 
