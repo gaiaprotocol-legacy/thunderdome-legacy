@@ -1424,6 +1424,66 @@ button.component:hover {
 .topic-chat-room-list-item > main > .last-message {
   padding-left: 4px;
 }
+.topic-info-modal > header {
+  display: flex;
+  gap: 12px;
+}
+.topic-info-modal > header > h1 > .image {
+  width: 34px;
+  height: 34px;
+}
+.topic-info-modal > header > h1 > .name {
+  text-transform: initial;
+}
+.topic-info-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px !important;
+}
+.topic-info-modal > main > .metrics > .holder-count,
+.topic-info-modal > main > .metrics > .price,
+.topic-info-modal > main > .balance-and-fees {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.topic-info-modal > main > .metrics > .holder-count h3,
+.topic-info-modal > main > .metrics > .price h3,
+.topic-info-modal > main > .balance-and-fees h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.topic-info-modal > main > .metrics > .holder-count .value,
+.topic-info-modal > main > .metrics > .price .value,
+.topic-info-modal > main > .balance-and-fees .value {
+  font-size: 16px;
+}
+.topic-info-modal > main > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.topic-info-modal > main > .metrics > .holder-count,
+.topic-info-modal > main > .metrics > .price {
+  width: 50%;
+}
+.topic-info-modal > main > .balance-and-fees {
+  flex-direction: row;
+  gap: 10px;
+}
+.topic-info-modal > main > .balance-and-fees > .info {
+  flex-grow: 1;
+}
+.topic-info-modal > main > .balance-and-fees > .info > .balance,
+.topic-info-modal > main > .balance-and-fees > .info > .fees {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .creators-view {
   height: 100%;
 }
@@ -1560,6 +1620,66 @@ button.component:hover {
   font-size: 16px;
   cursor: pointer;
 }
+.group-info-modal > header {
+  display: flex;
+  gap: 12px;
+}
+.group-info-modal > header > h1 > .image {
+  width: 34px;
+  height: 34px;
+}
+.group-info-modal > header > h1 > .name {
+  text-transform: initial;
+}
+.group-info-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px !important;
+}
+.group-info-modal > main > .metrics > .holder-count,
+.group-info-modal > main > .metrics > .price,
+.group-info-modal > main > .balance-and-fees {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.group-info-modal > main > .metrics > .holder-count h3,
+.group-info-modal > main > .metrics > .price h3,
+.group-info-modal > main > .balance-and-fees h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.group-info-modal > main > .metrics > .holder-count .value,
+.group-info-modal > main > .metrics > .price .value,
+.group-info-modal > main > .balance-and-fees .value {
+  font-size: 16px;
+}
+.group-info-modal > main > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.group-info-modal > main > .metrics > .holder-count,
+.group-info-modal > main > .metrics > .price {
+  width: 50%;
+}
+.group-info-modal > main > .balance-and-fees {
+  flex-direction: row;
+  gap: 10px;
+}
+.group-info-modal > main > .balance-and-fees > .info {
+  flex-grow: 1;
+}
+.group-info-modal > main > .balance-and-fees > .info > .balance,
+.group-info-modal > main > .balance-and-fees > .info > .fees {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .login-required {
   background-color: var(--panel-bg-color);
   border: 1px solid var(--line-color);
@@ -1573,6 +1693,63 @@ button.component:hover {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+.user-info-modal > header {
+  display: flex;
+  gap: 12px;
+}
+.user-info-modal > header > h1 > .avatar {
+  width: 34px;
+  height: 34px;
+}
+.user-info-modal > header > h1 > .name {
+  text-transform: initial;
+}
+.user-info-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px !important;
+}
+.user-info-modal > main > .metrics > .holder-count,
+.user-info-modal > main > .metrics > .price,
+.user-info-modal > main > .balance {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.user-info-modal > main > .metrics > .holder-count h3,
+.user-info-modal > main > .metrics > .price h3,
+.user-info-modal > main > .balance h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.user-info-modal > main > .metrics > .holder-count .value,
+.user-info-modal > main > .metrics > .price .value,
+.user-info-modal > main > .balance .value {
+  font-size: 16px;
+}
+.user-info-modal > main > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.user-info-modal > main > .metrics > .holder-count,
+.user-info-modal > main > .metrics > .price {
+  width: 50%;
+}
+.user-info-modal > main > .balance {
+  flex-direction: row;
+  gap: 10px;
+}
+.user-info-modal > main > .balance > .info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 @font-face {
   font-family: 'Mona-Sans-ExtraBoldWide';

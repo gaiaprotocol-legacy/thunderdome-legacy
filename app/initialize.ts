@@ -41,7 +41,7 @@ export default async function initialize(config: Config) {
   Env.contractAddresses = {
     [ContractType.CreatorKeys]: "0x298c92D5af8eEFA02b55dE45cb2337704af1b894",
     [ContractType.GroupKeys]: "0xe741b5DF37FB86eaB58F616dA0f4BfF10251C37a",
-    [ContractType.TopicKeys]: "0x30A87277204c9C56DDc7Df998829B27aC1DdF623",
+    [ContractType.TopicKeys]: "0x89ef657f8c32197D7852f4Bb410e87afEfcb6B59",
   };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
   Env.defaultTopic = "thunderdome";
@@ -60,7 +60,7 @@ export default async function initialize(config: Config) {
 
   await SplashLoader.load(el("img", { src: "/images/logo-transparent.png" }), [
     FSESFSignedUserManager.fetchUserOnInit(),
-    BlockTimeManager.init(0.5),
+    BlockTimeManager.init(0.3),
   ]);
 
   Router.route("**", FSESFLayout);

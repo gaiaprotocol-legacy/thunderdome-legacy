@@ -53,7 +53,9 @@ serveWithOptions(async (req) => {
       data.reference_key = args[0];
     } else if (eventName === "Trade" || eventName === "ClaimHolderFee") {
       data.wallet_address = args[0];
-      data.reference_key = args[1];
+      data.reference_key = contractType === 2
+        ? ethers.decodeBytes32String(args[1])
+        : args[1];
     }
 
     const { error: saveEventError } = await supabase
