@@ -12,6 +12,7 @@ import {
   Env,
   FSESFLayout,
   FSESFSignedUserManager,
+  GroupChatRoomView,
   GroupsView,
   inject_fsesf_msg,
   MyCreatorsView,
@@ -78,6 +79,7 @@ export default async function initialize(config: Config) {
     GroupsView,
   );
   Router.route(["groups", "group/{groupId}"], MyGroupsView);
+  Router.route(["groups", "group/{groupId}"], GroupChatRoomView);
 
   Router.route(["topics", "topic/{topic}"], TopicsView);
   Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
