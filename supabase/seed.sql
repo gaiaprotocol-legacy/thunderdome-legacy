@@ -27,6 +27,49 @@ end;$$;
 
 ALTER FUNCTION "public"."create_creator_key"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(creator_address text, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone, creator_user_id uuid, creator_wallet_address text, creator_display_name text, creator_avatar text, creator_avatar_thumb text, creator_stored_avatar text, creator_stored_avatar_thumb text, creator_x_username text)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.creator_address,
+        t.supply::text,
+        t.last_fetched_price::text,
+        t.total_trading_volume::text,
+        t.is_price_up,
+        t.last_message,
+        t.last_message_sent_at,
+        t.holder_count,
+        t.last_purchased_at,
+        t.created_at,
+        t.updated_at,
+        u.user_id AS owner_user_id,
+        u.wallet_address AS owner_wallet_address,
+        u.display_name AS owner_display_name,
+        u.avatar AS owner_avatar,
+        u.avatar_thumb AS owner_avatar_thumb,
+        u.stored_avatar AS owner_stored_avatar,
+        u.stored_avatar_thumb AS owner_stored_avatar_thumb,
+        u.x_username AS owner_x_username
+    FROM 
+        public.creator_keys t
+    LEFT JOIN 
+        public.creator_key_holders th ON t.creator_address = th.creator_address AND th.wallet_address = p_wallet_address
+    LEFT JOIN 
+        "public"."users_public" u ON t.creator_address = u.wallet_address
+    WHERE 
+        (t.creator_address = p_wallet_address OR th.wallet_address = p_wallet_address)
+        AND (p_last_message_sent_at IS NULL OR t.last_message_sent_at < p_last_message_sent_at)
+    ORDER BY 
+        t.last_message_sent_at DESC
+    LIMIT 
+        max_count;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(topic text, image text, image_thumb text, metadata jsonb, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone)
     LANGUAGE "plpgsql"
     AS $$
@@ -81,9 +124,9 @@ BEGIN
 
         -- add key info
         insert into group_keys (
-            group_id, owner, name, symbol
+            group_id, owner
         ) values (
-            new.args[2], new.args[1], new.args[3], new.args[4]
+            new.args[2], new.args[1]
         );
 
         -- add key holder info
@@ -559,7 +602,7 @@ ALTER TABLE "public"."group_key_holders" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."group_keys" (
     "group_id" text NOT NULL,
     "owner" text NOT NULL,
-    "name" text NOT NULL,
+    "name" text,
     "image" text,
     "image_thumb" text,
     "image_stored" boolean DEFAULT false NOT NULL,
@@ -862,6 +905,10 @@ ALTER TABLE "public"."users_public" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "view everyone" ON "public"."contract_events" FOR SELECT USING (true);
 
+CREATE POLICY "view everyone" ON "public"."creator_keys" FOR SELECT USING (true);
+
+CREATE POLICY "view everyone" ON "public"."group_keys" FOR SELECT USING (true);
+
 CREATE POLICY "view everyone" ON "public"."topic_chat_messages" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."topic_keys" FOR SELECT USING (true);
@@ -896,6 +943,10 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "anon";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "authenticated";

@@ -58,12 +58,12 @@ export default async function initialize(config: Config) {
 
   Router.route([
     "creators",
-    "creator/{creatorXUsername}",
+    "creator/{creatorAddress}",
     "creators/trending",
     "creators/top",
     "creators/new",
   ], CreatorsView);
-  Router.route("creators", MyCreatorsView);
+  Router.route(["creators", "creator/{creatorAddress}"], MyCreatorsView);
 
   Router.route(
     [
@@ -75,7 +75,7 @@ export default async function initialize(config: Config) {
     ],
     GroupsView,
   );
-  Router.route("groups", MyGroupsView);
+  Router.route(["groups", "group/{groupId}"], MyGroupsView);
 
   Router.route(["topics", "topic/{topic}"], TopicsView);
   Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
