@@ -7,6 +7,7 @@ import {
   SplashLoader,
 } from "@common-module/app";
 import {
+  ContractType,
   CreatorChatRoomView,
   CreatorsView,
   Env,
@@ -34,6 +35,11 @@ export default async function initialize(config: Config) {
   Env.blockchain = {
     ...config.blockchain,
     symbolDisplay: "FTM",
+  };
+  Env.contractAddresses = {
+    [ContractType.CreatorKeys]: "0x298c92D5af8eEFA02b55dE45cb2337704af1b894",
+    [ContractType.GroupKeys]: "0xe741b5DF37FB86eaB58F616dA0f4BfF10251C37a",
+    [ContractType.TopicKeys]: "0xdf98e88944be3bc7C861135dAc617AD562EBB8D0",
   };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
   Env.defaultTopic = "thunderdome";
