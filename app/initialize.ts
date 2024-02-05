@@ -54,7 +54,7 @@ export default async function initialize(config: Config) {
 
   Router.route("**", FSESFLayout);
 
-  Router.route("about", AboutView);
+  Router.route(["", "about"], AboutView);
 
   Router.route([
     "creators",

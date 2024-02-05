@@ -27,6 +27,42 @@ end;$$;
 
 ALTER FUNCTION "public"."create_creator_key"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(topic text, image text, image_thumb text, metadata jsonb, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.topic,
+        t.image,
+        t.image_thumb,
+        t.metadata,
+        t.supply::text,
+        t.last_fetched_price::text,
+        t.total_trading_volume::text,
+        t.is_price_up,
+        t.last_message,
+        t.last_message_sent_at,
+        t.holder_count,
+        t.last_purchased_at,
+        t.created_at,
+        t.updated_at
+    FROM 
+        public.topic_keys t
+    JOIN 
+        public.topic_key_holders th ON t.topic = th.topic AND th.wallet_address = p_wallet_address
+    WHERE 
+        th.wallet_address = p_wallet_address
+        AND (p_last_message_sent_at IS NULL OR t.last_message_sent_at < p_last_message_sent_at)
+    ORDER BY 
+        t.last_message_sent_at DESC
+    LIMIT 
+        max_count;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."parse_contract_event"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$DECLARE
@@ -816,6 +852,8 @@ CREATE POLICY "view everyone" ON "public"."group_chat_messages" FOR SELECT USING
 
 CREATE POLICY "view everyone" ON "public"."topic_chat_messages" FOR SELECT USING (true);
 
+CREATE POLICY "view everyone" ON "public"."topic_keys" FOR SELECT USING (true);
+
 CREATE POLICY "view everyone" ON "public"."user_wallets" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."users_public" FOR SELECT USING (true);
@@ -830,6 +868,10 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "anon";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "anon";
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "authenticated";
