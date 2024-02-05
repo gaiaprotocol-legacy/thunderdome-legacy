@@ -27,6 +27,86 @@ end;$$;
 
 ALTER FUNCTION "public"."create_creator_key"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."get_creator_key"(p_creator_address text) RETURNS TABLE(creator_address text, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone, creator_user_id uuid, creator_wallet_address text, creator_display_name text, creator_avatar text, creator_avatar_thumb text, creator_stored_avatar text, creator_stored_avatar_thumb text, creator_x_username text)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.creator_address,
+        t.supply::text,
+        t.last_fetched_price::text,
+        t.total_trading_volume::text,
+        t.is_price_up,
+        t.last_message,
+        t.last_message_sent_at,
+        t.holder_count,
+        t.last_purchased_at,
+        t.created_at,
+        t.updated_at,
+        u.user_id AS owner_user_id,
+        u.wallet_address AS owner_wallet_address,
+        u.display_name AS owner_display_name,
+        u.avatar AS owner_avatar,
+        u.avatar_thumb AS owner_avatar_thumb,
+        u.stored_avatar AS owner_stored_avatar,
+        u.stored_avatar_thumb AS owner_stored_avatar_thumb,
+        u.x_username AS owner_x_username
+    FROM 
+        public.creator_keys t
+    LEFT JOIN 
+        "public"."users_public" u ON t.creator_address = u.wallet_address
+    WHERE 
+        t.creator_address = p_creator_address;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_creator_key"(p_creator_address text) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_group_key"(p_group_id text) RETURNS TABLE(group_id text, owner text, name text, image text, image_thumb text, image_stored boolean, stored_image text, stored_image_thumb text, metadata jsonb, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone, owner_user_id uuid, owner_wallet_address text, owner_display_name text, owner_avatar text, owner_avatar_thumb text, owner_stored_avatar text, owner_stored_avatar_thumb text, owner_x_username text)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.group_id,
+        t.owner,
+        t.name,
+        t.image,
+        t.image_thumb,
+        t.image_stored,
+        t.stored_image,
+        t.stored_image_thumb,
+        t.metadata,
+        t.supply::text,
+        t.last_fetched_price::text,
+        t.total_trading_volume::text,
+        t.is_price_up,
+        t.last_message,
+        t.last_message_sent_at,
+        t.holder_count,
+        t.last_purchased_at,
+        t.created_at,
+        t.updated_at,
+        u.user_id AS owner_user_id,
+        u.wallet_address AS owner_wallet_address,
+        u.display_name AS owner_display_name,
+        u.avatar AS owner_avatar,
+        u.avatar_thumb AS owner_avatar_thumb,
+        u.stored_avatar AS owner_stored_avatar,
+        u.stored_avatar_thumb AS owner_stored_avatar_thumb,
+        u.x_username AS owner_x_username
+    FROM 
+        public.creator_keys t
+    LEFT JOIN 
+        "public"."users_public" u ON t.owner = u.wallet_address
+    WHERE 
+        t.group_id = p_group_id;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_group_key"(p_group_id text) OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(creator_address text, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone, creator_user_id uuid, creator_wallet_address text, creator_display_name text, creator_avatar text, creator_avatar_thumb text, creator_stored_avatar text, creator_stored_avatar_thumb text, creator_x_username text)
     LANGUAGE "plpgsql"
     AS $$
@@ -70,6 +150,57 @@ $$;
 
 ALTER FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."get_held_or_owned_group_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(group_id text, owner text, name text, image text, image_thumb text, image_stored boolean, stored_image text, stored_image_thumb text, metadata jsonb, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone, owner_user_id uuid, owner_wallet_address text, owner_display_name text, owner_avatar text, owner_avatar_thumb text, owner_stored_avatar text, owner_stored_avatar_thumb text, owner_x_username text)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.group_id,
+        t.owner,
+        t.name,
+        t.image,
+        t.image_thumb,
+        t.image_stored,
+        t.stored_image,
+        t.stored_image_thumb,
+        t.metadata,
+        t.supply::text,
+        t.last_fetched_price::text,
+        t.total_trading_volume::text,
+        t.is_price_up,
+        t.last_message,
+        t.last_message_sent_at,
+        t.holder_count,
+        t.last_purchased_at,
+        t.created_at,
+        t.updated_at,
+        u.user_id AS owner_user_id,
+        u.wallet_address AS owner_wallet_address,
+        u.display_name AS owner_display_name,
+        u.avatar AS owner_avatar,
+        u.avatar_thumb AS owner_avatar_thumb,
+        u.stored_avatar AS owner_stored_avatar,
+        u.stored_avatar_thumb AS owner_stored_avatar_thumb,
+        u.x_username AS owner_x_username
+    FROM 
+        public.group_keys t
+    LEFT JOIN 
+        public.group_key_holders th ON t.group_id = th.group_id AND th.wallet_address = p_wallet_address
+    LEFT JOIN 
+        "public"."users_public" u ON t.owner = u.wallet_address
+    WHERE 
+        (t.owner = p_wallet_address OR th.wallet_address = p_wallet_address)
+        AND (p_last_message_sent_at IS NULL OR t.last_message_sent_at < p_last_message_sent_at)
+    ORDER BY 
+        t.last_message_sent_at DESC
+    LIMIT 
+        max_count;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_held_or_owned_group_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(topic text, image text, image_thumb text, metadata jsonb, supply text, last_fetched_price text, total_trading_volume text, is_price_up boolean, last_message text, last_message_sent_at timestamp with time zone, holder_count integer, last_purchased_at timestamp with time zone, created_at timestamp with time zone, updated_at timestamp with time zone)
     LANGUAGE "plpgsql"
     AS $$
@@ -105,6 +236,113 @@ END;
 $$;
 
 ALTER FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_key_holders"(p_key_type smallint, p_reference_key text, last_balance numeric DEFAULT NULL::numeric, max_count integer DEFAULT 50) RETURNS TABLE(user_id uuid, wallet_address text, total_earned_trading_fees numeric, display_name text, avatar text, avatar_thumb text, avatar_stored boolean, stored_avatar text, stored_avatar_thumb text, x_username text, metadata jsonb, points integer, blocked boolean, created_at timestamp with time zone, updated_at timestamp with time zone, balance text)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        u.user_id,
+        u.wallet_address,
+        u.total_earned_trading_fees,
+        u.display_name,
+        u.avatar,
+        u.avatar_thumb,
+        u.avatar_stored,
+        u.stored_avatar,
+        u.stored_avatar_thumb,
+        u.x_username,
+        u.metadata,
+        u.points,
+        u.blocked,
+        u.created_at,
+        u.updated_at,
+        kh.last_fetched_balance::text AS balance
+    FROM 
+        public.users_public u
+    INNER JOIN 
+        LATERAL (
+            SELECT * FROM public.creator_key_holders WHERE p_key_type = 0 AND creator_address = p_reference_key
+            UNION ALL
+            SELECT * FROM public.group_key_holders WHERE p_key_type = 1 AND group_id = p_reference_key
+            UNION ALL
+            SELECT * FROM public.topic_key_holders WHERE p_key_type = 2 AND topic = p_reference_key
+        ) kh ON u.wallet_address = kh.wallet_address
+    WHERE 
+        last_balance IS NULL OR kh.last_fetched_balance > last_balance
+    ORDER BY 
+        kh.last_fetched_balance DESC
+    LIMIT 
+        max_count;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_key_holders"(p_key_type smallint, p_reference_key text, last_balance numeric, max_count integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_target_activities"(p_key_type smallint, p_reference_key text, last_created_at timestamp with time zone DEFAULT NULL::timestamp with time zone, max_count integer DEFAULT 100) RETURNS TABLE(block_number bigint, log_index bigint, tx text, wallet_address text, key_type smallint, reference_key text, activity_name text, args text[], created_at timestamp with time zone, user_id uuid, user_display_name text, user_avatar text, user_avatar_thumb text, user_stored_avatar text, user_stored_avatar_thumb text, user_x_username text, key_name text, key_image_thumb text, key_stored_image_thumb text)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        a.block_number,
+        a.log_index,
+        a.tx,
+        a.wallet_address,
+        a.key_type,
+        a.reference_key,
+        a.activity_name,
+        a.args,
+        a.created_at,
+        u.user_id,
+        u.display_name as user_display_name,
+        u.avatar as user_avatar,
+        u.avatar_thumb as user_avatar_thumb,
+        u.stored_avatar as user_stored_avatar,
+        u.stored_avatar_thumb as user_stored_avatar_thumb,
+        u.x_username as user_x_username,
+        k.key_name,
+        k.key_image_thumb,
+        k.key_stored_image_thumb
+    FROM 
+        "public"."activities" a
+    LEFT JOIN 
+        "public"."users_public" u ON a.wallet_address = u.wallet_address
+    INNER JOIN 
+        LATERAL (
+            SELECT
+                users_public.wallet_address as reference_key,
+                display_name as key_name,
+                avatar_thumb as key_image_thumb,
+                stored_avatar_thumb as key_stored_image_thumb
+            FROM public.users_public WHERE p_key_type = 0 AND users_public.wallet_address = p_reference_key
+            UNION ALL
+            SELECT
+                group_id as reference_key,
+                name as key_name,
+                image_thumb as key_image_thumb,
+                stored_image_thumb as key_stored_image_thumb
+            FROM public.group_keys WHERE p_key_type = 1 AND group_id = p_reference_key
+            UNION ALL
+            SELECT
+                topic as reference_key,
+                topic as key_name,
+                image_thumb as key_image_thumb,
+                image_thumb as key_stored_image_thumb
+            FROM public.topic_keys WHERE p_key_type = 2 AND topic = p_reference_key
+        ) k ON a.reference_key = k.reference_key
+    WHERE
+        a.key_type = p_key_type AND a.reference_key = p_reference_key
+        AND (last_created_at IS NULL OR a.created_at < last_created_at)
+    ORDER BY 
+        a.created_at DESC
+    LIMIT 
+        max_count;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_target_activities"(p_key_type smallint, p_reference_key text, last_created_at timestamp with time zone, max_count integer) OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."parse_contract_event"() RETURNS trigger
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -511,12 +749,13 @@ ALTER TABLE "public"."activities" OWNER TO "postgres";
 CREATE TABLE IF NOT EXISTS "public"."contract_events" (
     "block_number" bigint NOT NULL,
     "log_index" bigint NOT NULL,
-    "event_type" smallint NOT NULL,
+    "event_name" text NOT NULL,
     "args" text[] DEFAULT '{}'::text[] NOT NULL,
-    "wallet_address" text NOT NULL,
+    "wallet_address" text,
     "key_type" smallint,
     "reference_key" text,
-    "created_at" timestamp with time zone DEFAULT now() NOT NULL
+    "created_at" timestamp with time zone DEFAULT now() NOT NULL,
+    "tx" text NOT NULL
 );
 
 ALTER TABLE "public"."contract_events" OWNER TO "postgres";
@@ -944,13 +1183,33 @@ GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "anon";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_creator_key"() TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."get_creator_key"(p_creator_address text) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_creator_key"(p_creator_address text) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_creator_key"(p_creator_address text) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_group_key"(p_group_id text) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_group_key"(p_group_id text) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_group_key"(p_group_id text) TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_held_or_owned_creator_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."get_held_or_owned_group_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_held_or_owned_group_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_held_or_owned_group_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_held_topic_keys"(p_wallet_address text, p_last_message_sent_at timestamp with time zone, max_count integer) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_key_holders"(p_key_type smallint, p_reference_key text, last_balance numeric, max_count integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_key_holders"(p_key_type smallint, p_reference_key text, last_balance numeric, max_count integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_key_holders"(p_key_type smallint, p_reference_key text, last_balance numeric, max_count integer) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_target_activities"(p_key_type smallint, p_reference_key text, last_created_at timestamp with time zone, max_count integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_target_activities"(p_key_type smallint, p_reference_key text, last_created_at timestamp with time zone, max_count integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_target_activities"(p_key_type smallint, p_reference_key text, last_created_at timestamp with time zone, max_count integer) TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "anon";
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "authenticated";
