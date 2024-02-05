@@ -7,6 +7,7 @@ import {
   SplashLoader,
 } from "@common-module/app";
 import {
+  CreatorChatRoomView,
   CreatorsView,
   Env,
   FSESFLayout,
@@ -64,6 +65,7 @@ export default async function initialize(config: Config) {
     "creators/new",
   ], CreatorsView);
   Router.route(["creators", "creator/{creatorAddress}"], MyCreatorsView);
+  Router.route(["creators", "creator/{creatorAddress}"], CreatorChatRoomView);
 
   Router.route(
     [

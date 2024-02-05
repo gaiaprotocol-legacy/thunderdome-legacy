@@ -1,3 +1,6 @@
+/*!***********************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
+  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -98,6 +101,9 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
+  \*********************************************************************************************************************************************/
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -1347,6 +1353,35 @@ button.component:hover {
     overflow-y: visible;
     border-right: none;
   }
+}
+.creator-chat-room-view {
+  top: 60px;
+  height: calc(100% - 60px);
+}
+.creator-chat-room-header {
+  height: 56px;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.creator-chat-room-header > button.back {
+  display: none;
+}
+@container (width < 1280px) {
+  .creator-chat-room-header > button.back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+.creator-chat-room-header > .avatar {
+  width: 32px;
+  height: 32px;
+}
+.creator-chat-room-header > h1 {
+  font-size: 16px;
 }
 .groups-view {
   height: 100%;
