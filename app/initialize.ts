@@ -21,6 +21,7 @@ import {
   WalletManager,
 } from "fsesf";
 import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
+import AboutView from "./AboutView.js";
 import Config from "./Config.js";
 
 inject_fsesf_msg();
@@ -52,6 +53,8 @@ export default async function initialize(config: Config) {
   ]);
 
   Router.route("**", FSESFLayout);
+
+  Router.route("about", AboutView);
 
   Router.route([
     "creators",
