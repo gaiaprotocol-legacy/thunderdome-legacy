@@ -327,6 +327,84 @@ button.component:hover {
   justify-content: flex-end;
   gap: 8px;
 }
+.adaptive-modal-background {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999998;
+  width: 100%;
+  height: 100%;
+  background-color: var(--popup-bg-color);
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  padding: 20px 0;
+}
+@container (width < 1280px) {
+  .adaptive-modal-background {
+    padding: 0;
+  }
+}
+.adaptive-modal.component {
+  max-width: 614px;
+  width: 90%;
+  margin: auto;
+  border: 1px solid var(--line-color);
+  border-radius: 16px;
+  background-color: var(--content-bg-color);
+}
+@container (width < 1280px) {
+  .adaptive-modal.component {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}
+.adaptive-modal.component > header {
+  display: flex;
+  align-items: center;
+  padding: 24px;
+}
+@container (width < 1280px) {
+  .adaptive-modal.component > header {
+    padding: 16px 12px;
+    border-bottom: 1px solid var(--line-color);
+  }
+}
+.adaptive-modal.component > header > button.back {
+  display: none;
+}
+.adaptive-modal.component > header > h1 {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+@container (width < 1280px) {
+  .adaptive-modal.component > header > button.back {
+    display: block;
+  }
+  .adaptive-modal.component > header > button.close {
+    display: none;
+  }
+}
+.adaptive-modal.component > main {
+  padding: 0 24px;
+}
+.adaptive-modal.component > footer {
+  padding: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@container (width < 1280px) {
+  .adaptive-modal.component > footer {
+    display: none;
+  }
+}
 @keyframes loading-spinner-animation {
   0% {
     transform: rotate(0deg);
@@ -1298,6 +1376,11 @@ button.component:hover {
   align-items: center;
   gap: 8px;
 }
+@container (width < 1280px) {
+  .topic-chat-room-header {
+    padding: 0 10px;
+  }
+}
 .topic-chat-room-header > button.back {
   display: none;
 }
@@ -1309,10 +1392,12 @@ button.component:hover {
   }
 }
 .topic-chat-room-header > h1 {
+  flex-grow: 1;
   display: flex;
   align-items: center;
   font-size: 16px;
   font-family: 'Proto Mono';
+  cursor: pointer;
 }
 .topic-chat-room-header > h1 > .image {
   width: 24px;
@@ -1332,6 +1417,66 @@ button.component:hover {
 }
 .topic-chat-room-list-item > main > .last-message {
   padding-left: 4px;
+}
+.topic-info-modal > header {
+  display: flex;
+  gap: 12px;
+}
+.topic-info-modal > header > h1 > .image {
+  width: 34px;
+  height: 34px;
+}
+.topic-info-modal > header > h1 > .name {
+  text-transform: initial;
+}
+.topic-info-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px !important;
+}
+.topic-info-modal > main > .metrics > .holder-count,
+.topic-info-modal > main > .metrics > .price,
+.topic-info-modal > main > .balance-and-fees {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.topic-info-modal > main > .metrics > .holder-count h3,
+.topic-info-modal > main > .metrics > .price h3,
+.topic-info-modal > main > .balance-and-fees h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.topic-info-modal > main > .metrics > .holder-count .value,
+.topic-info-modal > main > .metrics > .price .value,
+.topic-info-modal > main > .balance-and-fees .value {
+  font-size: 16px;
+}
+.topic-info-modal > main > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.topic-info-modal > main > .metrics > .holder-count,
+.topic-info-modal > main > .metrics > .price {
+  width: 50%;
+}
+.topic-info-modal > main > .balance-and-fees {
+  flex-direction: row;
+  gap: 10px;
+}
+.topic-info-modal > main > .balance-and-fees > .info {
+  flex-grow: 1;
+}
+.topic-info-modal > main > .balance-and-fees > .info > .balance,
+.topic-info-modal > main > .balance-and-fees > .info > .fees {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .creators-view {
   height: 100%;
@@ -1371,6 +1516,11 @@ button.component:hover {
   align-items: center;
   gap: 8px;
 }
+@container (width < 1280px) {
+  .creator-chat-room-header {
+    padding: 0 10px;
+  }
+}
 .creator-chat-room-header > button.back {
   display: none;
 }
@@ -1384,9 +1534,12 @@ button.component:hover {
 .creator-chat-room-header > .avatar {
   width: 32px;
   height: 32px;
+  cursor: pointer;
 }
 .creator-chat-room-header > h1 {
+  flex-grow: 1;
   font-size: 16px;
+  cursor: pointer;
 }
 .groups-view {
   height: 100%;
@@ -1436,6 +1589,11 @@ button.component:hover {
   align-items: center;
   gap: 8px;
 }
+@container (width < 1280px) {
+  .group-chat-room-header {
+    padding: 0 10px;
+  }
+}
 .group-chat-room-header > button.back {
   display: none;
 }
@@ -1449,9 +1607,72 @@ button.component:hover {
 .group-chat-room-header > .avatar {
   width: 32px;
   height: 32px;
+  cursor: pointer;
 }
 .group-chat-room-header > h1 {
+  flex-grow: 1;
   font-size: 16px;
+  cursor: pointer;
+}
+.group-info-modal > header {
+  display: flex;
+  gap: 12px;
+}
+.group-info-modal > header > h1 > .image {
+  width: 34px;
+  height: 34px;
+}
+.group-info-modal > header > h1 > .name {
+  text-transform: initial;
+}
+.group-info-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px !important;
+}
+.group-info-modal > main > .metrics > .holder-count,
+.group-info-modal > main > .metrics > .price,
+.group-info-modal > main > .balance-and-fees {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.group-info-modal > main > .metrics > .holder-count h3,
+.group-info-modal > main > .metrics > .price h3,
+.group-info-modal > main > .balance-and-fees h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.group-info-modal > main > .metrics > .holder-count .value,
+.group-info-modal > main > .metrics > .price .value,
+.group-info-modal > main > .balance-and-fees .value {
+  font-size: 16px;
+}
+.group-info-modal > main > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.group-info-modal > main > .metrics > .holder-count,
+.group-info-modal > main > .metrics > .price {
+  width: 50%;
+}
+.group-info-modal > main > .balance-and-fees {
+  flex-direction: row;
+  gap: 10px;
+}
+.group-info-modal > main > .balance-and-fees > .info {
+  flex-grow: 1;
+}
+.group-info-modal > main > .balance-and-fees > .info > .balance,
+.group-info-modal > main > .balance-and-fees > .info > .fees {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .login-required {
   background-color: var(--panel-bg-color);
@@ -1466,6 +1687,63 @@ button.component:hover {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+.user-info-modal > header {
+  display: flex;
+  gap: 12px;
+}
+.user-info-modal > header > h1 > .avatar {
+  width: 34px;
+  height: 34px;
+}
+.user-info-modal > header > h1 > .name {
+  text-transform: initial;
+}
+.user-info-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px !important;
+}
+.user-info-modal > main > .metrics > .holder-count,
+.user-info-modal > main > .metrics > .price,
+.user-info-modal > main > .balance {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.user-info-modal > main > .metrics > .holder-count h3,
+.user-info-modal > main > .metrics > .price h3,
+.user-info-modal > main > .balance h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.user-info-modal > main > .metrics > .holder-count .value,
+.user-info-modal > main > .metrics > .price .value,
+.user-info-modal > main > .balance .value {
+  font-size: 16px;
+}
+.user-info-modal > main > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.user-info-modal > main > .metrics > .holder-count,
+.user-info-modal > main > .metrics > .price {
+  width: 50%;
+}
+.user-info-modal > main > .balance {
+  flex-direction: row;
+  gap: 10px;
+}
+.user-info-modal > main > .balance > .info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 @font-face {
   font-family: 'Mona-Sans-ExtraBoldWide';
