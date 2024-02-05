@@ -7,6 +7,7 @@ import {
   SplashLoader,
 } from "@common-module/app";
 import {
+  BlockTimeManager,
   ContractType,
   CreatorChatRoomView,
   CreatorsView,
@@ -32,6 +33,7 @@ inject_fsesf_msg();
 MaterialIconSystem.launch();
 
 export default async function initialize(config: Config) {
+  Env.keyName = "ticket";
   Env.blockchain = {
     ...config.blockchain,
     symbolDisplay: "FTM",
@@ -58,6 +60,7 @@ export default async function initialize(config: Config) {
 
   await SplashLoader.load(el("img", { src: "/images/logo-transparent.png" }), [
     FSESFSignedUserManager.fetchUserOnInit(),
+    BlockTimeManager.init(0.5),
   ]);
 
   Router.route("**", FSESFLayout);
