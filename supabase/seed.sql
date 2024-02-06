@@ -773,7 +773,7 @@ BEGIN
                 ) on conflict (creator_address) do update
                     set supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
-                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    total_trading_volume = creator_keys.total_trading_volume + new.args[5]::numeric,
                     is_price_up = true,
                     last_purchased_at = now();
 
@@ -798,7 +798,7 @@ BEGIN
                 update group_keys set
                     supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
-                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    total_trading_volume = group_keys.total_trading_volume + new.args[5]::numeric,
                     is_price_up = true,
                     last_purchased_at = now()
                 where group_id = new.reference_key;
@@ -828,7 +828,7 @@ BEGIN
                 ) on conflict (topic) do update
                     set supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
-                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    total_trading_volume = topic_keys.total_trading_volume + new.args[5]::numeric,
                     is_price_up = true,
                     last_purchased_at = now();
 
@@ -866,7 +866,7 @@ BEGIN
                 update creator_keys set
                     supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
-                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    total_trading_volume = creator_keys.total_trading_volume + new.args[5]::numeric,
                     is_price_up = false
                 where creator_address = new.reference_key;
 
@@ -896,7 +896,7 @@ BEGIN
                 update group_keys set
                     supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
-                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    total_trading_volume = group_keys.total_trading_volume + new.args[5]::numeric,
                     is_price_up = false
                 where group_id = new.reference_key;
 
@@ -926,7 +926,7 @@ BEGIN
                 update topic_keys set
                     supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
-                    total_trading_volume = total_trading_volume + new.args[5]::numeric,
+                    total_trading_volume = topic_keys.total_trading_volume + new.args[5]::numeric,
                     is_price_up = false
                 where topic = new.reference_key;
 
