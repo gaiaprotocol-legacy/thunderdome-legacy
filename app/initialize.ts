@@ -20,6 +20,7 @@ import {
   MyCreatorsView,
   MyGroupsView,
   PointsView,
+  SettingsView,
   TopicChatRoomView,
   TopicsView,
   TrendingCreatorsView,
@@ -95,6 +96,8 @@ export default async function initialize(config: Config) {
   Router.route(["topics", "topic/{topic}"], TopicsView);
   Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
   Router.route(["points", "points/leaderboard"], PointsView);
+
+  Router.route("settings", SettingsView);
 
   AuthUtil.checkEmailAccess();
 }

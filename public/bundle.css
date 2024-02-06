@@ -1,3 +1,6 @@
+/*!***********************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
+  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -98,6 +101,9 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
+  \*********************************************************************************************************************************************/
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -1818,6 +1824,45 @@ button.component:hover {
 }
 .key-list-item > main > main > .price.down {
   color: var(--falling-color);
+}
+.settings-view {
+  padding: 20px;
+}
+.settings-view > section {
+  border: 1px solid var(--line-color);
+  border-radius: 16px;
+  background-color: var(--content-bg-color);
+}
+.settings-view > section > header {
+  display: flex;
+  align-items: center;
+  padding: 24px;
+}
+.settings-view > section > header > h2 {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.settings-view > section > main {
+  padding: 0 24px;
+  display: flex;
+}
+.settings-view > section > main > .linked {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 0;
+  flex-grow: 1;
+}
+.settings-view > section > footer {
+  padding: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 @font-face {
   font-family: 'Mona-Sans-ExtraBoldWide';
