@@ -1204,7 +1204,7 @@ button.component:hover {
 .side-panel > main > section > header > button {
   padding: 4px 6px;
 }
-.side-panel > main > section > .token-list {
+.side-panel > main > section > .key-list {
   border-top: 1px solid var(--line-color);
 }
 .side-panel > main > ul.menu {
@@ -1432,6 +1432,9 @@ button.component:hover {
 .topic-info-modal > header > h1 > .image {
   width: 34px;
   height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .topic-info-modal > header > h1 > .name {
   text-transform: initial;
@@ -1916,7 +1919,7 @@ button.component:hover {
   align-items: center;
 }
 .activity-list-item > header > .trader-avatar,
-.activity-list-item > header > .token-image {
+.activity-list-item > header > .key-image {
   flex-shrink: 0;
   width: 50px;
   height: 50px;
@@ -1924,6 +1927,9 @@ button.component:hover {
   background-color: #252527;
   background-size: cover;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .activity-list-item > header > .trader-avatar {
   margin-right: -8px;
