@@ -26,7 +26,7 @@ select
     $$
     select net.http_post(
         'https://dwzrduviqvesskxhtcbu.supabase.co/functions/v1/track-contract-events',
-        body := '{"contractType":"0"}'::JSONB,
+        body := '{"contractType":0}'::JSONB,
         headers := '{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3enJkdXZpcXZlc3NreGh0Y2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3NzY2MzMsImV4cCI6MjAyMjM1MjYzM30.W6MSBY3IRluB66_VkxEAoGu8Z6R77WRVoX9VcMkhlEc"}'::JSONB
     ) AS request_id;
     $$
@@ -39,7 +39,7 @@ select
     $$
     select net.http_post(
         'https://dwzrduviqvesskxhtcbu.supabase.co/functions/v1/track-contract-events',
-        body := '{"contractType":"1"}'::JSONB,
+        body := '{"contractType":1}'::JSONB,
         headers := '{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3enJkdXZpcXZlc3NreGh0Y2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3NzY2MzMsImV4cCI6MjAyMjM1MjYzM30.W6MSBY3IRluB66_VkxEAoGu8Z6R77WRVoX9VcMkhlEc"}'::JSONB
     ) AS request_id;
     $$
@@ -52,7 +52,7 @@ select
     $$
     select net.http_post(
         'https://dwzrduviqvesskxhtcbu.supabase.co/functions/v1/track-contract-events',
-        body := '{"contractType":"2"}'::JSONB,
+        body := '{"contractType":2}'::JSONB,
         headers := '{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3enJkdXZpcXZlc3NreGh0Y2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3NzY2MzMsImV4cCI6MjAyMjM1MjYzM30.W6MSBY3IRluB66_VkxEAoGu8Z6R77WRVoX9VcMkhlEc"}'::JSONB
     ) AS request_id;
     $$
