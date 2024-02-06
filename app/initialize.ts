@@ -22,6 +22,7 @@ import {
   PointsView,
   TopicChatRoomView,
   TopicsView,
+  TrendingCreatorsView,
   WalletManager,
 } from "fsesf";
 import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
@@ -76,6 +77,7 @@ export default async function initialize(config: Config) {
   ], CreatorsView);
   Router.route(["creators", "creator/{creatorAddress}"], MyCreatorsView);
   Router.route(["creators", "creator/{creatorAddress}"], CreatorChatRoomView);
+  Router.route("creators/trending", TrendingCreatorsView);
 
   Router.route(
     [
