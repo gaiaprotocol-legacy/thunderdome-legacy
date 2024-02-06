@@ -158,7 +158,7 @@ BEGIN
         u.stored_avatar_thumb AS owner_stored_avatar_thumb,
         u.x_username AS owner_x_username
     FROM 
-        public.creator_keys t
+        public.group_keys t
     LEFT JOIN 
         "public"."users_public" u ON t.owner = u.wallet_address
     WHERE 
