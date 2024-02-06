@@ -1,6 +1,3 @@
-/*!***********************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
-  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -101,9 +98,6 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
-/*!*********************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
-  \*********************************************************************************************************************************************/
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -1224,6 +1218,12 @@ button.component:hover {
 .side-panel > main > ul.menu > li > a:hover {
   background-color: var(--hover-color);
 }
+.side-panel > main > section.keys > .key-list {
+  border-top: 1px solid var(--line-color);
+}
+.side-panel > main > section.keys > .key-list:empty {
+  display: none;
+}
 .chat-room-view {
   position: absolute;
   left: 380px;
@@ -1843,6 +1843,12 @@ button.component:hover {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+.key-list-item > main > header > h3 > .image {
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+  margin-right: 6px;
+}
 .key-list-item > main > main {
   font-size: 12px;
 }
@@ -1902,6 +1908,112 @@ button.component:hover {
 }
 .activity-list-item > main > .info > .price.down {
   color: var(--falling-color);
+}
+.my-points-view {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.my-points-view > .metrics > .points,
+.my-points-view > .metrics > .rank,
+.my-points-view > .referral {
+  border: 1px solid var(--line-color);
+  border-radius: 6px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.my-points-view > .metrics > .points h3,
+.my-points-view > .metrics > .rank h3,
+.my-points-view > .referral h3 {
+  color: #595959;
+  font-size: 12px;
+}
+.my-points-view > .metrics > .points .value,
+.my-points-view > .metrics > .rank .value,
+.my-points-view > .referral .value {
+  font-size: 16px;
+}
+.my-points-view > .metrics {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+}
+.my-points-view > .metrics > .points,
+.my-points-view > .metrics > .rank {
+  width: 50%;
+}
+.my-points-view > .referral > .link {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  border: 1px solid var(--line-color);
+  border-radius: 8px;
+  padding: 4px 4px 4px 8px;
+  background-color: var(--content-bg-color);
+}
+.my-points-view > .referral > .link > button.copy {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.point-leaderboard-view > .point-leaderboard {
+  width: 100%;
+  max-width: 700px;
+  margin: 30px auto;
+}
+@container (width < 1280px) {
+  .point-leaderboard-view > .point-leaderboard {
+    margin: 0;
+  }
+}
+.point-leaderboard {
+  color: #ccc;
+}
+@container (width < 1280px) {
+  .point-leaderboard .x,
+  .point-leaderboard .discord {
+    display: none;
+  }
+}
+.point-leaderboard > thead > tr > th {
+  border-bottom: 1px solid var(--line-color);
+  padding: 12px;
+  font-weight: bold;
+  color: #fff;
+}
+.point-leaderboard > tbody:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--disable-color);
+  padding: 8px 12px;
+}
+.point-leaderboard > tbody > tr > td {
+  border-bottom: 1px solid var(--line-color);
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+.point-leaderboard > tbody > tr > td > .user {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line-color);
+  border-radius: 19px;
+  padding: 5px 14px 5px 5px;
+}
+.point-leaderboard > tbody > tr > td > .user:hover {
+  background-color: var(--hover-color);
+}
+.point-leaderboard > tbody > tr > td > .user > .avatar {
+  width: 26px;
+  height: 26px;
+}
+.point-leaderboard > tbody > tr > td.points {
+  font-weight: bold;
+  color: var(--primary-color);
 }
 .settings-view {
   padding: 20px;

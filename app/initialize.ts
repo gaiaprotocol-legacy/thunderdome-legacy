@@ -19,8 +19,10 @@ import {
   inject_fsesf_msg,
   MyCreatorsView,
   MyGroupsView,
+  MyPointsView,
   NewCreatorsView,
   NewGroupsView,
+  PointLeaderboardView,
   PointsView,
   SettingsView,
   TopCreatorsView,
@@ -40,6 +42,7 @@ inject_fsesf_msg();
 MaterialIconSystem.launch();
 
 export default async function initialize(config: Config) {
+  Env.domain = "thunderdome.so";
   Env.keyName = "ticket";
   Env.blockchain = {
     ...config.blockchain,
@@ -105,7 +108,10 @@ export default async function initialize(config: Config) {
 
   Router.route(["topics", "topic/{topic}"], TopicsView);
   Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
+
   Router.route(["points", "points/leaderboard"], PointsView);
+  Router.route("points", MyPointsView);
+  Router.route("points/leaderboard", PointLeaderboardView);
 
   Router.route("settings", SettingsView);
 
