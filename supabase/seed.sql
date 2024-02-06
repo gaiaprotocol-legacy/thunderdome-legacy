@@ -106,7 +106,7 @@ BEGIN
                 group_id as reference_key,
                 name as key_name,
                 image_thumb as key_image_thumb,
-                stored_image_thumb as key_stored_image_thumb
+                image_thumb as key_stored_image_thumb
             FROM public.group_keys WHERE a.key_type = 1 AND group_id = a.reference_key
             UNION ALL
             SELECT
@@ -481,7 +481,7 @@ BEGIN
                 group_id as reference_key,
                 name as key_name,
                 image_thumb as key_image_thumb,
-                stored_image_thumb as key_stored_image_thumb
+                image_thumb as key_stored_image_thumb
             FROM public.group_keys WHERE p_key_type = 1 AND group_id = p_reference_key
             UNION ALL
             SELECT
@@ -766,13 +766,16 @@ BEGIN
             IF new.key_type = 0 THEN
                 
                 -- update key info
-                update creator_keys set
-                    supply = new.args[8]::numeric,
+                insert into creator_keys (
+                    creator_address, supply, last_fetched_price, total_trading_volume, is_price_up, last_purchased_at
+                ) values (
+                    new.reference_key, new.args[8]::numeric, new.args[5]::numeric, new.args[5]::numeric, true, now()
+                ) on conflict (creator_address) do update
+                    set supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
                     total_trading_volume = total_trading_volume + new.args[5]::numeric,
                     is_price_up = true,
-                    last_purchased_at = now()
-                where creator_address = new.reference_key;
+                    last_purchased_at = now();
 
                 -- update key holder info
                 insert into creator_key_holders (
@@ -818,13 +821,16 @@ BEGIN
             ELSIF new.key_type = 2 THEN
                 
                 -- update key info
-                update topic_keys set
-                    supply = new.args[8]::numeric,
+                insert into topic_keys (
+                    topic, supply, last_fetched_price, total_trading_volume, is_price_up, last_purchased_at
+                ) values (
+                    new.reference_key, new.args[8]::numeric, new.args[5]::numeric, new.args[5]::numeric, true, now()
+                ) on conflict (topic) do update
+                    set supply = new.args[8]::numeric,
                     last_fetched_price = new.args[5]::numeric,
                     total_trading_volume = total_trading_volume + new.args[5]::numeric,
                     is_price_up = true,
-                    last_purchased_at = now()
-                where topic = new.reference_key;
+                    last_purchased_at = now();
 
                 -- update key holder info
                 insert into topic_key_holders (
