@@ -1153,6 +1153,7 @@ button.component:hover {
   background-color: var(--content-bg-color);
   overflow-y: auto;
   padding-bottom: 120px;
+  container-type: inline-size;
 }
 @container (width < 1280px) {
   .side-panel > main {
@@ -1744,6 +1745,79 @@ button.component:hover {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+.key-list {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@container (width < 1280px) {
+  .key-list {
+    padding: 0;
+    gap: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}
+.key-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  text-align: center;
+  color: var(--empty-message-color);
+  padding: 20px 0;
+}
+.key-list-item {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 1px solid var(--line-color);
+  cursor: pointer;
+}
+@container (width < 1280px) {
+  .key-list-item {
+    border: none;
+    border-bottom: 1px solid var(--line-color);
+  }
+}
+.key-list-item > .image {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #252527;
+  background-size: cover;
+}
+.key-list-item > main {
+  flex-grow: 1;
+  width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.key-list-item > main > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.key-list-item > main > header > h3 {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.key-list-item > main > main {
+  font-size: 12px;
+}
+.key-list-item > main > main > .price.up {
+  color: var(--rising-color);
+}
+.key-list-item > main > main > .price.down {
+  color: var(--falling-color);
 }
 @font-face {
   font-family: 'Mona-Sans-ExtraBoldWide';
