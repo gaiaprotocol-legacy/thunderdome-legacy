@@ -1746,6 +1746,33 @@ button.component:hover {
   flex-direction: column;
   gap: 6px;
 }
+.user-list {
+  position: relative;
+}
+.user-list.hidden {
+  display: none;
+}
+.user-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  text-align: center;
+  color: #474B54;
+  padding: 20px 0;
+}
+.user-list-item {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--line-color);
+}
+.user-list-item > .avatar {
+  margin-right: 12px;
+}
+.user-list-item > .balance {
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line-color);
+}
 .key-list {
   padding: 16px;
   display: grid;
@@ -1817,6 +1844,57 @@ button.component:hover {
   color: var(--rising-color);
 }
 .key-list-item > main > main > .price.down {
+  color: var(--falling-color);
+}
+.activity-list {
+  position: relative;
+}
+.activity-list.hidden {
+  display: none;
+}
+.activity-list-item {
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--line-color);
+}
+.activity-list-item > header {
+  display: flex;
+  align-items: center;
+}
+.activity-list-item > header > .trader-avatar,
+.activity-list-item > header > .token-image {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #252527;
+  background-size: cover;
+  cursor: pointer;
+}
+.activity-list-item > header > .trader-avatar {
+  margin-right: -8px;
+}
+.activity-list-item > main {
+  flex-grow: 1;
+  width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.activity-list-item > main > .description > a {
+  color: var(--primary-color);
+  cursor: pointer;
+}
+.activity-list-item > main > .info {
+  font-size: 12px;
+  color: #595959;
+}
+.activity-list-item > main > .info > .price.up {
+  color: var(--rising-color);
+}
+.activity-list-item > main > .info > .price.down {
   color: var(--falling-color);
 }
 .settings-view {
