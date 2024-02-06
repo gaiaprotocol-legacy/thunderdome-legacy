@@ -19,11 +19,16 @@ import {
   inject_fsesf_msg,
   MyCreatorsView,
   MyGroupsView,
+  NewCreatorsView,
+  NewGroupsView,
   PointsView,
   SettingsView,
+  TopCreatorsView,
+  TopGroupsView,
   TopicChatRoomView,
   TopicsView,
   TrendingCreatorsView,
+  TrendingGroupsView,
   WalletManager,
 } from "fsesf";
 import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
@@ -79,6 +84,8 @@ export default async function initialize(config: Config) {
   Router.route(["creators", "creator/{creatorAddress}"], MyCreatorsView);
   Router.route(["creators", "creator/{creatorAddress}"], CreatorChatRoomView);
   Router.route("creators/trending", TrendingCreatorsView);
+  Router.route("creators/top", TopCreatorsView);
+  Router.route("creators/new", NewCreatorsView);
 
   Router.route(
     [
@@ -92,6 +99,9 @@ export default async function initialize(config: Config) {
   );
   Router.route(["groups", "group/{groupId}"], MyGroupsView);
   Router.route(["groups", "group/{groupId}"], GroupChatRoomView);
+  Router.route("groups/trending", TrendingGroupsView);
+  Router.route("groups/top", TopGroupsView);
+  Router.route("groups/new", NewGroupsView);
 
   Router.route(["topics", "topic/{topic}"], TopicsView);
   Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
