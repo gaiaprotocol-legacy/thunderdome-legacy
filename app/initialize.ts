@@ -16,6 +16,8 @@ import {
   FSESFSignedUserManager,
   GroupChatRoomView,
   GroupsView,
+  HashtagChatRoomView,
+  HashtagsView,
   inject_fsesf_msg,
   MyCreatorsView,
   MyGroupsView,
@@ -27,8 +29,6 @@ import {
   SettingsView,
   TopCreatorsView,
   TopGroupsView,
-  TopicChatRoomView,
-  TopicsView,
   TrendingCreatorsView,
   TrendingGroupsView,
   WalletManager,
@@ -51,10 +51,10 @@ export default async function initialize(config: Config) {
   Env.contractAddresses = {
     [ContractType.CreatorKeys]: "0x298c92D5af8eEFA02b55dE45cb2337704af1b894",
     [ContractType.GroupKeys]: "0xe741b5DF37FB86eaB58F616dA0f4BfF10251C37a",
-    [ContractType.TopicKeys]: "0x89ef657f8c32197D7852f4Bb410e87afEfcb6B59",
+    [ContractType.HashtagKeys]: "0x89ef657f8c32197D7852f4Bb410e87afEfcb6B59",
   };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
-  Env.defaultTopic = "thunderdome";
+  Env.defaultHashtag = "thunderdome";
 
   AppInitializer.initialize(
     config.supabaseUrl,
@@ -106,8 +106,8 @@ export default async function initialize(config: Config) {
   Router.route("groups/top", TopGroupsView);
   Router.route("groups/new", NewGroupsView);
 
-  Router.route(["topics", "topic/{topic}"], TopicsView);
-  Router.route(["topics", "topic/{topic}"], TopicChatRoomView);
+  Router.route(["hashtags", "hashtag/{hashtag}"], HashtagsView);
+  Router.route(["hashtags", "hashtag/{hashtag}"], HashtagChatRoomView);
 
   Router.route(["points", "points/leaderboard"], PointsView);
   Router.route("points", MyPointsView);

@@ -1,7 +1,7 @@
 import { ethers } from "https://esm.sh/ethers@6.7.0";
 import CreatorKeysContract from "../_shared/contracts/CreatorKeysContract.ts";
 import GroupKeysContract from "../_shared/contracts/GroupKeysContract.ts";
-import TopicKeysContract from "../_shared/contracts/TopicKeysContract.ts";
+import HashtagKeysContract from "../_shared/contracts/HashtagKeysContract.ts";
 import { serveWithOptions } from "../_shared/cors.ts";
 import supabase from "../_shared/supabase.ts";
 
@@ -15,10 +15,10 @@ serveWithOptions(async (req) => {
   const provider = new ethers.JsonRpcProvider(Deno.env.get("RPC_URL"));
   const signer = new ethers.JsonRpcSigner(provider, ethers.ZeroAddress);
 
-  let contract: CreatorKeysContract | GroupKeysContract | TopicKeysContract;
+  let contract: CreatorKeysContract | GroupKeysContract | HashtagKeysContract;
   if (contractType === 0) contract = new CreatorKeysContract(signer);
   else if (contractType === 1) contract = new GroupKeysContract(signer);
-  else if (contractType === 2) contract = new TopicKeysContract(signer);
+  else if (contractType === 2) contract = new HashtagKeysContract(signer);
   else throw new Error("Invalid contractType");
 
   const { data, error: fetchEventBlockError } = await supabase.from(

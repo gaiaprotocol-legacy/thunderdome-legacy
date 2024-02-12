@@ -47,7 +47,7 @@ select
 
 select
   cron.schedule(
-    'track-topic-key-events',
+    'track-hashtag-key-events',
     '2,12,22,32,42,52 * * * *',
     $$
     select net.http_post(

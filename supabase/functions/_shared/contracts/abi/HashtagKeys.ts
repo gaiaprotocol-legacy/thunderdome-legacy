@@ -23,7 +23,7 @@ import type {
   TypedContractMethod,
 } from "./common.ts";
 
-export interface TopicKeysInterface extends Interface {
+export interface HashtagKeysInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "batchClaimHolderFees"
@@ -36,6 +36,7 @@ export interface TopicKeysInterface extends Interface {
       | "getPrice"
       | "getSellPrice"
       | "getSellPriceAfterFee"
+      | "hashtags"
       | "holderFeePercent"
       | "holders"
       | "initialize"
@@ -47,7 +48,6 @@ export interface TopicKeysInterface extends Interface {
       | "setHolderFeePercent"
       | "setProtocolFeeDestination"
       | "setProtocolFeePercent"
-      | "topics"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -102,6 +102,7 @@ export interface TopicKeysInterface extends Interface {
     functionFragment: "getSellPriceAfterFee",
     values: [BytesLike, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "hashtags", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "holderFeePercent",
     values?: undefined
@@ -143,7 +144,6 @@ export interface TopicKeysInterface extends Interface {
     functionFragment: "setProtocolFeePercent",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "topics", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
@@ -183,6 +183,7 @@ export interface TopicKeysInterface extends Interface {
     functionFragment: "getSellPriceAfterFee",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "hashtags", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "holderFeePercent",
     data: BytesLike
@@ -215,7 +216,6 @@ export interface TopicKeysInterface extends Interface {
     functionFragment: "setProtocolFeePercent",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "topics", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -225,13 +225,13 @@ export interface TopicKeysInterface extends Interface {
 export namespace ClaimHolderFeeEvent {
   export type InputTuple = [
     holder: AddressLike,
-    topic: BytesLike,
+    hashtag: BytesLike,
     fee: BigNumberish
   ];
-  export type OutputTuple = [holder: string, topic: string, fee: bigint];
+  export type OutputTuple = [holder: string, hashtag: string, fee: bigint];
   export interface OutputObject {
     holder: string;
-    topic: string;
+    hashtag: string;
     fee: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -304,7 +304,7 @@ export namespace SetProtocolFeePercentEvent {
 export namespace TradeEvent {
   export type InputTuple = [
     trader: AddressLike,
-    topic: BytesLike,
+    hashtag: BytesLike,
     isBuy: boolean,
     amount: BigNumberish,
     price: BigNumberish,
@@ -314,7 +314,7 @@ export namespace TradeEvent {
   ];
   export type OutputTuple = [
     trader: string,
-    topic: string,
+    hashtag: string,
     isBuy: boolean,
     amount: bigint,
     price: bigint,
@@ -324,7 +324,7 @@ export namespace TradeEvent {
   ];
   export interface OutputObject {
     trader: string;
-    topic: string;
+    hashtag: string;
     isBuy: boolean;
     amount: bigint;
     price: bigint;
@@ -338,11 +338,11 @@ export namespace TradeEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface TopicKeys extends BaseContract {
-  connect(runner?: ContractRunner | null): TopicKeys;
+export interface HashtagKeys extends BaseContract {
+  connect(runner?: ContractRunner | null): HashtagKeys;
   waitForDeployment(): Promise<this>;
 
-  interface: TopicKeysInterface;
+  interface: HashtagKeysInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -382,39 +382,43 @@ export interface TopicKeys extends BaseContract {
   ): Promise<this>;
 
   batchClaimHolderFees: TypedContractMethod<
-    [_topics: BytesLike[]],
+    [_hashtags: BytesLike[]],
     [void],
     "nonpayable"
   >;
 
   batchClaimableHolderFees: TypedContractMethod<
-    [_topics: BytesLike[], holder: AddressLike],
+    [_hashtags: BytesLike[], holder: AddressLike],
     [bigint[]],
     "view"
   >;
 
   buyKeys: TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [void],
     "payable"
   >;
 
-  claimHolderFee: TypedContractMethod<[topic: BytesLike], [void], "nonpayable">;
+  claimHolderFee: TypedContractMethod<
+    [hashtag: BytesLike],
+    [void],
+    "nonpayable"
+  >;
 
   claimableHolderFee: TypedContractMethod<
-    [topic: BytesLike, holder: AddressLike],
+    [hashtag: BytesLike, holder: AddressLike],
     [bigint],
     "view"
   >;
 
   getBuyPrice: TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
     "view"
   >;
 
   getBuyPriceAfterFee: TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
     "view"
   >;
@@ -426,14 +430,20 @@ export interface TopicKeys extends BaseContract {
   >;
 
   getSellPrice: TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
     "view"
   >;
 
   getSellPriceAfterFee: TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
+    "view"
+  >;
+
+  hashtags: TypedContractMethod<
+    [arg0: BytesLike],
+    [[bigint, bigint] & { supply: bigint; accFeePerUnit: bigint }],
     "view"
   >;
 
@@ -465,7 +475,7 @@ export interface TopicKeys extends BaseContract {
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   sellKeys: TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -488,12 +498,6 @@ export interface TopicKeys extends BaseContract {
     "nonpayable"
   >;
 
-  topics: TypedContractMethod<
-    [arg0: BytesLike],
-    [[bigint, bigint] & { supply: bigint; accFeePerUnit: bigint }],
-    "view"
-  >;
-
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -506,42 +510,42 @@ export interface TopicKeys extends BaseContract {
 
   getFunction(
     nameOrSignature: "batchClaimHolderFees"
-  ): TypedContractMethod<[_topics: BytesLike[]], [void], "nonpayable">;
+  ): TypedContractMethod<[_hashtags: BytesLike[]], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "batchClaimableHolderFees"
   ): TypedContractMethod<
-    [_topics: BytesLike[], holder: AddressLike],
+    [_hashtags: BytesLike[], holder: AddressLike],
     [bigint[]],
     "view"
   >;
   getFunction(
     nameOrSignature: "buyKeys"
   ): TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [void],
     "payable"
   >;
   getFunction(
     nameOrSignature: "claimHolderFee"
-  ): TypedContractMethod<[topic: BytesLike], [void], "nonpayable">;
+  ): TypedContractMethod<[hashtag: BytesLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "claimableHolderFee"
   ): TypedContractMethod<
-    [topic: BytesLike, holder: AddressLike],
+    [hashtag: BytesLike, holder: AddressLike],
     [bigint],
     "view"
   >;
   getFunction(
     nameOrSignature: "getBuyPrice"
   ): TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
     "view"
   >;
   getFunction(
     nameOrSignature: "getBuyPriceAfterFee"
   ): TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
     "view"
   >;
@@ -555,15 +559,22 @@ export interface TopicKeys extends BaseContract {
   getFunction(
     nameOrSignature: "getSellPrice"
   ): TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
     "view"
   >;
   getFunction(
     nameOrSignature: "getSellPriceAfterFee"
   ): TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "hashtags"
+  ): TypedContractMethod<
+    [arg0: BytesLike],
+    [[bigint, bigint] & { supply: bigint; accFeePerUnit: bigint }],
     "view"
   >;
   getFunction(
@@ -603,7 +614,7 @@ export interface TopicKeys extends BaseContract {
   getFunction(
     nameOrSignature: "sellKeys"
   ): TypedContractMethod<
-    [topic: BytesLike, amount: BigNumberish],
+    [hashtag: BytesLike, amount: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -616,13 +627,6 @@ export interface TopicKeys extends BaseContract {
   getFunction(
     nameOrSignature: "setProtocolFeePercent"
   ): TypedContractMethod<[_feePercent: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "topics"
-  ): TypedContractMethod<
-    [arg0: BytesLike],
-    [[bigint, bigint] & { supply: bigint; accFeePerUnit: bigint }],
-    "view"
-  >;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
