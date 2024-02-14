@@ -1325,7 +1325,7 @@ button.component:hover {
   width: 0;
   flex-grow: 1;
 }
-.topics-view {
+.hashtags-view {
   width: 380px;
   height: 100%;
   overflow-y: scroll;
@@ -1335,14 +1335,14 @@ button.component:hover {
   padding-bottom: 60px;
 }
 @container (width < 1280px) {
-  .topics-view {
+  .hashtags-view {
     width: 100%;
     height: auto;
     overflow-y: visible;
     border-right: none;
   }
 }
-.topics-view > header {
+.hashtags-view > header {
   border-bottom: 1px solid var(--line-color);
   display: flex;
   align-items: center;
@@ -1350,32 +1350,32 @@ button.component:hover {
   height: 56px;
   padding: 0 10px;
 }
-.topics-view > header > .topic-search-form {
+.hashtags-view > header > .hashtag-search-form {
   flex-grow: 1;
 }
-.topics-view > header > .checkbox > label {
+.hashtags-view > header > .checkbox > label {
   font-size: 12px;
 }
-.topic-search-form > label {
+.hashtag-search-form > label {
   display: flex;
   align-items: center;
   gap: 8px;
   height: 100%;
 }
-.topic-search-form > label > .icon {
+.hashtag-search-form > label > .icon {
   cursor: default;
 }
-.topic-search-form > label > input {
+.hashtag-search-form > label > input {
   flex-grow: 1;
   width: 100%;
   max-width: 320px;
   height: 100%;
 }
-.topic-search-form > label > input::placeholder {
+.hashtag-search-form > label > input::placeholder {
   font-size: 12px;
   font-style: italic;
 }
-.topic-chat-room-header {
+.hashtag-chat-room-header {
   height: 56px;
   border-bottom: 1px solid var(--line-color);
   padding: 0 20px;
@@ -1384,21 +1384,21 @@ button.component:hover {
   gap: 8px;
 }
 @container (width < 1280px) {
-  .topic-chat-room-header {
+  .hashtag-chat-room-header {
     padding: 0 10px;
   }
 }
-.topic-chat-room-header > button.back {
+.hashtag-chat-room-header > button.back {
   display: none;
 }
 @container (width < 1280px) {
-  .topic-chat-room-header > button.back {
+  .hashtag-chat-room-header > button.back {
     display: flex;
     align-items: center;
     justify-content: center;
   }
 }
-.topic-chat-room-header > h1 {
+.hashtag-chat-room-header > h1 {
   flex-grow: 1;
   display: flex;
   align-items: center;
@@ -1406,48 +1406,48 @@ button.component:hover {
   font-family: 'Proto Mono';
   cursor: pointer;
 }
-.topic-chat-room-header > h1 > .image {
+.hashtag-chat-room-header > h1 > .image {
   width: 24px;
   height: 24px;
   margin-right: 6px;
 }
-.topic-chat-room-list-item > main > header > h3 {
+.hashtag-chat-room-list-item > main > header > h3 {
   margin-top: -2px;
   margin-left: -2px;
   font-family: 'Proto Mono';
 }
-.topic-chat-room-list-item > main > header > h3 > .image {
+.hashtag-chat-room-list-item > main > header > h3 > .image {
   width: 24px;
   height: 24px;
   margin-left: 4px;
   margin-right: 6px;
 }
-.topic-chat-room-list-item > main > .last-message {
+.hashtag-chat-room-list-item > main > .last-message {
   padding-left: 4px;
 }
-.topic-info-modal > header {
+.hashtag-info-modal > header {
   display: flex;
   gap: 12px;
 }
-.topic-info-modal > header > h1 > .image {
+.hashtag-info-modal > header > h1 > .image {
   width: 34px;
   height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.topic-info-modal > header > h1 > .name {
+.hashtag-info-modal > header > h1 > .name {
   text-transform: initial;
 }
-.topic-info-modal > main {
+.hashtag-info-modal > main {
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 0 20px !important;
 }
-.topic-info-modal > main > .metrics > .holder-count,
-.topic-info-modal > main > .metrics > .price,
-.topic-info-modal > main > .balance-and-fees {
+.hashtag-info-modal > main > .metrics > .holder-count,
+.hashtag-info-modal > main > .metrics > .price,
+.hashtag-info-modal > main > .balance-and-fees {
   border: 1px solid var(--line-color);
   border-radius: 6px;
   padding: 16px 20px;
@@ -1455,35 +1455,35 @@ button.component:hover {
   flex-direction: column;
   gap: 6px;
 }
-.topic-info-modal > main > .metrics > .holder-count h3,
-.topic-info-modal > main > .metrics > .price h3,
-.topic-info-modal > main > .balance-and-fees h3 {
+.hashtag-info-modal > main > .metrics > .holder-count h3,
+.hashtag-info-modal > main > .metrics > .price h3,
+.hashtag-info-modal > main > .balance-and-fees h3 {
   color: #595959;
   font-size: 12px;
 }
-.topic-info-modal > main > .metrics > .holder-count .value,
-.topic-info-modal > main > .metrics > .price .value,
-.topic-info-modal > main > .balance-and-fees .value {
+.hashtag-info-modal > main > .metrics > .holder-count .value,
+.hashtag-info-modal > main > .metrics > .price .value,
+.hashtag-info-modal > main > .balance-and-fees .value {
   font-size: 16px;
 }
-.topic-info-modal > main > .metrics {
+.hashtag-info-modal > main > .metrics {
   width: 100%;
   display: flex;
   gap: 10px;
 }
-.topic-info-modal > main > .metrics > .holder-count,
-.topic-info-modal > main > .metrics > .price {
+.hashtag-info-modal > main > .metrics > .holder-count,
+.hashtag-info-modal > main > .metrics > .price {
   width: 50%;
 }
-.topic-info-modal > main > .balance-and-fees {
+.hashtag-info-modal > main > .balance-and-fees {
   flex-direction: row;
   gap: 10px;
 }
-.topic-info-modal > main > .balance-and-fees > .info {
+.hashtag-info-modal > main > .balance-and-fees > .info {
   flex-grow: 1;
 }
-.topic-info-modal > main > .balance-and-fees > .info > .balance,
-.topic-info-modal > main > .balance-and-fees > .info > .fees {
+.hashtag-info-modal > main > .balance-and-fees > .info > .balance,
+.hashtag-info-modal > main > .balance-and-fees > .info > .fees {
   display: flex;
   align-items: center;
   gap: 6px;

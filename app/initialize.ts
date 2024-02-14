@@ -51,7 +51,7 @@ export default async function initialize(config: Config) {
   Env.contractAddresses = {
     [ContractType.CreatorKeys]: "0x298c92D5af8eEFA02b55dE45cb2337704af1b894",
     [ContractType.GroupKeys]: "0xe741b5DF37FB86eaB58F616dA0f4BfF10251C37a",
-    [ContractType.HashtagKeys]: "0x89ef657f8c32197D7852f4Bb410e87afEfcb6B59",
+    [ContractType.HashtagKeys]: "0x23e0035F44cB5Bb4fb83e3F4CA413DB39c6f7BF0",
   };
   Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
   Env.defaultHashtag = "thunderdome";
