@@ -11,9 +11,8 @@ import {
   ContractType,
   CreatorChatRoomView,
   CreatorsView,
-  Env,
+  FSESFEnv,
   FSESFLayout,
-  FSESFSignedUserManager,
   GroupChatRoomView,
   GroupsView,
   HashtagChatRoomView,
@@ -21,40 +20,47 @@ import {
   inject_fsesf_msg,
   MyCreatorsView,
   MyGroupsView,
-  MyPointsView,
   NewCreatorsView,
   NewGroupsView,
-  PointLeaderboardView,
-  PointsView,
-  SettingsView,
   TopCreatorsView,
   TopGroupsView,
   TrendingCreatorsView,
   TrendingGroupsView,
-  WalletManager,
 } from "fsesf";
 import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
+import {
+  ESFEnv,
+  ESFSignedUserManager,
+  PointLeaderboardView,
+  PointsView,
+  SettingsView,
+  WalletManager,
+} from "../../esf/lib/index.js";
 import AboutView from "./AboutView.js";
 import Config from "./Config.js";
+import MyPointsView from "./TDMyPointsView.js";
+import TDMyPointsView from "./TDMyPointsView.js";
 
 inject_fsesf_msg();
 
 MaterialIconSystem.launch();
 
 export default async function initialize(config: Config) {
-  Env.domain = "thunderdome.so";
-  Env.keyName = "ticket";
-  Env.blockchain = {
+  ESFEnv.domain = "thunderdome.so";
+  ESFEnv.keyName = "ticket";
+  ESFEnv.messageForWalletLinking = "Link Wallet to Thunder Dome";
+  ESFEnv.Layout = FSESFLayout;
+
+  FSESFEnv.blockchain = {
     ...config.blockchain,
     symbolDisplay: "FTM",
   };
-  Env.contractAddresses = {
+  FSESFEnv.contractAddresses = {
     [ContractType.CreatorKeys]: "0x298c92D5af8eEFA02b55dE45cb2337704af1b894",
     [ContractType.GroupKeys]: "0xe741b5DF37FB86eaB58F616dA0f4BfF10251C37a",
     [ContractType.HashtagKeys]: "0x23e0035F44cB5Bb4fb83e3F4CA413DB39c6f7BF0",
   };
-  Env.messageForWalletLinking = "Link Wallet to Thunder Dome";
-  Env.defaultHashtag = "thunderdome";
+  FSESFEnv.defaultHashtag = "thunderdome";
 
   AppInitializer.initialize(
     config.supabaseUrl,
@@ -69,7 +75,7 @@ export default async function initialize(config: Config) {
   ]);
 
   await SplashLoader.load(el("img", { src: "/images/logo-transparent.png" }), [
-    FSESFSignedUserManager.fetchUserOnInit(),
+    ESFSignedUserManager.fetchUserOnInit(),
     BlockTimeManager.init(0.3),
   ]);
 
@@ -110,7 +116,7 @@ export default async function initialize(config: Config) {
   Router.route(["hashtags", "hashtag/{hashtag}"], HashtagChatRoomView);
 
   Router.route(["points", "points/leaderboard"], PointsView);
-  Router.route("points", MyPointsView);
+  Router.route("points", TDMyPointsView);
   Router.route("points/leaderboard", PointLeaderboardView);
 
   Router.route("settings", SettingsView);
