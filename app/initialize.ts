@@ -7,6 +7,14 @@ import {
   SplashLoader,
 } from "@common-module/app";
 import {
+  ESFEnv,
+  ESFSignedUserManager,
+  PointLeaderboardView,
+  PointsView,
+  SettingsView,
+  WalletConnectManager
+} from "esf-module";
+import {
   BlockTimeManager,
   ContractType,
   CreatorChatRoomView,
@@ -28,17 +36,8 @@ import {
   TrendingGroupsView,
 } from "fsesf";
 import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
-import {
-  ESFEnv,
-  ESFSignedUserManager,
-  PointLeaderboardView,
-  PointsView,
-  SettingsView,
-  WalletManager,
-} from "../../esf/lib/index.js";
 import AboutView from "./AboutView.js";
 import Config from "./Config.js";
-import MyPointsView from "./TDMyPointsView.js";
 import TDMyPointsView from "./TDMyPointsView.js";
 
 inject_fsesf_msg();
@@ -68,7 +67,7 @@ export default async function initialize(config: Config) {
     config.dev,
   );
 
-  WalletManager.init(config.walletConnectProjectId, [
+  WalletConnectManager.init(config.walletConnectProjectId, [
     fantom,
     fantomTestnet,
     fantomSonicTestnet,
