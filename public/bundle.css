@@ -113,7 +113,7 @@ meter {
   src: url(https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlvAw.ttf) format('truetype');
 }
 :root {
-  --document-bg-color: #121212;
+  --page-bg-color: #121212;
   --content-bg-color: #141414;
   --panel-bg-color: #1E1E1E;
   --popup-bg-color: rgba(0, 0, 0, 0.5);
@@ -133,7 +133,7 @@ meter {
   --loading-bar-color: rgba(193, 168, 125, 0.5);
   width: 100%;
   height: 100%;
-  background-color: var(--document-bg-color);
+  background-color: var(--page-bg-color);
   color: var(--text-color);
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
@@ -996,7 +996,7 @@ button.component:hover {
   border-radius: 16px;
 }
 :root {
-  --document-bg-color: #141c27;
+  --page-bg-color: #141c27;
   --content-bg-color: #1d2733;
   --primary-color: #50a7ea;
   --secondary-color: #b2c0d1;
@@ -1232,7 +1232,7 @@ button.component:hover {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--document-bg-color);
+  background-color: var(--page-bg-color);
 }
 @container (width < 1280px) {
   .chat-room-view {
@@ -1323,6 +1323,7 @@ button.component:hover {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 0;
+  height: 20px;
   flex-grow: 1;
 }
 .hashtags-view {
