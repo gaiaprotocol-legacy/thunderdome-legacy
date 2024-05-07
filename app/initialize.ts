@@ -33,7 +33,7 @@ export default async function initialize(config: AppConfig) {
     dev: config.dev,
     serviceName: "Thunder Dome",
     serviceUrl: "https://thunderdome.so",
-    overviewUrl: "", //TODO:
+    overviewUrl: "https://x.com/ThunderDomeFTM", //TODO:
     socialUrls: {
       x: "https://x.com/ThunderDomeFTM",
     },
