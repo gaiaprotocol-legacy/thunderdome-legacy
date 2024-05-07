@@ -12,9 +12,11 @@ import {
 import {
   CreatorInfoModal,
   HorizontalTrendingAssetList,
+  NewAssetList,
   SFSignedUserManager,
   SFUserService,
   SignedUserHoldingAssetList,
+  TopAssetList,
   UserAvatar,
   UserInfoModal,
 } from "fsesf";
@@ -26,6 +28,8 @@ export default class TicketsTab extends Activatable {
   private trendingList: HorizontalTrendingAssetList;
   private tabs: Tabs;
   private yourTicketsList: SignedUserHoldingAssetList;
+  private topAssetList: TopAssetList;
+  private newAssetList: NewAssetList;
 
   constructor() {
     super(".app-tab.tickets-tab");
@@ -50,14 +54,18 @@ export default class TicketsTab extends Activatable {
           },
         ]),
         this.yourTicketsList = new SignedUserHoldingAssetList(),
+        this.topAssetList = new TopAssetList(),
+        this.newAssetList = new NewAssetList(),
       ),
     );
 
     this.tabs.on("select", (id: string) => {
-      [this.yourTicketsList].forEach((list) => list?.hide());
-      if (id === "your-tickets") {
-        this.yourTicketsList.show();
-      }
+      [this.yourTicketsList, this.topAssetList, this.newAssetList].forEach((
+        list,
+      ) => list?.hide());
+      if (id === "your-tickets") this.yourTicketsList.show();
+      else if (id === "top") this.topAssetList.show();
+      else if (id === "new") this.newAssetList.show();
     }).init();
 
     if (this.referrelStore.get("from")) {
