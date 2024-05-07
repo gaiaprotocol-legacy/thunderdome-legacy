@@ -3427,7 +3427,6 @@ button.component.disabled {
   gap: 10px;
   font-size: 18px;
   font-weight: bold;
-  text-transform: capitalize;
 }
 .buy-creator-popup > main {
   padding: 20px;
@@ -3463,7 +3462,6 @@ button.component.disabled {
   gap: 10px;
   font-size: 18px;
   font-weight: bold;
-  text-transform: capitalize;
 }
 .sell-creator-popup > main {
   padding: 20px;
