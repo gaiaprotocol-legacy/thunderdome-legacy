@@ -1,7 +1,6 @@
 {
   "scripts": {
     "webpack-dev": "webpack --mode development --watch --config webpack.config.development.cjs",
-    "webpack-testnet": "webpack --mode development --watch --config webpack.config.testnet.cjs",
     "webpack-mainnet": "webpack --mode production --config webpack.config.mainnet.cjs",
     "predeploy": "yarn webpack-mainnet",
     "deploy": "gh-pages -d public"
@@ -9,9 +8,7 @@
   "type": "module",
   "dependencies": {
     "fsesf": "^0.0.1",
-    "@wagmi/core": "^1.3.8",
-    "@web3modal/ethereum": "^2.7.1",
-    "@web3modal/html": "^2.7.1"
+    "point-module": "^0.0.1"
   },
   "devDependencies": {
     "assert": "^2.0.0",
@@ -20,6 +17,7 @@
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.8.1",
     "dotenv": "^16.3.1",
+    "firebase": "^10.8.1",
     "gh-pages": "^6.0.0",
     "http-browserify": "^1.7.0",
     "https-browserify": "^1.0.0",

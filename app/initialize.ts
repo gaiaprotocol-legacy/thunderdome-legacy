@@ -1,124 +1,128 @@
 import {
   AppInitializer,
   AuthUtil,
+  BodyNode,
+  BrowserInfo,
   el,
-  MaterialIconSystem,
+  PolyfillUtil,
   Router,
   SplashLoader,
+  Store,
 } from "@common-module/app";
-import {
-  ESFEnv,
-  ESFSignedUserManager,
-  PointLeaderboardView,
-  PointsView,
-  SettingsView,
-  WalletConnectManager
-} from "esf-module";
+import { PWAInstallOverlay } from "@common-module/social";
 import {
   BlockTimeManager,
-  ContractType,
-  CreatorChatRoomView,
-  CreatorsView,
-  FSESFEnv,
-  FSESFLayout,
-  GroupChatRoomView,
-  GroupsView,
-  HashtagChatRoomView,
-  HashtagsView,
+  HashtagSubscribeManager,
   inject_fsesf_msg,
-  MyCreatorsView,
-  MyGroupsView,
-  NewCreatorsView,
-  NewGroupsView,
-  TopCreatorsView,
-  TopGroupsView,
-  TrendingCreatorsView,
-  TrendingGroupsView,
+  LinkWalletPopup,
+  RealtimeActivityManager,
+  SFEnv,
+  SFOnlineUserManager,
+  SFSignedUserManager,
+  SignedUserAssetManager,
+  WalletConnectManager,
 } from "fsesf";
-import { fantom, fantomSonicTestnet, fantomTestnet } from "viem/chains";
-import AboutView from "./AboutView.js";
-import Config from "./Config.js";
-import TDMyPointsView from "./TDMyPointsView.js";
+import App from "./App.js";
+import AppConfig from "./AppConfig.js";
+import WelcomePopup from "./WelcomePopup.js";
 
-inject_fsesf_msg();
+export default async function initialize(config: AppConfig) {
+  inject_fsesf_msg();
 
-MaterialIconSystem.launch();
+  SFEnv.init({
+    dev: config.dev,
+    serviceName: "Thunder Dome",
+    serviceUrl: "https://thunderdome.so",
+    overviewUrl: "", //TODO:
+    socialUrls: {
+      x: "https://x.com/ThunderDomeFTM",
+    },
+    messageForWalletLinking: "Link Wallet to Thunder Dome",
 
-export default async function initialize(config: Config) {
-  ESFEnv.domain = "thunderdome.so";
-  ESFEnv.keyName = "ticket";
-  ESFEnv.messageForWalletLinking = "Link Wallet to Thunder Dome";
-  ESFEnv.Layout = FSESFLayout;
+    chains: config.chains,
+    defaultChain: config.defaultChain,
+    contractAddresses: config.contractAddresses,
 
-  FSESFEnv.blockchain = {
-    ...config.blockchain,
-    symbolDisplay: "FTM",
-  };
-  FSESFEnv.contractAddresses = {
-    [ContractType.CreatorKeys]: "0x298c92D5af8eEFA02b55dE45cb2337704af1b894",
-    [ContractType.GroupKeys]: "0xe741b5DF37FB86eaB58F616dA0f4BfF10251C37a",
-    [ContractType.HashtagKeys]: "0x23e0035F44cB5Bb4fb83e3F4CA413DB39c6f7BF0",
-  };
-  FSESFEnv.defaultHashtag = "thunderdome";
+    assetName: "ticket",
+    userBaseUri: "",
+    creatorOptions: { unit: "ticket", baseUri: "/creator" },
+    hashtagOptions: { unit: "topic", baseUri: "/topic" },
+  });
 
   AppInitializer.initialize(
+    config.dev,
     config.supabaseUrl,
     config.supabaseAnonKey,
-    config.dev,
   );
 
-  WalletConnectManager.init(config.walletConnectProjectId, [
-    fantom,
-    fantomTestnet,
-    fantomSonicTestnet,
-  ]);
+  if (
+    BrowserInfo.isMobileDevice && !BrowserInfo.installed &&
+    !(window as any).ethereum && location.pathname === "/"
+  ) {
+    new PWAInstallOverlay(SFEnv.serviceName, SFEnv.overviewUrl).appendTo(
+      BodyNode,
+    );
+  } else {
+    //TODO: 메시지 변경하고 열기 WelcomePopup.launch();
+  }
 
-  await SplashLoader.load(el("img", { src: "/images/logo-transparent.png" }), [
-    ESFSignedUserManager.fetchUserOnInit(),
-    BlockTimeManager.init(0.3),
-  ]);
+  WalletConnectManager.init({
+    projectId: config.walletConnectProjectId,
+    name: "Thunder Dome",
+    description: "Social Fi on Fantom",
+    icon: "https://thunderdome.so/images/icon-192x192.png",
+  }, config.chains);
 
-  Router.route("**", FSESFLayout);
+  /*FCM.init(
+    {
+      apiKey: "AIzaSyBZCRpj9smnz-yIpXC4KVi9RFs23qcxH7M",
+      authDomain: "topictrade-8b711.firebaseapp.com",
+      projectId: "topictrade-8b711",
+      storageBucket: "topictrade-8b711.appspot.com",
+      messagingSenderId: "993631591207",
+      appId: "1:993631591207:web:d7bec5f0e54efdfe2ee702",
+      measurementId: "G-9CNQ54G1CY",
+    },
+    "BKhZmi9lpQlQhFXwyMNujFGfjXQEfWKNML8S2gzu6hcFGr1pL-vPOTPU5YwtFHJ4poW-Ax7qm9xeR-7AB76eGl4",
+  );*/
 
-  Router.route(["", "about"], AboutView);
+  await SplashLoader.load(
+    el("img", { src: "/images/logo-transparent.png" }),
+    [
+      BlockTimeManager.init(),
+      SFSignedUserManager.init((userId) =>
+        HashtagSubscribeManager.loadSignedUserSubscribedHashtags(
+          userId,
+        )
+      ),
+    ],
+  );
 
-  Router.route([
-    "creators",
-    "creator/{creatorAddress}",
-    "creators/trending",
-    "creators/top",
-    "creators/new",
-  ], CreatorsView);
-  Router.route(["creators", "creator/{creatorAddress}"], MyCreatorsView);
-  Router.route(["creators", "creator/{creatorAddress}"], CreatorChatRoomView);
-  Router.route("creators/trending", TrendingCreatorsView);
-  Router.route("creators/top", TopCreatorsView);
-  Router.route("creators/new", NewCreatorsView);
+  SFOnlineUserManager.init();
+  SignedUserAssetManager.init();
+  RealtimeActivityManager.init();
+
+  const params = new URLSearchParams(location.search);
+  if (params.has("from")) new Store("referral").set("from", params.get("from"));
 
   Router.route(
-    [
-      "groups",
-      "group/{groupId}",
-      "groups/trending",
-      "groups/top",
-      "groups/new",
-    ],
-    GroupsView,
+    ["", "topic/{topic}", "creator/{creatorAddress}", "{xUsername}"],
+    App,
   );
-  Router.route(["groups", "group/{groupId}"], MyGroupsView);
-  Router.route(["groups", "group/{groupId}"], GroupChatRoomView);
-  Router.route("groups/trending", TrendingGroupsView);
-  Router.route("groups/top", TopGroupsView);
-  Router.route("groups/new", NewGroupsView);
-
-  Router.route(["hashtags", "hashtag/{hashtag}"], HashtagsView);
-  Router.route(["hashtags", "hashtag/{hashtag}"], HashtagChatRoomView);
-
-  Router.route(["points", "points/leaderboard"], PointsView);
-  Router.route("points", TDMyPointsView);
-  Router.route("points/leaderboard", PointLeaderboardView);
-
-  Router.route("settings", SettingsView);
 
   AuthUtil.checkEmailAccess();
+
+  if (SFSignedUserManager.signed && !SFSignedUserManager.walletLinked) {
+    new LinkWalletPopup();
+  }
+
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data.action === "notificationclick") {
+      const fcmData = event.data.data?.FCM_MSG?.data;
+      if (fcmData?.redirectTo) Router.go(fcmData.redirectTo);
+    }
+  });
+
+  if (BrowserInfo.isWindows) BodyNode.addClass("windows");
+  PolyfillUtil.fixMSWindowsEmojiDisplay();
 }

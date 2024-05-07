@@ -1,29 +1,36 @@
 import { ethers } from "https://esm.sh/ethers@6.7.0";
-import CreatorKeysContract from "../_shared/contracts/CreatorKeysContract.ts";
-import GroupKeysContract from "../_shared/contracts/GroupKeysContract.ts";
-import HashtagKeysContract from "../_shared/contracts/HashtagKeysContract.ts";
+import CreatorTradeContract from "../_shared/contracts/CreatorTradeContract.ts";
+import HashtagTradeContract from "../_shared/contracts/HashtagTradeContract.ts";
+import TicketsContract from "../_shared/contracts/TicketsContract.ts";
 import { serveWithOptions } from "../_shared/cors.ts";
 import supabase from "../_shared/supabase.ts";
 
 serveWithOptions(async (req) => {
-  let { contractType, blockPeriod } = await req.json();
+  let { chain, contractType, blockPeriod } = await req.json();
   if (contractType === undefined) throw new Error("Missing contractType");
   if (!blockPeriod) {
-    blockPeriod = parseInt(Deno.env.get("DEFAULT_BLOCK_PERIOD")!);
+    if (chain === "base") blockPeriod = 500;
+    else if (chain === "arbitrum") blockPeriod = 2500;
+    else blockPeriod = 750;
   }
 
-  const provider = new ethers.JsonRpcProvider(Deno.env.get("RPC_URL"));
+  const provider = new ethers.JsonRpcProvider(
+    Deno.env.get(`${chain.toUpperCase()}_RPC_URL`),
+  );
   const signer = new ethers.JsonRpcSigner(provider, ethers.ZeroAddress);
 
-  let contract: CreatorKeysContract | GroupKeysContract | HashtagKeysContract;
-  if (contractType === 0) contract = new CreatorKeysContract(signer);
-  else if (contractType === 1) contract = new GroupKeysContract(signer);
-  else if (contractType === 2) contract = new HashtagKeysContract(signer);
-  else throw new Error("Invalid contractType");
+  let contract: CreatorTradeContract | TicketsContract | HashtagTradeContract;
+  if (contractType === "creator-trade") {
+    contract = new CreatorTradeContract(signer);
+  } else if (contractType === "hashtag-trade") {
+    contract = new HashtagTradeContract(signer);
+  } else if (contractType === "tickets") {
+    contract = new TicketsContract(chain, signer);
+  } else throw new Error("Invalid contractType");
 
   const { data, error: fetchEventBlockError } = await supabase.from(
     "tracked_event_blocks",
-  ).select().eq("contract_type", contractType);
+  ).select().eq("chain", chain).eq("contract_type", contractType);
   if (fetchEventBlockError) throw fetchEventBlockError;
 
   let toBlock = (data?.[0]?.block_number ?? contract.deployBlockNumber) +
@@ -37,23 +44,25 @@ serveWithOptions(async (req) => {
     const eventName = Object.keys(contract.eventTopicFilters).find((key) =>
       contract.eventTopicFilters[key][0] === event.topics[0]
     );
-
     const args = event.args.map((arg) => arg.toString());
     const data: any = {
+      chain,
+      contract_type: contractType,
       block_number: event.blockNumber,
       log_index: event.index,
       tx: event.transactionHash,
       event_name: eventName,
       args,
-      key_type: contractType,
     };
 
-    if (eventName === "GroupCreated") {
+    if (eventName === "TicketCreated") {
       data.wallet_address = args[1];
-      data.reference_key = args[0];
+      data.asset_id = args[0];
+    } else if (eventName === "TicketDeleted") {
+      data.asset_id = args[0];
     } else if (eventName === "Trade" || eventName === "ClaimHolderFee") {
       data.wallet_address = args[0];
-      data.reference_key = contractType === 2
+      data.asset_id = contractType === "hashtag-trade"
         ? ethers.decodeBytes32String(args[1])
         : args[1];
     }
@@ -62,7 +71,7 @@ serveWithOptions(async (req) => {
       .from("contract_events")
       .upsert(data);
     if (saveEventError) {
-      console.log(data);
+      console.error(data);
       throw saveEventError;
     }
   }
@@ -70,6 +79,7 @@ serveWithOptions(async (req) => {
   const { error: saveEventBlockError } = await supabase.from(
     "tracked_event_blocks",
   ).upsert({
+    chain,
     contract_type: contractType,
     block_number: toBlock,
     updated_at: new Date().toISOString(),

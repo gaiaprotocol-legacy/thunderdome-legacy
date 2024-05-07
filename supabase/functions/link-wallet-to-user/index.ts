@@ -3,7 +3,7 @@ import { serveWithOptions } from "../_shared/cors.ts";
 import supabase, { getSignedUser } from "../_shared/supabase.ts";
 
 serveWithOptions(async (req) => {
-  const { walletAddress, signedMessage } = await req.json();
+  const { walletType, walletAddress, signedMessage } = await req.json();
   if (!walletAddress || !signedMessage) {
     throw new Error("Missing wallet address or signed message");
   }
@@ -41,6 +41,9 @@ serveWithOptions(async (req) => {
   if (deleteWalletAddressError) throw deleteWalletAddressError;
 
   const { error: setWalletAddressError } = await supabase.from("users_public")
-    .update({ wallet_address: walletAddress }).eq("user_id", user.id);
+    .update({ wallet_address: walletAddress, wallet_type: walletType }).eq(
+      "user_id",
+      user.id,
+    );
   if (setWalletAddressError) throw setWalletAddressError;
 });
