@@ -134,26 +134,12 @@ export default class App extends View {
         this.room = new UserDisplay(params.xUsername).appendTo(
           this.roomSection,
         );
-        if (data?.wallet_address) {
-          [this.ticketsTab, this.chatsTab].forEach((list) =>
-            list.activeCreator(data.wallet_address)
-          );
-        } else {
-          [this.ticketsTab, this.chatsTab].forEach((list) =>
-            list.deactiveCreator()
-          );
-          this.room.on("userLoaded", (user) => {
-            [this.ticketsTab, this.chatsTab].forEach((list) =>
-              list.activeCreator(user.wallet_address)
-            );
-          });
-        }
       } else {
         this.room.loadUser(params.xUsername, data);
-        [this.ticketsTab, this.chatsTab].forEach((list) =>
-          list.deactiveCreator()
-        );
       }
+      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
+        list.deactiveCreator()
+      );
       [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
         list.deactiveHashtag()
       );
@@ -166,7 +152,7 @@ export default class App extends View {
       } else {
         this.room.enter(params.creatorAddress, data);
       }
-      [this.ticketsTab, this.topicsTab].forEach((list) =>
+      [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
         list.deactiveHashtag()
       );
       [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
@@ -181,7 +167,7 @@ export default class App extends View {
       } else {
         this.room.enter(params.topic, data);
       }
-      [this.ticketsTab, this.chatsTab].forEach((list) =>
+      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
         list.deactiveCreator()
       );
       [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
@@ -191,7 +177,7 @@ export default class App extends View {
     } else {
       this.room?.delete();
       this.room = undefined;
-      [this.ticketsTab, this.chatsTab].forEach((list) =>
+      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
         list.deactiveCreator()
       );
       [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
