@@ -19,7 +19,7 @@ module.exports = {
     entry: {
         'bundle': './app/mainnet.ts',
         __less: './public/style/main.less',
-        //"firebase-messaging-sw": "./service-worker/firebase-messaging-sw.ts",
+        "firebase-messaging-sw": "./service-worker/firebase-messaging-sw.ts",
     },
     module: {
         rules: [

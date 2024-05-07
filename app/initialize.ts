@@ -9,7 +9,7 @@ import {
   SplashLoader,
   Store,
 } from "@common-module/app";
-import { PWAInstallOverlay } from "@common-module/social";
+import { FCM, PWAInstallOverlay } from "@common-module/social";
 import {
   BlockTimeManager,
   HashtagSubscribeManager,
@@ -73,18 +73,18 @@ export default async function initialize(config: AppConfig) {
     icon: "https://thunderdome.so/images/icon-192x192.png",
   }, config.chains);
 
-  /*FCM.init(
+  FCM.init(
     {
-      apiKey: "AIzaSyBZCRpj9smnz-yIpXC4KVi9RFs23qcxH7M",
-      authDomain: "topictrade-8b711.firebaseapp.com",
-      projectId: "topictrade-8b711",
-      storageBucket: "topictrade-8b711.appspot.com",
-      messagingSenderId: "993631591207",
-      appId: "1:993631591207:web:d7bec5f0e54efdfe2ee702",
-      measurementId: "G-9CNQ54G1CY",
+      apiKey: "AIzaSyCIUXHJ8e-Z9V9qjIa6LqPLNth5ACv-BRY",
+      authDomain: "thunder-dome.firebaseapp.com",
+      projectId: "thunder-dome",
+      storageBucket: "thunder-dome.appspot.com",
+      messagingSenderId: "1084442345242",
+      appId: "1:1084442345242:web:0ced2bb4ef2395588436a3",
+      measurementId: "G-1P6VSYWPX8",
     },
-    "BKhZmi9lpQlQhFXwyMNujFGfjXQEfWKNML8S2gzu6hcFGr1pL-vPOTPU5YwtFHJ4poW-Ax7qm9xeR-7AB76eGl4",
-  );*/
+    "BMN8rlpisL71SRy6EgCO1bGwldNs471mpvPqxzPm0icl2KIe5W-Qf8iHTnWurO5m3sVPWzxyMOfVW2K22DTQW3E",
+  );
 
   await SplashLoader.load(
     el("img", { src: "/images/logo-transparent.png" }),
