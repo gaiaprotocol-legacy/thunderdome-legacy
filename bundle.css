@@ -4241,6 +4241,7 @@ body > section.app {
   body > section.app {
     width: 100%;
     margin-left: 0;
+    padding-bottom: calc(50px + env(safe-area-inset-bottom));
   }
 }
 body > section.app > .app-nav-bar > ul > .app-nav-bar-menu > .avatar {
