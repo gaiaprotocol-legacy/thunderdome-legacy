@@ -12,6 +12,7 @@ import {
 import { FCM, PWAInstallOverlay } from "@common-module/social";
 import {
   BlockTimeManager,
+  CoinbaseWalletManager,
   HashtagSubscribeManager,
   inject_fsesf_msg,
   LinkWalletPopup,
@@ -70,6 +71,12 @@ export default async function initialize(config: AppConfig) {
     name: "Thunder Dome",
     icon: "https://thunderdome.so/images/icon-192x192.png",
   }, config.chains);
+
+  CoinbaseWalletManager.init({
+    name: "Thunder Dome",
+    icon: "https://thunderdome.so/images/icon-192x192.png",
+  }, config.chains);
+
   WalletConnectManager.init({
     projectId: config.walletConnectProjectId,
     name: "Thunder Dome",
