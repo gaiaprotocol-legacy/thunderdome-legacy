@@ -1389,6 +1389,10 @@ button.component.disabled {
   --falling-color: #FB6565;
   --online-color: #1dbf73;
 }
+body > div > .select-modal {
+  position: fixed;
+  z-index: 999999;
+}
 .layout {
   height: 100%;
 }
@@ -3213,6 +3217,37 @@ button.component.disabled {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.connect-wallet-popup {
+  max-width: 420px !important;
+}
+.connect-wallet-popup > header {
+  display: flex;
+  justify-content: center;
+}
+.connect-wallet-popup > header > h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.connect-wallet-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 20px;
+}
+.connect-wallet-popup > main > button {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  height: 58px;
+}
+.connect-wallet-popup > main > button > img {
+  height: 32px;
+  border-radius: 4px;
 }
 .link-wallet-popup {
   max-width: 420px !important;
