@@ -15,6 +15,7 @@ import {
   HashtagSubscribeManager,
   inject_fsesf_msg,
   LinkWalletPopup,
+  MetaMaskManager,
   RealtimeActivityManager,
   SFEnv,
   SFOnlineUserManager,
@@ -24,7 +25,6 @@ import {
 } from "fsesf";
 import App from "./App.js";
 import AppConfig from "./AppConfig.js";
-import WelcomePopup from "./WelcomePopup.js";
 
 export default async function initialize(config: AppConfig) {
   inject_fsesf_msg();
@@ -66,6 +66,10 @@ export default async function initialize(config: AppConfig) {
     //TODO: 메시지 변경하고 열기 WelcomePopup.launch();
   }
 
+  MetaMaskManager.init({
+    name: "Thunder Dome",
+    icon: "https://thunderdome.so/images/icon-192x192.png",
+  }, config.chains);
   WalletConnectManager.init({
     projectId: config.walletConnectProjectId,
     name: "Thunder Dome",
