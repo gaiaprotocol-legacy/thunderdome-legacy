@@ -3116,9 +3116,15 @@ body > div > .select-modal {
   border-radius: 21px;
   font-size: 12px;
   color: var(--sub-text-color);
+  max-width: 100%;
 }
 .profile-section .link > .loading-content {
   margin-right: 8px;
+}
+.profile-section .link > .url {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .profile-section .link > button.copy {
   cursor: pointer;
@@ -3209,6 +3215,7 @@ body > div > .select-modal {
   font-size: 20px;
 }
 .x-section > .link-container > .link {
+  max-width: calc(100% - 26px);
   display: flex;
   gap: 4px;
   align-items: center;
@@ -3216,6 +3223,11 @@ body > div > .select-modal {
   background-color: var(--input-bg-color);
   padding: 8px 4px 8px 12px;
   border-radius: 6px;
+}
+.x-section > .link-container > .link > a {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .x-section > .link-container > .link > button.copy {
   cursor: pointer;
@@ -4150,6 +4162,11 @@ body > div > .select-modal {
 }
 .point-section > .referral-link > .link > .loading-content {
   margin-right: 8px;
+}
+.point-section > .referral-link > .link > .url {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .point-section > .referral-link > .link > button.copy {
   cursor: pointer;
