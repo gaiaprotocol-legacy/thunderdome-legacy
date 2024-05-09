@@ -3050,6 +3050,7 @@ body > div > .select-modal {
   padding: 16px;
   display: flex;
   gap: 12px;
+  color: var(--sub-text-color);
 }
 .login-required > main {
   flex-grow: 1;
