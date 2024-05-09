@@ -9,7 +9,11 @@ import {
   SplashLoader,
   Store,
 } from "@common-module/app";
-import { FCM, PWAInstallOverlay } from "@common-module/social";
+import {
+  AndroidFcmNotification,
+  FCM,
+  PWAInstallOverlay,
+} from "@common-module/social";
 import {
   BlockTimeManager,
   CoinbaseWalletManager,
@@ -133,6 +137,19 @@ export default async function initialize(config: AppConfig) {
       if (fcmData?.redirectTo) Router.go(fcmData.redirectTo);
     }
   });
+
+  if (params.has("fcm_data")) {
+    const fcmData = JSON.parse(params.get("fcm_data")!);
+    if (fcmData.redirectTo) {
+      if (BrowserInfo.isAndroid) {
+        new AndroidFcmNotification(
+          fcmData.title,
+          fcmData.body,
+          fcmData.redirectTo,
+        );
+      } else Router.go(fcmData.redirectTo);
+    }
+  }
 
   if (BrowserInfo.isWindows) BodyNode.addClass("windows");
   PolyfillUtil.fixMSWindowsEmojiDisplay();
