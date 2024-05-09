@@ -1194,6 +1194,17 @@ button.component.disabled {
 .warning-message-box.component > p > b {
   font-weight: bold;
 }
+.exit-app-popup.component > header > h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.exit-app-popup.component > main {
+  padding: 0 20px;
+}
 .x-account-email-required-popup > header {
   padding: 0 12px !important;
 }
