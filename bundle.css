@@ -1399,6 +1399,80 @@ button.component.disabled {
   max-width: 280px;
   border-radius: 8px;
 }
+@keyframes android-fcm-notification-timer-bar {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+:root {
+  --android-fcm-notification-timer-bar-bg-color: var(--list-loading-bar-bg-color);
+  --android-fcm-notification-timer-bar-color: var(--list-loading-bar-color);
+}
+.android-fcm-notification {
+  position: fixed;
+  left: 50%;
+  top: 16px;
+  z-index: 999998;
+  width: 90%;
+  max-width: 614px;
+  transform: translateX(-50%);
+  border: 1px solid var(--line-color);
+  background-color: var(--modal-bg-color);
+  display: flex;
+  flex-direction: column;
+  animation: show-popup 0.3s ease-out;
+}
+.android-fcm-notification > .timer-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--android-fcm-notification-timer-bar-bg-color);
+  z-index: 999997;
+  overflow: hidden;
+}
+.android-fcm-notification > .timer-bar::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: var(--android-fcm-notification-timer-bar-color);
+  animation: android-fcm-notification-timer-bar 5s linear forwards;
+}
+.android-fcm-notification > header {
+  flex-shrink: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+.android-fcm-notification > header > h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.android-fcm-notification > main {
+  padding: 0 20px;
+}
+.android-fcm-notification > footer {
+  flex-shrink: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 12px;
+}
+.android-fcm-notification > footer:empty {
+  display: none;
+}
 :root {
   --rising-color: #00A67E;
   --falling-color: #FB6565;
