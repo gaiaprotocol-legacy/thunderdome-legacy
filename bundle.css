@@ -2525,12 +2525,12 @@ body > div > .select-modal {
   font-size: 12px;
   color: var(--sub-text-color);
 }
-.hashtag-holder-list:empty {
+.creator-holder-list:empty {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.hashtag-holder-list:empty::before {
+.creator-holder-list:empty::before {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
@@ -3607,6 +3607,46 @@ body > div > .select-modal {
 }
 .creator-room-title-bar > .menu {
   margin-left: auto;
+}
+.hashtag-holder-list:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hashtag-holder-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
+  padding: 8px 12px;
+}
+.creator-holder-list-item {
+  cursor: pointer;
+  height: 58px;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+@media (pointer: fine) {
+  .creator-holder-list-item:hover {
+    background-color: var(--button-hover-color);
+  }
+}
+.creator-holder-list-item:active {
+  background-color: var(--button-hover-color);
+}
+.creator-holder-list-item > .avatar {
+  width: 36px;
+  height: 36px;
+}
+.creator-holder-list-item > .name {
+  flex-grow: 1;
+}
+.creator-holder-list-item > .balance {
+  font-size: 12px;
+  color: var(--sub-text-color);
 }
 .signed-user-holding-creator-list:empty {
   display: flex;
