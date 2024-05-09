@@ -1437,7 +1437,7 @@ button.component.disabled {
 .android-fcm-notification {
   position: fixed;
   left: 50%;
-  top: 16px;
+  top: 80px;
   z-index: 999998;
   width: 90%;
   max-width: 614px;
