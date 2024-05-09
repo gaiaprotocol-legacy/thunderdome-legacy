@@ -456,7 +456,6 @@ button.component.disabled {
   gap: 40px;
   padding: 0 10px;
   overflow-x: auto;
-  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 .tabs.component > ul::-webkit-scrollbar {
@@ -1554,7 +1553,6 @@ body > div > .select-modal {
 .horizontal-trending-asset-list {
   width: 100%;
   overflow-x: auto;
-  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 .horizontal-trending-asset-list::-webkit-scrollbar {
