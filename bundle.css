@@ -1002,6 +1002,29 @@ button.component.disabled {
 .input.component > textarea {
   height: 100px;
 }
+.quantity-input.component {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  align-items: flex-start;
+}
+.quantity-input.component > .label {
+  text-transform: capitalize;
+}
+.quantity-input.component > main {
+  display: flex;
+  border: 1px solid var(--input-border-color);
+  border-radius: 20px;
+}
+.quantity-input.component > main > input {
+  font-size: var(--page-font-size);
+  background-color: var(--input-bg-color);
+  padding: 0 12px;
+}
+.quantity-input.component > main > input:focus {
+  border: 1px solid var(--primary-color);
+}
 :root {
   --checkbox-border-color: var(--input-border-color);
   --checkbox-bg-color: var(--input-bg-color);
@@ -2203,13 +2226,15 @@ body > div > .select-modal {
   text-transform: capitalize;
 }
 .buy-hashtag-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding: 20px;
 }
 .buy-hashtag-popup > main > p {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 20px;
 }
 .buy-hashtag-popup > main > table {
   width: 100%;
@@ -2239,13 +2264,15 @@ body > div > .select-modal {
   text-transform: capitalize;
 }
 .sell-hashtag-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding: 20px;
 }
 .sell-hashtag-popup > main > p {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 20px;
 }
 .sell-hashtag-popup > main > table {
   width: 100%;
@@ -3565,13 +3592,15 @@ body > div > .select-modal {
   font-weight: bold;
 }
 .buy-creator-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding: 20px;
 }
 .buy-creator-popup > main > p {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 20px;
 }
 .buy-creator-popup > main > table {
   width: 100%;
@@ -3600,13 +3629,15 @@ body > div > .select-modal {
   font-weight: bold;
 }
 .sell-creator-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding: 20px;
 }
 .sell-creator-popup > main > p {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 20px;
 }
 .sell-creator-popup > main > table {
   width: 100%;
