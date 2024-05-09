@@ -1064,6 +1064,11 @@ button.component.disabled {
 .rich-display.component > .image-container.loading {
   min-width: 64px;
   min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--overlay-color);
+  border-radius: 12px;
 }
 .rich-display.component > .image-container > a {
   cursor: pointer;
