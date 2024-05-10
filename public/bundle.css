@@ -1718,7 +1718,7 @@ body > div > .select-modal {
   border-radius: 50%;
 }
 .horizontal-trending-asset-list-item > main > h3 {
-  max-width: 100%;
+  max-width: calc(100% - 16px);
   font-weight: bold;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -2429,6 +2429,7 @@ body > div > .select-modal {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 0;
+  color: var(--sub-text-color);
 }
 .hashtag-list-item > .info-container > .last-message > .new-message-count {
   background-color: var(--contained-button-bg-color);
@@ -4214,6 +4215,7 @@ body > div > .select-modal {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 0;
+  color: var(--sub-text-color);
 }
 .signed-user-chat-room-list-item > .info-container > .last-message > .new-message-count {
   background-color: var(--contained-button-bg-color);
