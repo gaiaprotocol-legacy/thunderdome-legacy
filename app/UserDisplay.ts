@@ -45,7 +45,7 @@ export default class UserDisplay extends DomNode {
       const user = await SFUserService.fetchByXUsername(xUsername);
       if (user) {
         this.renderUser(user);
-        this.fireEvent("userLoaded", user);
+        this.emit("userLoaded", user);
       } else this.main.empty();
     }
   }

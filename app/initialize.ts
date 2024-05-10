@@ -17,6 +17,7 @@ import {
 import {
   BlockTimeManager,
   CoinbaseWalletManager,
+  CreatorSubscribeManager,
   HashtagSubscribeManager,
   inject_fsesf_msg,
   LinkWalletPopup,
@@ -105,11 +106,11 @@ export default async function initialize(config: AppConfig) {
     el("img", { src: "/images/logo-transparent.png" }),
     [
       BlockTimeManager.init(),
-      SFSignedUserManager.init((userId) =>
-        HashtagSubscribeManager.loadSignedUserSubscribedHashtags(
-          userId,
-        )
-      ),
+      SFSignedUserManager.init([(userId) => {
+        CreatorSubscribeManager.loadSignedUserUnsubscribedCreators(userId);
+      }, (userId) => {
+        HashtagSubscribeManager.loadSignedUserSubscribedHashtags(userId);
+      }]),
     ],
   );
 
