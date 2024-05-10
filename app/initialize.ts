@@ -54,7 +54,7 @@ export default async function initialize(config: AppConfig) {
     assetName: "ticket",
     userBaseUri: "",
     creatorOptions: { unit: "ticket", baseUri: "/creator" },
-    hashtagOptions: { unit: "topic", baseUri: "/topic" },
+    hashtagOptions: { unit: "ticket", baseUri: "/topic" },
   });
 
   AppInitializer.initialize(

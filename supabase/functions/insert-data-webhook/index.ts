@@ -79,22 +79,39 @@ async function findCreatorSubscribedTokens(
 ): Promise<string[]> {
   const { data: holders, error: getHoldersError } = await supabase.from(
     "creator_holders",
-  ).select("user_id").eq("creator_address", creatorAddress).neq(
-    "user_id",
-    exceptUser,
+  ).select("wallet_address").eq(
+    "creator_address",
+    creatorAddress,
   );
   if (getHoldersError) throw getHoldersError;
 
-  const { data: unsubs, error: getUnsubsError } = await supabase.from(
-    "unsubscribed_creators",
-  ).select("user_id").eq("creator_address", creatorAddress);
+  const holderWalletAddresses = holders.map((holder) => holder.wallet_address);
+  holderWalletAddresses.push(creatorAddress);
+
+  const [
+    { data: holderUsers, error: getHolderUsersError },
+    { data: unsubs, error: getUnsubsError },
+  ] = await Promise.all([
+    supabase.from(
+      "users_public",
+    ).select("user_id").in(
+      "wallet_address",
+      holderWalletAddresses,
+    ).neq("user_id", exceptUser),
+    supabase.from("unsubscribed_creators").select("user_id").eq(
+      "creator_address",
+      creatorAddress,
+    ),
+  ]);
+
+  if (getHolderUsersError) throw getHolderUsersError;
   if (getUnsubsError) throw getUnsubsError;
 
   const { data: tokens, error: getTokensError } = await supabase.from(
     "fcm_tokens",
   ).select("token").in(
     "user_id",
-    holders.map((holder) => holder.user_id).filter(
+    holderUsers.map((holder) => holder.user_id).filter(
       (holder) => !unsubs.some((unsub) => unsub.user_id === holder),
     ),
   );
@@ -145,12 +162,61 @@ serveWithOptions(async (req) => {
     if (getUserError) throw getUserError;
     const user = users[0];
 
-    const tokens = await findHashtagSubscribedTokens(
-      data.asset_id!,
-      user?.user_id,
-    );
+    if (data.contract_type === "creator-trade") {
+      const tokens = await findCreatorSubscribedTokens(
+        data.asset_id!,
+        user?.user_id,
+      );
 
-    if (data.contract_type === "hashtag-trade") {
+      if (data.args[2] === "true") { // buy
+        for (const token of tokens) {
+          try {
+            await sendFcmToSpecificUser(token, {
+              tag: `creator_${data.asset_id}`,
+              title: "New trade",
+              body: `${
+                user
+                  ? user.display_name
+                  : shortenEthereumAddress(data.wallet_address ?? "")
+              } bought ${numberWithCommas(data.args[3])} ${data.asset_id} ${
+                Deno.env.get("CREATOR_UNIT")
+              }${data.args[3] === "1" ? "" : "s"}.`,
+              icon: user?.stored_avatar_thumb,
+            }, {
+              redirectTo: `/${data.asset_id}`,
+            });
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      } else {
+        for (const token of tokens) {
+          try {
+            await sendFcmToSpecificUser(token, {
+              tag: `creator_${data.asset_id}`,
+              title: "New trade",
+              body: `${
+                user
+                  ? user.display_name
+                  : shortenEthereumAddress(data.wallet_address ?? "")
+              } sold ${numberWithCommas(data.args[3])} ${data.asset_id} ${
+                Deno.env.get("CREATOR_UNIT")
+              }${data.args[3] === "1" ? "" : "s"}.`,
+              icon: user?.stored_avatar_thumb,
+            }, {
+              redirectTo: `/${data.asset_id}`,
+            });
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+    } else if (data.contract_type === "hashtag-trade") {
+      const tokens = await findHashtagSubscribedTokens(
+        data.asset_id!,
+        user?.user_id,
+      );
+
       if (data.args[2] === "true") { // buy
         for (const token of tokens) {
           try {
@@ -163,7 +229,7 @@ serveWithOptions(async (req) => {
                   : shortenEthereumAddress(data.wallet_address ?? "")
               } bought ${numberWithCommas(data.args[3])} ${data.asset_id} ${
                 Deno.env.get("HASHTAG_UNIT")
-              }.`,
+              }${data.args[3] === "1" ? "" : "s"}.`,
               icon: user?.stored_avatar_thumb,
             }, {
               redirectTo: `/${data.asset_id}`,
@@ -184,7 +250,7 @@ serveWithOptions(async (req) => {
                   : shortenEthereumAddress(data.wallet_address ?? "")
               } sold ${numberWithCommas(data.args[3])} ${data.asset_id} ${
                 Deno.env.get("HASHTAG_UNIT")
-              }.`,
+              }${data.args[3] === "1" ? "" : "s"}.`,
               icon: user?.stored_avatar_thumb,
             }, {
               redirectTo: `/${data.asset_id}`,
@@ -199,6 +265,7 @@ serveWithOptions(async (req) => {
     payload.type === "INSERT" && payload.table === "creator_messages"
   ) {
     const data = payload.record as CreatorMessage;
+
     const { data: users, error: getUserError } = await supabase.from(
       "users_public",
     ).select("user_id, display_name, stored_avatar_thumb").eq(
