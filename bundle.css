@@ -2429,6 +2429,7 @@ body > div > .select-modal {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 0;
+  color: var(--sub-text-color);
 }
 .hashtag-list-item > .info-container > .last-message > .new-message-count {
   background-color: var(--contained-button-bg-color);
@@ -4214,6 +4215,7 @@ body > div > .select-modal {
   text-overflow: ellipsis;
   overflow: hidden;
   width: 0;
+  color: var(--sub-text-color);
 }
 .signed-user-chat-room-list-item > .info-container > .last-message > .new-message-count {
   background-color: var(--contained-button-bg-color);
