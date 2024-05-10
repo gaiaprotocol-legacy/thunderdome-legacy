@@ -1718,7 +1718,7 @@ body > div > .select-modal {
   border-radius: 50%;
 }
 .horizontal-trending-asset-list-item > main > h3 {
-  max-width: 100%;
+  max-width: 90%;
   font-weight: bold;
   white-space: nowrap;
   text-overflow: ellipsis;
