@@ -14,8 +14,10 @@ import {
   CreatorRoom,
   HashtagRoom,
   HashtagUtil,
+  SFEnv,
   SFSignedUserManager,
 } from "fsesf";
+import HomeTab from "./tabs/HomeTab.js";
 import PointsTab from "./tabs/PointsTab.js";
 import SettingsTab from "./tabs/SettingsTab.js";
 import TicketsTab from "./tabs/TicketsTab.js";
@@ -25,6 +27,7 @@ import UserDisplay from "./UserDisplay.js";
 export default class App extends View {
   private navBar: AppNavBar;
 
+  private homeTab: HomeTab | undefined;
   private ticketsTab: TicketsTab;
   private topicsTab: TopicsTab;
   private pointsTab: PointsTab;
@@ -42,27 +45,53 @@ export default class App extends View {
         this.navBar = new AppNavBar({
           id: "sofia-app-nav-bar",
           logo: el("img", { src: "/images/logo-navbar.png" }),
-          menu: [{
-            id: "tickets",
-            title: "Tickets",
-            icon: new MaterialIcon("confirmation_number"),
-          }, {
-            id: "topics",
-            title: "Topics",
-            icon: new MaterialIcon("tag"),
-          }, {
-            id: "points",
-            title: "Points",
-            icon: new MaterialIcon("star"),
-          }, {
-            id: "settings",
-            title: SFSignedUserManager.user ? undefined : "Settings",
-            icon: SFSignedUserManager.user
-              ? el(".avatar")
-              : new MaterialIcon("settings"),
-            toFooter: SFSignedUserManager.user !== undefined,
-          }],
+          menu: SFEnv.dev
+            ? [{
+              id: "home",
+              title: "Home",
+              icon: new MaterialIcon("home"),
+            }, {
+              id: "tickets",
+              title: "Tickets",
+              icon: new MaterialIcon("confirmation_number"),
+            }, {
+              id: "topics",
+              title: "Topics",
+              icon: new MaterialIcon("tag"),
+            }, {
+              id: "points",
+              title: "Points",
+              icon: new MaterialIcon("star"),
+            }, {
+              id: "settings",
+              title: SFSignedUserManager.user ? undefined : "Settings",
+              icon: SFSignedUserManager.user
+                ? el(".avatar")
+                : new MaterialIcon("settings"),
+              toFooter: SFSignedUserManager.user !== undefined,
+            }]
+            : [{
+              id: "tickets",
+              title: "Tickets",
+              icon: new MaterialIcon("confirmation_number"),
+            }, {
+              id: "topics",
+              title: "Topics",
+              icon: new MaterialIcon("tag"),
+            }, {
+              id: "points",
+              title: "Points",
+              icon: new MaterialIcon("star"),
+            }, {
+              id: "settings",
+              title: SFSignedUserManager.user ? undefined : "Settings",
+              icon: SFSignedUserManager.user
+                ? el(".avatar")
+                : new MaterialIcon("settings"),
+              toFooter: SFSignedUserManager.user !== undefined,
+            }],
         }),
+        this.homeTab = new HomeTab(),
         this.ticketsTab = new TicketsTab(),
         this.topicsTab = new TopicsTab(),
         this.pointsTab = new PointsTab(),
@@ -84,13 +113,18 @@ export default class App extends View {
     }
 
     this.navBar.on("select", (id: string) => {
+      BodyNode.deleteClass("home", "tickets", "topics", "points", "settings")
+        .addClass(id);
+
       [
+        this.homeTab,
         this.ticketsTab,
         this.topicsTab,
         this.pointsTab,
         this.settingsTab,
-      ].forEach((list) => list.deactivate());
-      if (id === "tickets") this.ticketsTab.activate();
+      ].forEach((list) => list?.deactivate());
+      if (id === "home") this.homeTab?.activate();
+      else if (id === "tickets") this.ticketsTab.activate();
       else if (id === "topics") this.topicsTab.activate();
       else if (id === "points") this.pointsTab.activate();
       else if (id === "settings") this.settingsTab.activate();
