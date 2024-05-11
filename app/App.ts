@@ -16,7 +16,6 @@ import {
   HashtagUtil,
   SFSignedUserManager,
 } from "fsesf";
-import ChatsTab from "./tabs/ChatsTab.js";
 import PointsTab from "./tabs/PointsTab.js";
 import SettingsTab from "./tabs/SettingsTab.js";
 import TicketsTab from "./tabs/TicketsTab.js";
@@ -27,7 +26,6 @@ export default class App extends View {
   private navBar: AppNavBar;
 
   private ticketsTab: TicketsTab;
-  private chatsTab: ChatsTab;
   private topicsTab: TopicsTab;
   private pointsTab: PointsTab;
   private settingsTab: SettingsTab;
@@ -49,10 +47,6 @@ export default class App extends View {
             title: "Tickets",
             icon: new MaterialIcon("confirmation_number"),
           }, {
-            id: "chats",
-            title: "Chats",
-            icon: new MaterialIcon("forum"),
-          }, {
             id: "topics",
             title: "Topics",
             icon: new MaterialIcon("tag"),
@@ -70,7 +64,6 @@ export default class App extends View {
           }],
         }),
         this.ticketsTab = new TicketsTab(),
-        this.chatsTab = new ChatsTab(),
         this.topicsTab = new TopicsTab(),
         this.pointsTab = new PointsTab(),
         this.settingsTab = new SettingsTab(),
@@ -93,13 +86,11 @@ export default class App extends View {
     this.navBar.on("select", (id: string) => {
       [
         this.ticketsTab,
-        this.chatsTab,
         this.topicsTab,
         this.pointsTab,
         this.settingsTab,
       ].forEach((list) => list.deactivate());
       if (id === "tickets") this.ticketsTab.activate();
-      else if (id === "chats") this.chatsTab.activate();
       else if (id === "topics") this.topicsTab.activate();
       else if (id === "points") this.pointsTab.activate();
       else if (id === "settings") this.settingsTab.activate();
@@ -107,7 +98,6 @@ export default class App extends View {
 
     const assetTabs = [
       this.ticketsTab,
-      this.chatsTab,
       this.topicsTab,
       this.settingsTab,
     ];
@@ -135,7 +125,6 @@ export default class App extends View {
   public changeParams(params: ViewParams, uri: string, data?: any): void {
     const assetTabs = [
       this.ticketsTab,
-      this.chatsTab,
       this.topicsTab,
       this.settingsTab,
     ];

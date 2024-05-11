@@ -10,13 +10,14 @@ import {
   Tabs,
 } from "@common-module/app";
 import {
+  ActivityList,
   CreatorInfoModal,
-  HorizontalTrendingAssetList,
   NewAssetList,
   SFSignedUserManager,
   SFUserService,
-  SignedUserHoldingAssetList,
+  SignedUserChatRoomList,
   TopAssetList,
+  TrendingAssetList,
   UserAvatar,
   UserInfoModal,
 } from "fsesf";
@@ -24,47 +25,64 @@ import {
 export default class TicketsTab extends Activatable {
   private referrelStore = new Store("referral");
 
-  private main;
   private tabs: Tabs;
-  private yourTicketsList: SignedUserHoldingAssetList;
+  private chatRoomList: SignedUserChatRoomList;
+  private trendingAssetList: TrendingAssetList;
   private topAssetList: TopAssetList;
   private newAssetList: NewAssetList;
+  private activityList: ActivityList;
 
   constructor() {
     super(".app-tab.tickets-tab");
     this.append(
       el("header", el("h1", "Tickets")),
-      this.main = el(
+      this.tabs = new Tabs(undefined, [
+        {
+          id: "your-tickets",
+          label: "Your Tickets",
+        },
+        {
+          id: "trending",
+          label: "Trending",
+        },
+        {
+          id: "top",
+          label: "Top",
+        },
+        {
+          id: "new",
+          label: "New",
+        },
+        {
+          id: "activity",
+          label: "Activity",
+        },
+      ]),
+      el(
         "main",
-        el("header", el("h2", "Trending")),
-        new HorizontalTrendingAssetList(),
-        this.tabs = new Tabs(undefined, [
-          {
-            id: "your-tickets",
-            label: "Your Tickets",
-          },
-          {
-            id: "top",
-            label: "Top",
-          },
-          {
-            id: "new",
-            label: "New",
-          },
-        ]),
-        this.yourTicketsList = new SignedUserHoldingAssetList(),
+        this.chatRoomList = new SignedUserChatRoomList(),
+        this.trendingAssetList = new TrendingAssetList(),
         this.topAssetList = new TopAssetList(),
         this.newAssetList = new NewAssetList(),
+        this.activityList = new ActivityList(),
       ),
     );
 
     this.tabs.on("select", (id: string) => {
-      [this.yourTicketsList, this.topAssetList, this.newAssetList].forEach((
+      [
+        this.chatRoomList,
+        this.trendingAssetList,
+        this.topAssetList,
+        this.newAssetList,
+        this.activityList,
+      ].forEach((
         list,
       ) => list?.hide());
-      if (id === "your-tickets") this.yourTicketsList.show();
+      if (id === "your-tickets") this.chatRoomList.show();
+      else if (id === "trending") this.trendingAssetList.show();
       else if (id === "top") this.topAssetList.show();
       else if (id === "new") this.newAssetList.show();
+      else if (id === "activity") this.activityList.show();
     }).init();
 
     if (this.referrelStore.get("from")) {
@@ -130,20 +148,27 @@ export default class TicketsTab extends Activatable {
               click: () => SFSignedUserManager.signIn(),
             }),
           }),
-        ).appendTo(this.main, 0);
+        ).appendTo(this, 1);
       }
     }
   }
 
   public activeAsset(chain: string | undefined, assetId: string) {
-    this.yourTicketsList.activeAsset(chain, assetId);
+    this.chatRoomList.activeAsset(chain, assetId);
+    this.trendingAssetList.activeAsset(chain, assetId);
     this.topAssetList.activeAsset(chain, assetId);
     this.newAssetList.activeAsset(chain, assetId);
   }
 
   public deactiveAsset() {
-    this.yourTicketsList.deactiveAsset();
+    this.chatRoomList.deactiveAsset();
+    this.trendingAssetList.deactiveAsset();
     this.topAssetList.deactiveAsset();
     this.newAssetList.deactiveAsset();
+  }
+
+  public activate(): void {
+    super.activate();
+    this.tabs.emit("visible");
   }
 }
