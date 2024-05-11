@@ -25,7 +25,6 @@ export default class TicketsTab extends Activatable {
   private referrelStore = new Store("referral");
 
   private main;
-  private trendingList: HorizontalTrendingAssetList;
   private tabs: Tabs;
   private yourTicketsList: SignedUserHoldingAssetList;
   private topAssetList: TopAssetList;
@@ -38,7 +37,7 @@ export default class TicketsTab extends Activatable {
       this.main = el(
         "main",
         el("header", el("h2", "Trending")),
-        this.trendingList = new HorizontalTrendingAssetList(),
+        new HorizontalTrendingAssetList(),
         this.tabs = new Tabs(undefined, [
           {
             id: "your-tickets",
@@ -136,15 +135,15 @@ export default class TicketsTab extends Activatable {
     }
   }
 
-  public activeCreator(creatorAddress: string) {
+  public activeAsset(chain: string | undefined, assetId: string) {
+    this.yourTicketsList.activeAsset(chain, assetId);
+    this.topAssetList.activeAsset(chain, assetId);
+    this.newAssetList.activeAsset(chain, assetId);
   }
 
-  public deactiveCreator() {
-  }
-
-  public activeHashtag(hashtag: string) {
-  }
-
-  public deactiveHashtag() {
+  public deactiveAsset() {
+    this.yourTicketsList.deactiveAsset();
+    this.topAssetList.deactiveAsset();
+    this.newAssetList.deactiveAsset();
   }
 }

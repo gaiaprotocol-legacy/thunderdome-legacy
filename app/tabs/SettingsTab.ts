@@ -12,19 +12,11 @@ export default class SettingsTab extends Activatable {
     );
   }
 
-  public activeCreator(creatorAddress: string) {
-    this.mePanel.activeCreator(creatorAddress);
+  public activeAsset(chain: string | undefined, assetId: string) {
+    this.mePanel.activeAsset(chain, assetId);
   }
 
-  public deactiveCreator() {
-    this.mePanel.deactiveCreator();
-  }
-
-  public activeHashtag(hashtag: string) {
-    this.mePanel.activeHashtag(hashtag);
-  }
-
-  public deactiveHashtag() {
-    this.mePanel.deactiveHashtag();
+  public deactiveAsset() {
+    this.mePanel.deactiveAsset();
   }
 }

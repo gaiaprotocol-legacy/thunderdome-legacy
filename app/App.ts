@@ -105,6 +105,13 @@ export default class App extends View {
       else if (id === "settings") this.settingsTab.activate();
     }).init();
 
+    const assetTabs = [
+      this.ticketsTab,
+      this.chatsTab,
+      this.topicsTab,
+      this.settingsTab,
+    ];
+
     if (params.xUsername) {
       this.room = new UserDisplay(params.xUsername, data).appendTo(
         this.roomSection,
@@ -113,21 +120,26 @@ export default class App extends View {
       this.room = new CreatorRoom(params.creatorAddress, data).appendTo(
         this.roomSection,
       );
-      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
-        list.activeCreator(params.creatorAddress!)
+      assetTabs.forEach((list) =>
+        list.activeAsset(undefined, params.creatorAddress!)
       );
     } else if (params.topic) {
       this.room = new HashtagRoom(params.topic, data).appendTo(
         this.roomSection,
       );
-      [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
-        list.activeHashtag(params.topic!)
-      );
+      assetTabs.forEach((list) => list.activeAsset(undefined, params.topic!));
       this.checkAvailableTopic(params.topic);
     }
   }
 
   public changeParams(params: ViewParams, uri: string, data?: any): void {
+    const assetTabs = [
+      this.ticketsTab,
+      this.chatsTab,
+      this.topicsTab,
+      this.settingsTab,
+    ];
+
     if (params.xUsername) {
       if (!(this.room instanceof UserDisplay)) {
         this.room?.delete();
@@ -137,12 +149,7 @@ export default class App extends View {
       } else {
         this.room.loadUser(params.xUsername, data);
       }
-      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
-        list.deactiveCreator()
-      );
-      [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
-        list.deactiveHashtag()
-      );
+      assetTabs.forEach((list) => list.deactiveAsset());
     } else if (params.creatorAddress) {
       if (!(this.room instanceof CreatorRoom)) {
         this.room?.delete();
@@ -152,11 +159,8 @@ export default class App extends View {
       } else {
         this.room.enter(params.creatorAddress, data);
       }
-      [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
-        list.deactiveHashtag()
-      );
-      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
-        list.activeCreator(params.creatorAddress!)
+      assetTabs.forEach((list) =>
+        list.activeAsset(undefined, params.creatorAddress!)
       );
     } else if (params.topic) {
       if (!(this.room instanceof HashtagRoom)) {
@@ -167,22 +171,12 @@ export default class App extends View {
       } else {
         this.room.enter(params.topic, data);
       }
-      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
-        list.deactiveCreator()
-      );
-      [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
-        list.activeHashtag(params.topic!)
-      );
+      assetTabs.forEach((list) => list.activeAsset(undefined, params.topic!));
       this.checkAvailableTopic(params.topic);
     } else {
       this.room?.delete();
       this.room = undefined;
-      [this.ticketsTab, this.chatsTab, this.settingsTab].forEach((list) =>
-        list.deactiveCreator()
-      );
-      [this.ticketsTab, this.topicsTab, this.settingsTab].forEach((list) =>
-        list.deactiveHashtag()
-      );
+      assetTabs.forEach((list) => list.deactiveAsset());
     }
   }
 

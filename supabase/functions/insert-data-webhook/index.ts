@@ -94,7 +94,7 @@ async function findCreatorSubscribedTokens(
   ] = await Promise.all([
     supabase.from(
       "users_public",
-    ).select("user_id").in(
+    ).select("user_id, wallet_address").in(
       "wallet_address",
       holderWalletAddresses,
     ).neq("user_id", exceptUser),

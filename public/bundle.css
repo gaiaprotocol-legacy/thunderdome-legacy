@@ -105,7 +105,7 @@ meter {
   --placeholder-bg-color: rgba(255, 255, 255, 0.1);
   --windows-scrollbar-color: rgba(128, 128, 128, 0.5);
   --page-bg-color: #121212;
-  --title-text-color: #fff;
+  --title-text-color: #f4f4f4;
   --paragraph-text-color: #b4c2d3;
   --sub-text-color: #8e8e8e;
   --page-font-family: 'Inter', sans-serif;
@@ -113,27 +113,6 @@ meter {
   --paragraph-line-height: 1.42857em;
   --overlay-color: rgba(0, 0, 0, 0.5);
   --modal-bg-color: #1E1E1E;
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 100;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyeMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuDyfMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuOKfMZg.ttf) format('truetype');
 }
 @font-face {
   font-family: 'Inter';
@@ -148,34 +127,6 @@ meter {
   font-weight: 500;
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuDyYMZg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuBWYMZg.ttf) format('truetype');
 }
 :root {
   width: 100%;
@@ -209,6 +160,7 @@ h6 {
 }
 p {
   line-height: var(--paragraph-line-height);
+  word-break: break-word;
 }
 a {
   cursor: pointer;
@@ -1718,7 +1670,7 @@ body > div > .select-modal {
   border-radius: 50%;
 }
 .horizontal-trending-asset-list-item > main > h3 {
-  max-width: calc(100% - 16px);
+  max-width: calc(100% - 32px);
   font-weight: bold;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -2143,6 +2095,9 @@ body > div > .select-modal {
   .hashtag-info-modal > main > .actions {
     padding: 12px;
   }
+}
+.hashtag-info-modal > main > .actions > button {
+  border-radius: 21px;
 }
 .hashtag-info-modal > main > .metrics {
   padding: 20px;
@@ -2760,7 +2715,7 @@ body > div > .select-modal {
   cursor: text;
 }
 .hashtag-message-form > main > form > .input-container > .message-input {
-  word-break: break-all;
+  word-break: break-word;
   color: var(--message-color);
 }
 .hashtag-message-list {
@@ -2881,6 +2836,8 @@ body > div > .select-modal {
   font-size: 13px;
   white-space: nowrap;
   line-height: 21px;
+  -webkit-user-select: none;
+  user-select: none;
 }
 @container (width < 520px) {
   .hashtag-message-display > .date {
@@ -2898,7 +2855,7 @@ body > div > .select-modal {
 .hashtag-message-display > .message-container > .message {
   flex-grow: 1;
   color: var(--message-color);
-  word-break: break-all;
+  word-break: break-word;
   padding: 2px 0;
 }
 @container (width < 520px) {
@@ -2920,6 +2877,8 @@ body > div > .select-modal {
   font-size: 13px;
   white-space: nowrap;
   line-height: 21px;
+  -webkit-user-select: none;
+  user-select: none;
 }
 @container (width < 520px) {
   .hashtag-message-display > .message-container > .date {
@@ -3148,10 +3107,11 @@ body > div > .select-modal {
   gap: 4px;
   align-items: center;
   justify-content: center;
-  padding: 34px 10px;
+  padding: 54px 10px 34px;
 }
 .me-panel > footer > button {
   opacity: 0.5;
+  border-radius: 19px;
 }
 .me-panel > footer > button:hover {
   opacity: 1;
@@ -3464,7 +3424,7 @@ body > div > .select-modal {
   padding: 8px 12px;
   border-radius: 6px;
   font-weight: bold;
-  word-break: break-all;
+  word-break: break-word;
 }
 .wallet-settings-modal > main > .wallet-address-container > .button-container {
   display: flex;
@@ -3926,7 +3886,7 @@ body > div > .select-modal {
   cursor: text;
 }
 .creator-message-form > main > form > .input-container > .message-input {
-  word-break: break-all;
+  word-break: break-word;
   color: var(--message-color);
 }
 .creator-message-list {
@@ -4012,7 +3972,7 @@ body > div > .select-modal {
   }
 }
 :root {
-  --message-color: #fff;
+  --message-color: var(--paragraph-text-color);
   --waiting-message-color: rgba(255, 255, 255, 0.5);
   --phone-message-bg-color: rgba(128, 128, 128, 0.2);
   --waiting-phone-message-bg-color: rgba(128, 128, 128, 0.1);
@@ -4047,6 +4007,8 @@ body > div > .select-modal {
   font-size: 13px;
   white-space: nowrap;
   line-height: 21px;
+  -webkit-user-select: none;
+  user-select: none;
 }
 @container (width < 520px) {
   .creator-message-display > .date {
@@ -4064,7 +4026,7 @@ body > div > .select-modal {
 .creator-message-display > .message-container > .message {
   flex-grow: 1;
   color: var(--message-color);
-  word-break: break-all;
+  word-break: break-word;
   padding: 2px 0;
 }
 @container (width < 520px) {
@@ -4086,6 +4048,8 @@ body > div > .select-modal {
   font-size: 13px;
   white-space: nowrap;
   line-height: 21px;
+  -webkit-user-select: none;
+  user-select: none;
 }
 @container (width < 520px) {
   .creator-message-display > .message-container > .date {
@@ -4300,7 +4264,7 @@ body > div > .select-modal {
   padding: 8px;
   background-color: var(--contained-button-bg-color);
   color: var(--contained-button-text-color);
-  font-weight: 500;
+  font-weight: bold;
   border-radius: 16px;
 }
 .point-section > .referral-link {
@@ -4425,6 +4389,7 @@ body > div > .select-modal {
   --primary-color: #50a7ea;
   --line-color: #24303f;
   --page-bg-color: #141c27;
+  --title-text-color: #f4f4f4;
   --paragraph-text-color: #E7E9EA;
   --sub-text-color: #97a3b2;
   --modal-bg-color: #141c27;

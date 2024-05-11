@@ -30,11 +30,11 @@ export default class TopicsTab extends Activatable {
     );
   }
 
-  public activeHashtag(hashtag: string) {
-    this.hashtagList.activeHashtag(hashtag);
+  public activeAsset(chain: string | undefined, assetId: string) {
+    this.hashtagList.activeHashtag(assetId);
   }
 
-  public deactiveHashtag() {
+  public deactiveAsset() {
     this.hashtagList.deactiveHashtag();
   }
 }
