@@ -1885,6 +1885,17 @@ body > div > .select-modal {
   font-size: 12px;
   color: var(--sub-text-color);
 }
+.trending-asset-list:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.trending-asset-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
+  padding: 8px 12px;
+}
 .top-asset-list:empty {
   display: flex;
   align-items: center;
@@ -2902,6 +2913,9 @@ body > div > .select-modal {
     background-color: var(--phone-message-hover-color);
   }
 }
+.activity-list {
+  padding: 10px 0;
+}
 .activity-list:empty {
   display: flex;
   align-items: center;
@@ -2912,6 +2926,9 @@ body > div > .select-modal {
   content: attr(data-empty-message);
   color: var(--sub-text-color);
   padding: 8px 12px;
+}
+.activity-list.hidden {
+  display: none;
 }
 @keyframes new-activity-list-item {
   from {
@@ -2925,11 +2942,10 @@ body > div > .select-modal {
   }
 }
 .activity-list-item {
-  padding: 10.5px 10px;
+  padding: 14px 20px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  align-items: center;
-  border-bottom: 1px solid var(--line-color);
 }
 .activity-list-item.new {
   animation: new-activity-list-item 0.3s ease-out;
@@ -2950,9 +2966,9 @@ body > div > .select-modal {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
+  width: 29px;
+  height: 29px;
+  border-radius: 4px;
 }
 .activity-list-item > header > .asset-image.loading,
 .activity-list-item > header > .user-avatar.loading {
@@ -2965,29 +2981,27 @@ body > div > .select-modal {
   animation-name: loading-content-animation;
   animation-timing-function: linear;
 }
-.activity-list-item > header > .user-avatar {
-  margin-right: -8px;
+.activity-list-item > header > .asset-image.creator,
+.activity-list-item > header > .user-avatar.creator {
   border-radius: 50%;
 }
-.activity-list-item > main {
-  flex-grow: 1;
-  width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.activity-list-item > header > .user-avatar {
+  margin-right: -6px;
+  border-radius: 50%;
+}
+.activity-list-item > header > .date {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--sub-text-color);
 }
 .activity-list-item > main > .description > a {
   color: var(--primary-color);
   cursor: pointer;
 }
-.activity-list-item > main > .info {
-  font-size: 12px;
-  color: var(--sub-text-color);
-}
-.activity-list-item > main > .info > .price.up {
+.activity-list-item > main > .description > .price.up {
   color: var(--rising-color);
 }
-.activity-list-item > main > .info > .price.down {
+.activity-list-item > main > .description > .price.down {
   color: var(--falling-color);
 }
 .asset-activity-list:empty {
@@ -4084,7 +4098,7 @@ body > div > .select-modal {
   color: var(--sub-text-color);
   padding: 8px 12px;
 }
-.signed-user-chat-room-list:hidden {
+.signed-user-chat-room-list.hidden {
   display: none;
 }
 .signed-user-chat-room-list-item {
@@ -4579,11 +4593,11 @@ body > section.room:empty::before {
   padding-bottom: 80px;
 }
 .tickets-tab > main > .referral-info-message-container {
-  padding: 16px 16px 0;
+  padding: 16px;
 }
 @container (width < 1280px) {
   .tickets-tab > main > .referral-info-message-container {
-    padding: 12px 12px 0;
+    padding: 12px;
   }
 }
 .tickets-tab > main > .referral-info-message-container > .info-message-box > main > p > .user {
@@ -4594,29 +4608,5 @@ body > section.room:empty::before {
 .tickets-tab > main > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar {
   width: 12px;
   height: 12px;
-}
-.tickets-tab > main > header {
-  padding: 20px 10px 10px 18px;
-  display: flex;
-  align-items: center;
-}
-.tickets-tab > main > header > h2 {
-  flex-grow: 1;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-.tickets-tab > main > header > button {
-  font-size: 12px;
-  padding: 4px 8px;
-}
-.tickets-tab > main > header > button > .title > .loading-spinner:after {
-  width: 12px;
-  height: 12px;
-}
-.tickets-tab > main > .horizontal-trending-asset-list {
-  flex-shrink: 0;
-}
-.tickets-tab > main > .tabs {
-  margin-top: 12px;
 }
 
