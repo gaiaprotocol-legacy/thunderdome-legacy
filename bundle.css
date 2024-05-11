@@ -104,6 +104,7 @@ meter {
   --placeholder-color: rgba(255, 255, 255, 0.5);
   --placeholder-bg-color: rgba(255, 255, 255, 0.1);
   --windows-scrollbar-color: rgba(128, 128, 128, 0.5);
+  --bold-weight: 500;
   --page-bg-color: #121212;
   --title-text-color: #f4f4f4;
   --paragraph-text-color: #b4c2d3;
@@ -418,6 +419,7 @@ button.component.disabled {
   min-height: 48px;
   display: flex;
   align-items: center;
+  justify-content: center;
   border-top: 3px solid transparent;
   border-bottom: 3px solid transparent;
   padding: 0 10px;
@@ -1080,7 +1082,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .alert.component > main {
@@ -1091,7 +1093,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .error-alert.component > main {
@@ -1102,7 +1104,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .confirm.component > main {
@@ -1113,7 +1115,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .prompt.component > main {
@@ -1146,7 +1148,7 @@ button.component.disabled {
   text-decoration: underline;
 }
 .info-message-box.component > main > p > b {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 :root {
   --warning-message-color: #FFA500;
@@ -1167,14 +1169,14 @@ button.component.disabled {
   text-decoration: underline;
 }
 .warning-message-box.component > p > b {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .exit-android-app-popup.component > header > h1 {
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .exit-android-app-popup.component > main {
@@ -1190,7 +1192,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   line-height: 1.5em;
 }
 @container (width < 1280px) {
@@ -1283,7 +1285,7 @@ button.component.disabled {
 }
 .leave-feedback-modal > header > .title {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .leave-feedback-modal > main {
   padding: 20px;
@@ -1310,7 +1312,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   line-height: 1.5em;
 }
 @container (width < 1280px) {
@@ -1347,7 +1349,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   line-height: 1.5em;
 }
 @container (width < 1280px) {
@@ -1430,7 +1432,7 @@ button.component.disabled {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .android-fcm-notification > main {
@@ -1494,7 +1496,7 @@ body > div > .select-modal {
   height: 56px;
   border-bottom: 1px solid var(--line-color);
   font-size: 16px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -1539,7 +1541,7 @@ body > div > .select-modal {
 }
 .title-bar-user-display > .name {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .user-drawer > header {
   display: flex;
@@ -1559,7 +1561,7 @@ body > div > .select-modal {
   gap: 4px;
 }
 .user-drawer > header > .signed-user > .info > .name {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .user-drawer > header > .signed-user > .info > .x-username {
   color: #595959;
@@ -1671,7 +1673,7 @@ body > div > .select-modal {
 }
 .horizontal-trending-asset-list-item > main > h3 {
   max-width: calc(100% - 32px);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -1766,7 +1768,7 @@ body > div > .select-modal {
 .holding-asset-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -1780,7 +1782,7 @@ body > div > .select-modal {
 .holding-asset-list-item > .info-container > .info > .price.down {
   color: var(--falling-color);
 }
-.holding-asset-list-item > .info-container > .balance-and-fee-earned {
+.holding-asset-list-item > .info-container > .balance-and-fees-earned {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1864,7 +1866,7 @@ body > div > .select-modal {
 .signed-user-holding-asset-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -1878,7 +1880,7 @@ body > div > .select-modal {
 .signed-user-holding-asset-list-item > .info-container > .info > .price.down {
   color: var(--falling-color);
 }
-.signed-user-holding-asset-list-item > .info-container > .balance-and-fee-earned {
+.signed-user-holding-asset-list-item > .info-container > .balance-and-fees-earned {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1981,7 +1983,7 @@ body > div > .select-modal {
 .asset-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -2051,7 +2053,7 @@ body > div > .select-modal {
   cursor: pointer;
 }
 .hashtag-room-title-bar > .info-container > h1 {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .hashtag-room-title-bar > .info-container > .info {
   font-size: 12px;
@@ -2093,7 +2095,7 @@ body > div > .select-modal {
 }
 .hashtag-info-modal > header > .title > .hashtag {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .hashtag-info-modal > main {
   padding-bottom: 80px;
@@ -2175,7 +2177,7 @@ body > div > .select-modal {
 }
 .hashtag-leaderboard-modal > header > .title {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .hashtag-leaderboard-modal > main {
   padding-bottom: 80px;
@@ -2188,7 +2190,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .buy-hashtag-popup > main {
@@ -2212,7 +2214,7 @@ body > div > .select-modal {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
   color: var(--title-text-color);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .buy-hashtag-popup > main > table tr > td {
   padding: 8px 10px;
@@ -2226,7 +2228,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .sell-hashtag-popup > main {
@@ -2250,7 +2252,7 @@ body > div > .select-modal {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
   color: var(--title-text-color);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .sell-hashtag-popup > main > table tr > td {
   padding: 8px 10px;
@@ -2264,7 +2266,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .claim-hashtag-holder-fee-popup > main {
@@ -2282,7 +2284,7 @@ body > div > .select-modal {
 .claim-hashtag-holder-fee-popup > main > table tr > th {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .claim-hashtag-holder-fee-popup > main > table tr > td {
   padding: 8px 10px;
@@ -2292,7 +2294,7 @@ body > div > .select-modal {
   color: var(--title-text-color);
 }
 .claim-hashtag-holder-fee-popup > main > table .total > td {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .hashtag-list:empty {
   display: flex;
@@ -2358,6 +2360,7 @@ body > div > .select-modal {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 .hashtag-list-item > .info-container > .info {
   display: flex;
@@ -2366,7 +2369,7 @@ body > div > .select-modal {
 .hashtag-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -2485,7 +2488,7 @@ body > div > .select-modal {
 .hashtag-leaderboard-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -2583,7 +2586,7 @@ body > div > .select-modal {
 .signed-user-holding-hashtag-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -2597,7 +2600,7 @@ body > div > .select-modal {
 .signed-user-holding-hashtag-list-item > .info-container > .info > .price.down {
   color: var(--falling-color);
 }
-.signed-user-holding-hashtag-list-item > .info-container > .balance-and-fee-earned {
+.signed-user-holding-hashtag-list-item > .info-container > .balance-and-fees-earned {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2794,7 +2797,7 @@ body > div > .select-modal {
   align-items: center;
 }
 .hashtag-message-list-item > main > .author > .name {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: var(--primary-color);
   cursor: pointer;
 }
@@ -3077,7 +3080,7 @@ body > div > .select-modal {
 }
 .me-panel > .signed-user > .info > .name {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .me-panel > .signed-user > .info > .x-username {
   font-size: 12px;
@@ -3090,7 +3093,7 @@ body > div > .select-modal {
 }
 .me-panel > header > h2 {
   flex-grow: 1;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: var(--primary-color);
 }
 .me-panel > header > button {
@@ -3149,7 +3152,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .login-required-popup > main {
@@ -3157,7 +3160,7 @@ body > div > .select-modal {
 }
 .user-info-modal > header > .title {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .user-info-modal > main {
   display: flex;
@@ -3178,7 +3181,7 @@ body > div > .select-modal {
 }
 .profile-section > .name {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .profile-section > .last-sign-in {
   display: flex;
@@ -3296,7 +3299,7 @@ body > div > .select-modal {
   gap: 12px;
 }
 .x-section > .link-container > h2 {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   margin-left: 4px;
   font-size: 20px;
 }
@@ -3333,7 +3336,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .connect-wallet-popup > main {
@@ -3364,7 +3367,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .link-wallet-popup > main {
@@ -3388,7 +3391,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .link-wallet-confirm-popup > main {
@@ -3415,7 +3418,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
 .wallet-settings-modal > main {
@@ -3430,14 +3433,14 @@ body > div > .select-modal {
   gap: 10px;
 }
 .wallet-settings-modal > main > .wallet-address-container > h3 {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .wallet-settings-modal > main > .wallet-address-container > .wallet-address {
   border: 1px solid var(--input-border-color);
   background-color: var(--input-bg-color);
   padding: 8px 12px;
   border-radius: 6px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   word-break: break-word;
 }
 .wallet-settings-modal > main > .wallet-address-container > .button-container {
@@ -3472,7 +3475,7 @@ body > div > .select-modal {
   gap: 4px;
 }
 .wallet-settings-modal > main > .chain-info-display > .balance > .value {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: var(--primary-color);
 }
 .coinbase-pay-button {
@@ -3489,7 +3492,7 @@ body > div > .select-modal {
   color: #fff;
   transition: background-color 0.3s ease, border-color 0.3s ease;
   white-space: nowrap;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 @media (pointer: fine) {
   .coinbase-pay-button:hover:not(.disabled) {
@@ -3505,7 +3508,7 @@ body > div > .select-modal {
 }
 .creator-info-modal > header > .title {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .creator-info-modal > main {
   display: flex;
@@ -3564,7 +3567,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .buy-creator-popup > main {
   display: flex;
@@ -3587,7 +3590,7 @@ body > div > .select-modal {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
   color: var(--title-text-color);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .buy-creator-popup > main > table tr > td {
   padding: 8px 10px;
@@ -3601,7 +3604,7 @@ body > div > .select-modal {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .sell-creator-popup > main {
   display: flex;
@@ -3624,7 +3627,7 @@ body > div > .select-modal {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
   color: var(--title-text-color);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .sell-creator-popup > main > table tr > td {
   padding: 8px 10px;
@@ -3685,7 +3688,7 @@ body > div > .select-modal {
   cursor: pointer;
 }
 .creator-room-title-bar > .info-container > h1 {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .creator-room-title-bar > .info-container > .info {
   font-size: 12px;
@@ -3797,7 +3800,7 @@ body > div > .select-modal {
 .signed-user-holding-creator-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -3811,7 +3814,7 @@ body > div > .select-modal {
 .signed-user-holding-creator-list-item > .info-container > .info > .price.down {
   color: var(--falling-color);
 }
-.signed-user-holding-creator-list-item > .info-container > .balance-and-fee-earned {
+.signed-user-holding-creator-list-item > .info-container > .balance-and-fees-earned {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3968,7 +3971,7 @@ body > div > .select-modal {
   align-items: center;
 }
 .creator-message-list-item > main > .author > .name {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: var(--primary-color);
   cursor: pointer;
 }
@@ -4103,7 +4106,7 @@ body > div > .select-modal {
 }
 .signed-user-chat-room-list-item {
   cursor: pointer;
-  height: 58px;
+  height: 64px;
   border-bottom: 1px solid var(--line-color);
   padding: 0 10px;
   display: flex;
@@ -4164,7 +4167,7 @@ body > div > .select-modal {
 .signed-user-chat-room-list-item > .info-container > .info > h3 {
   flex-grow: 1;
   width: 0;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -4253,7 +4256,7 @@ body > div > .select-modal {
   padding: 10px 10px 0 18px;
   display: flex;
   align-items: center;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: var(--primary-color);
 }
 .point-section > ul.earning-methods {
@@ -4278,7 +4281,7 @@ body > div > .select-modal {
   padding: 8px;
   background-color: var(--contained-button-bg-color);
   color: var(--contained-button-text-color);
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   border-radius: 16px;
 }
 .point-section > .referral-link {
@@ -4319,7 +4322,7 @@ body > div > .select-modal {
 .point-leaderboard > thead > tr > th {
   border-bottom: 1px solid var(--line-color);
   padding: 12px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: #fff;
 }
 .point-leaderboard > tbody:empty::before {
@@ -4349,12 +4352,12 @@ body > div > .select-modal {
   height: 26px;
 }
 .point-leaderboard > tbody > tr > td.points {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
   color: var(--primary-color);
 }
 .point-leaderboard-modal > header > .title {
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .point-leaderboard-modal > main {
   padding-bottom: 80px;
@@ -4465,7 +4468,7 @@ body > section.app > .app-tab > header {
   justify-content: center;
 }
 body > section.app > .app-tab > header > h1 {
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 body > section.app > .app-tab > header > .right {
   position: absolute;
@@ -4521,6 +4524,17 @@ body > section.room:empty::before {
   body > section.room:empty {
     display: none;
   }
+}
+body.home > section.app {
+  width: calc(100% - 71px);
+}
+@container (width < 1280px) {
+  body.home > section.app {
+    width: 100%;
+  }
+}
+body.home > section.room {
+  display: none;
 }
 .user-display {
   display: flex;
@@ -4582,10 +4596,44 @@ body > section.room:empty::before {
   align-items: center;
   gap: 10px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: var(--bold-weight);
 }
 .welcome-popup > main {
   padding: 0 20px;
+}
+@container (width >= 1280px) {
+  .home-tab {
+    padding-right: 71px;
+  }
+}
+.home-tab > header {
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+  border-bottom: none !important;
+}
+@container (width >= 1280px) {
+  .home-tab > header {
+    display: none !important;
+  }
+}
+.home-tab > header > h1 > img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.home-tab > .tabs {
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+}
+.home-tab > .tabs > ul > .tab {
+  width: 50%;
+}
+@container (width >= 1280px) {
+  .home-tab > main {
+    margin-right: -71px;
+  }
 }
 .tickets-tab > main {
   display: flex;
