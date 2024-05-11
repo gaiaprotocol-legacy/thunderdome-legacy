@@ -117,7 +117,10 @@ async function findCreatorSubscribedTokens(
   );
   if (getTokensError) throw getTokensError;
 
-  return tokens.map((t) => t.token);
+  return [
+    holderUsers.find((u) => u.wallet_address === creatorAddress),
+    tokens.map((t) => t.token),
+  ];
 }
 
 async function findHashtagSubscribedTokens(
@@ -163,7 +166,7 @@ serveWithOptions(async (req) => {
     const user = users[0];
 
     if (data.contract_type === "creator-trade") {
-      const tokens = await findCreatorSubscribedTokens(
+      const [creator, tokens] = await findCreatorSubscribedTokens(
         data.asset_id!,
         user?.user_id,
       );
@@ -178,9 +181,11 @@ serveWithOptions(async (req) => {
                 user
                   ? user.display_name
                   : shortenEthereumAddress(data.wallet_address ?? "")
-              } bought ${numberWithCommas(data.args[3])} ${data.asset_id} ${
-                Deno.env.get("CREATOR_UNIT")
-              }${data.args[3] === "1" ? "" : "s"}.`,
+              } bought ${numberWithCommas(data.args[3])} ${
+                creator ? creator.display_name : data.asset_id
+              } ${Deno.env.get("CREATOR_UNIT")}${
+                data.args[3] === "1" ? "" : "s"
+              }.`,
               icon: user?.stored_avatar_thumb,
             }, {
               redirectTo: `/${data.asset_id}`,
@@ -199,9 +204,11 @@ serveWithOptions(async (req) => {
                 user
                   ? user.display_name
                   : shortenEthereumAddress(data.wallet_address ?? "")
-              } sold ${numberWithCommas(data.args[3])} ${data.asset_id} ${
-                Deno.env.get("CREATOR_UNIT")
-              }${data.args[3] === "1" ? "" : "s"}.`,
+              } sold ${numberWithCommas(data.args[3])} ${
+                creator ? creator.display_name : data.asset_id
+              } ${Deno.env.get("CREATOR_UNIT")}${
+                data.args[3] === "1" ? "" : "s"
+              }.`,
               icon: user?.stored_avatar_thumb,
             }, {
               redirectTo: `/${data.asset_id}`,
@@ -275,7 +282,7 @@ serveWithOptions(async (req) => {
     if (getUserError) throw getUserError;
     const user = users[0];
 
-    const tokens = await findCreatorSubscribedTokens(
+    const [creator, tokens] = await findCreatorSubscribedTokens(
       data.creator_address,
       user?.user_id,
     );
