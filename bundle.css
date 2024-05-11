@@ -2394,7 +2394,7 @@ body > div > .select-modal {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 100px;
+  max-width: 120px;
 }
 .hashtag-list-item > .info-container > .last-message > .message {
   flex-grow: 1;
@@ -2516,7 +2516,7 @@ body > div > .select-modal {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 100px;
+  max-width: 120px;
 }
 .hashtag-leaderboard-item > .info-container > .last-message > .message {
   flex-grow: 1;
@@ -4200,7 +4200,7 @@ body > div > .select-modal {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  max-width: 100px;
+  max-width: 120px;
 }
 .signed-user-chat-room-list-item > .info-container > .last-message > .message {
   flex-grow: 1;
