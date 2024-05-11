@@ -105,7 +105,7 @@ meter {
   --placeholder-bg-color: rgba(255, 255, 255, 0.1);
   --windows-scrollbar-color: rgba(128, 128, 128, 0.5);
   --page-bg-color: #121212;
-  --title-text-color: #fff;
+  --title-text-color: #f4f4f4;
   --paragraph-text-color: #b4c2d3;
   --sub-text-color: #8e8e8e;
   --page-font-family: 'Inter', sans-serif;
@@ -4016,7 +4016,7 @@ body > div > .select-modal {
   }
 }
 :root {
-  --message-color: #fff;
+  --message-color: var(--paragraph-text-color);
   --waiting-message-color: rgba(255, 255, 255, 0.5);
   --phone-message-bg-color: rgba(128, 128, 128, 0.2);
   --waiting-phone-message-bg-color: rgba(128, 128, 128, 0.1);
@@ -4433,6 +4433,7 @@ body > div > .select-modal {
   --primary-color: #50a7ea;
   --line-color: #24303f;
   --page-bg-color: #141c27;
+  --title-text-color: #f4f4f4;
   --paragraph-text-color: #E7E9EA;
   --sub-text-color: #97a3b2;
   --modal-bg-color: #141c27;
