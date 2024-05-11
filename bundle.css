@@ -2096,6 +2096,9 @@ body > div > .select-modal {
     padding: 12px;
   }
 }
+.hashtag-info-modal > main > .actions > button {
+  border-radius: 21px;
+}
 .hashtag-info-modal > main > .metrics {
   padding: 20px;
   display: grid;
