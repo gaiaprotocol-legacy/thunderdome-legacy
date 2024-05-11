@@ -152,7 +152,6 @@ export default async function initialize(config: AppConfig) {
         );
       } else Router.go(fcmData.redirectTo);
     }
-    location.search = "";
   }
 
   if (BrowserInfo.isWindows) BodyNode.addClass("windows");

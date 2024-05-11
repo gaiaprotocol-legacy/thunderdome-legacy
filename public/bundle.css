@@ -2391,6 +2391,10 @@ body > div > .select-modal {
 }
 .hashtag-list-item > .info-container > .last-message > .sender {
   color: var(--title-text-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 120px;
 }
 .hashtag-list-item > .info-container > .last-message > .message {
   flex-grow: 1;
@@ -2509,6 +2513,10 @@ body > div > .select-modal {
 }
 .hashtag-leaderboard-item > .info-container > .last-message > .sender {
   color: var(--title-text-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 120px;
 }
 .hashtag-leaderboard-item > .info-container > .last-message > .message {
   flex-grow: 1;
@@ -4189,6 +4197,10 @@ body > div > .select-modal {
 }
 .signed-user-chat-room-list-item > .info-container > .last-message > .sender {
   color: var(--title-text-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 120px;
 }
 .signed-user-chat-room-list-item > .info-container > .last-message > .message {
   flex-grow: 1;

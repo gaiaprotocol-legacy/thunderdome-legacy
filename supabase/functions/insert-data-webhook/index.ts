@@ -76,7 +76,7 @@ function numberWithCommas(x: string, fixed?: number) {
 async function findCreatorSubscribedTokens(
   creatorAddress: string,
   exceptUser: string | undefined,
-): Promise<string[]> {
+): Promise<[any, string[]]> {
   const { data: holders, error: getHoldersError } = await supabase.from(
     "creator_holders",
   ).select("wallet_address").eq(

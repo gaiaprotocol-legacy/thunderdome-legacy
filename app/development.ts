@@ -10,12 +10,12 @@ await initialize({
 
   chains: {
     fantom: {
-      id: 64165,
+      id: 250,
       symbol: "FTM",
-      blockTime: 0.3,
+      blockTime: 2,
 
-      rpc: "https://rpcapi.sonic.fantom.network/",
-      explorerUrl: "https://public-sonic.fantom.network",
+      rpc: "https://rpc.ankr.com/fantom/",
+      explorerUrl: "https://ftmscan.com",
 
       assetBaseDivider: 4n,
       assetFeePercent: 100000000000000000n,
@@ -23,9 +23,9 @@ await initialize({
   },
   defaultChain: "fantom",
   contractAddresses: {
-    fantom: { // fantom testnet
-      [ContractType.CreatorTrade]: "0x14a4D7e4E3DF2AEF1464D84Bac9d27605eC78725",
-      [ContractType.HashtagTrade]: "0x736239bDcc4A8C6fd1582EdEEada9857AAb4C0Bd",
+    fantom: { // fantom mainnet
+      [ContractType.CreatorTrade]: "0x92f0B3c9542F48E1c01E5c7fd1020fF7683a4a69",
+      [ContractType.HashtagTrade]: "0x0Ffb883ebe6dB8186D610F09F31378943713E9C8",
     },
   },
 
