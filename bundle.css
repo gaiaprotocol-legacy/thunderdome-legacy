@@ -2169,6 +2169,7 @@ body > div > .select-modal {
 .hashtag-info-modal > main > .trade > button {
   flex-grow: 1;
   width: 33.33%;
+  border-radius: 15px;
 }
 .hashtag-menu {
   -webkit-user-select: none;
@@ -3232,6 +3233,9 @@ body > div > .select-modal {
 .profile-section .link > button.copy > .icon {
   font-size: 16px;
 }
+.profile-section > button.follow {
+  border-radius: 16px;
+}
 .user-metric-section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -3566,6 +3570,9 @@ body > div > .select-modal {
   .creator-metric-section > section > .value-container > .value {
     font-size: 13px;
   }
+}
+.creator-metric-section > button {
+  border-radius: 15px;
 }
 .buy-creator-popup {
   max-width: 500px !important;
