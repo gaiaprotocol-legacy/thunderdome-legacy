@@ -19,8 +19,6 @@ import {
   BlockTimeManager,
   BuyCreatorPopup,
   CoinbaseWalletManager,
-  CreatorSubscribeManager,
-  HashtagSubscribeManager,
   inject_fsesf_msg,
   LinkWalletPopup,
   MetaMaskManager,
@@ -41,10 +39,12 @@ export default async function initialize(config: AppConfig) {
     dev: config.dev,
     serviceName: "Thunder Dome",
     serviceUrl: "https://thunderdome.so",
+
     overviewUrl: "https://x.com/ThunderDomeFTM", //TODO:
     socialUrls: {
       x: "https://x.com/ThunderDomeFTM",
     },
+
     messageForWalletLinking: "Link Wallet to Thunder Dome",
 
     chains: config.chains,
@@ -55,6 +55,7 @@ export default async function initialize(config: AppConfig) {
     userBaseUri: "",
     creatorOptions: { unit: "ticket", baseUri: "/creator" },
     hashtagOptions: { unit: "ticket", baseUri: "/topic" },
+    additionalFeatures: ["follow"],
   });
 
   AppInitializer.initialize(
@@ -108,11 +109,7 @@ export default async function initialize(config: AppConfig) {
     el("img", { src: "/images/logo-transparent.png" }),
     [
       BlockTimeManager.init(),
-      SFSignedUserManager.init([(userId) => {
-        CreatorSubscribeManager.loadSignedUserUnsubscribedCreators(userId);
-      }, (userId) => {
-        HashtagSubscribeManager.loadSignedUserSubscribedHashtags(userId);
-      }]),
+      SFSignedUserManager.init(),
     ],
   );
 

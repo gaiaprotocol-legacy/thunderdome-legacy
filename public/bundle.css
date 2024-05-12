@@ -1703,7 +1703,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .holding-asset-list-item {
   cursor: pointer;
@@ -1798,7 +1798,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .signed-user-holding-asset-list.hidden {
   display: none;
@@ -1896,7 +1896,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .top-asset-list:empty {
   display: flex;
@@ -1907,7 +1907,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .new-asset-list:empty {
   display: flex;
@@ -1918,7 +1918,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .asset-list-item {
   cursor: pointer;
@@ -2169,6 +2169,7 @@ body > div > .select-modal {
 .hashtag-info-modal > main > .trade > button {
   flex-grow: 1;
   width: 33.33%;
+  border-radius: 15px;
 }
 .hashtag-menu {
   -webkit-user-select: none;
@@ -2305,7 +2306,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 @keyframes new-hashtag-list-item {
   from {
@@ -2424,7 +2425,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 @keyframes new-hashtag-leaderboard-item {
   from {
@@ -2544,7 +2545,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .signed-user-holding-hashtag-list-item {
   cursor: pointer;
@@ -2624,7 +2625,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .hashtag-holder-list-item {
   cursor: pointer;
@@ -2762,7 +2763,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .hashtag-message-list-item {
   display: flex;
@@ -2936,7 +2937,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .activity-list.hidden {
   display: none;
@@ -3024,7 +3025,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .user-avatar {
   position: relative;
@@ -3231,6 +3232,9 @@ body > div > .select-modal {
 }
 .profile-section .link > button.copy > .icon {
   font-size: 16px;
+}
+.profile-section > button.follow {
+  border-radius: 16px;
 }
 .user-metric-section {
   display: grid;
@@ -3567,6 +3571,9 @@ body > div > .select-modal {
     font-size: 13px;
   }
 }
+.creator-metric-section > button {
+  border-radius: 15px;
+}
 .buy-creator-popup {
   max-width: 500px !important;
 }
@@ -3719,7 +3726,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .creator-holder-list-item {
   cursor: pointer;
@@ -3759,7 +3766,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .signed-user-holding-creator-list-item {
   cursor: pointer;
@@ -3936,7 +3943,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .creator-message-list-item {
   display: flex;
@@ -4107,7 +4114,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .signed-user-chat-room-list.hidden {
   display: none;
@@ -4341,7 +4348,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--disable-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .point-leaderboard > tbody > tr > td {
   border-bottom: 1px solid var(--line-color);
@@ -4383,7 +4390,7 @@ body > div > .select-modal {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 .referee-list-item {
   cursor: pointer;
@@ -4530,7 +4537,7 @@ body > section.room:empty::before {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
-  padding: 8px 12px;
+  padding: 24px 12px;
 }
 @container (width < 1280px) {
   body > section.room:empty {
