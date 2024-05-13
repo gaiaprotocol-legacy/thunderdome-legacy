@@ -107,7 +107,7 @@ meter {
   --bold-weight: 500;
   --page-bg-color: #121212;
   --title-text-color: #f4f4f4;
-  --paragraph-text-color: #b4c2d3;
+  --paragraph-text-color: #c2cedd;
   --sub-text-color: #8e8e8e;
   --page-font-family: 'Inter', sans-serif;
   --page-font-size: 14px;
@@ -3354,16 +3354,28 @@ body > div > .select-modal {
 .connect-wallet-popup > main {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 24px;
   padding: 10px 20px;
 }
-.connect-wallet-popup > main > button {
+.connect-wallet-popup > main > section {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  justify-content: flex-start;
-  height: 58px;
 }
-.connect-wallet-popup > main > button > img {
+.connect-wallet-popup > main > section > h2 {
+  font-size: 16px;
+  font-weight: var(--bold-weight);
+  text-transform: capitalize;
+}
+.connect-wallet-popup > main > section > p {
+  font-size: 12px;
+}
+.connect-wallet-popup > main > section > button {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+}
+.connect-wallet-popup > main > section > button > img {
   height: 32px;
   border-radius: 4px;
 }
@@ -4296,8 +4308,7 @@ body > div > .select-modal {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  padding: 8px;
+  padding: 8px 12px;
   background-color: var(--contained-button-bg-color);
   color: var(--contained-button-text-color);
   font-weight: var(--bold-weight);
