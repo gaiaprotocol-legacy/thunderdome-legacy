@@ -29,6 +29,7 @@ import {
   SignedUserAssetManager,
   WalletConnectManager,
 } from "fsesf";
+import { PMEnv } from "point-module";
 import App from "./App.js";
 import AppConfig from "./AppConfig.js";
 
@@ -56,6 +57,10 @@ export default async function initialize(config: AppConfig) {
     creatorOptions: { unit: "ticket", baseUri: "/creator" },
     hashtagOptions: { unit: "ticket", baseUri: "/topic" },
     additionalFeatures: ["follow"],
+  });
+
+  PMEnv.init({
+    pointWeightPerPrice: 10,
   });
 
   AppInitializer.initialize(
