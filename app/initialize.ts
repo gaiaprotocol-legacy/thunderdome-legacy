@@ -60,7 +60,7 @@ export default async function initialize(config: AppConfig) {
   });
 
   PMEnv.init({
-    pointWeightPerPrice: 10,
+    pointWeightPerPrice: 4,
   });
 
   AppInitializer.initialize(
