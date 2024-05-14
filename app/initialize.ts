@@ -123,7 +123,7 @@ export default async function initialize(config: AppConfig) {
   RealtimeActivityManager.init();
 
   const params = new URLSearchParams(location.search);
-  if (params.has("from")) new Store("referral").set("from", params.get("from"));
+  if (params.has("from")) new Store("referral").set("from", params.get("from"), true);
 
   Router.route(
     ["", "topic/{topic}", "creator/{creatorAddress}", "{xUsername}"],

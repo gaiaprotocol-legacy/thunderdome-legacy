@@ -101,6 +101,7 @@ export default class TicketsTab extends Activatable {
     const from = this.referrelStore.get<string>("from");
     if (from) {
       const user = await SFUserService.fetchByXUsername(from);
+      console.log(user);
       if (user) {
         el(
           ".referral-info-message-container",
