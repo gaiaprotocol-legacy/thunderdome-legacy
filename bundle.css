@@ -4663,29 +4663,33 @@ body.home > section.room {
 }
 @container (width >= 1280px) {
   .home-tab > main {
+    padding-right: 71px;
     margin-right: -71px;
   }
 }
-.tickets-tab > main {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 80px;
+.home-tab > main > .post-form {
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
 }
-.tickets-tab > main > .referral-info-message-container {
+.tickets-tab > .referral-info-message-container {
   padding: 16px;
 }
 @container (width < 1280px) {
-  .tickets-tab > main > .referral-info-message-container {
+  .tickets-tab > .referral-info-message-container {
     padding: 12px;
   }
 }
-.tickets-tab > main > .referral-info-message-container > .info-message-box > main > p > .user {
+.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user {
   display: inline-flex;
   gap: 4px;
   align-items: center;
 }
-.tickets-tab > main > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar {
+.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar {
   width: 12px;
   height: 12px;
+}
+.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar.online::after {
+  display: none;
 }
 
