@@ -76,7 +76,13 @@ function numberWithCommas(x: string, fixed?: number) {
 async function findCreatorSubscribedTokens(
   creatorAddress: string,
   exceptUser: string | undefined,
-): Promise<[any, string[]]> {
+): Promise<[
+  {
+    user_id: string;
+    display_name?: string;
+  } | undefined,
+  { user_id: string; token: string }[],
+]> {
   const { data: holders, error: getHoldersError } = await supabase.from(
     "creator_holders",
   ).select("wallet_address").eq(
@@ -109,7 +115,7 @@ async function findCreatorSubscribedTokens(
 
   const { data: tokens, error: getTokensError } = await supabase.from(
     "fcm_tokens",
-  ).select("token").in(
+  ).select("user_id, token").in(
     "user_id",
     holderUsers.map((holder) => holder.user_id).filter(
       (holder) => !unsubs.some((unsub) => unsub.user_id === holder),
@@ -119,7 +125,10 @@ async function findCreatorSubscribedTokens(
 
   return [
     holderUsers.find((u) => u.wallet_address === creatorAddress),
-    tokens.map((t) => t.token),
+    tokens.map((t) => ({
+      user_id: t.user_id,
+      token: t.token,
+    })),
   ];
 }
 
@@ -172,9 +181,9 @@ serveWithOptions(async (req) => {
       );
 
       if (data.args[2] === "true") { // buy
-        for (const token of tokens) {
+        for (const t of tokens) {
           try {
-            await sendFcmToSpecificUser(token, {
+            await sendFcmToSpecificUser(t.token, {
               tag: `creator_${data.asset_id}`,
               title: "New trade",
               body: `${
@@ -182,7 +191,11 @@ serveWithOptions(async (req) => {
                   ? user.display_name
                   : shortenEthereumAddress(data.wallet_address ?? "")
               } bought ${numberWithCommas(data.args[3])} ${
-                creator ? creator.display_name : data.asset_id
+                creator?.user_id === t.user_id
+                  ? "your"
+                  : (creator?.display_name
+                    ? creator.display_name
+                    : shortenEthereumAddress(data.asset_id ?? ""))
               } ${Deno.env.get("CREATOR_UNIT")}${
                 data.args[3] === "1" ? "" : "s"
               }.`,
@@ -195,9 +208,9 @@ serveWithOptions(async (req) => {
           }
         }
       } else {
-        for (const token of tokens) {
+        for (const t of tokens) {
           try {
-            await sendFcmToSpecificUser(token, {
+            await sendFcmToSpecificUser(t.token, {
               tag: `creator_${data.asset_id}`,
               title: "New trade",
               body: `${
@@ -205,7 +218,11 @@ serveWithOptions(async (req) => {
                   ? user.display_name
                   : shortenEthereumAddress(data.wallet_address ?? "")
               } sold ${numberWithCommas(data.args[3])} ${
-                creator ? creator.display_name : data.asset_id
+                creator?.user_id === t.user_id
+                  ? "your"
+                  : (creator?.display_name
+                    ? creator.display_name
+                    : shortenEthereumAddress(data.asset_id ?? ""))
               } ${Deno.env.get("CREATOR_UNIT")}${
                 data.args[3] === "1" ? "" : "s"
               }.`,
@@ -288,12 +305,14 @@ serveWithOptions(async (req) => {
     );
 
     if (data.message) {
-      for (const token of tokens) {
+      for (const t of tokens) {
         try {
-          await sendFcmToSpecificUser(token, {
+          await sendFcmToSpecificUser(t.token, {
             tag: `creator_${data.creator_address}`,
-            title: user?.display_name,
-            body: data.message,
+            title: creator?.display_name
+              ? creator.display_name
+              : shortenEthereumAddress(data.creator_address),
+            body: user?.display_name + ": " + data.message,
             icon: user?.stored_avatar_thumb,
           }, {
             redirectTo: `${
@@ -305,12 +324,14 @@ serveWithOptions(async (req) => {
         }
       }
     } else if (data.rich?.files?.length) {
-      for (const token of tokens) {
+      for (const t of tokens) {
         try {
-          await sendFcmToSpecificUser(token, {
+          await sendFcmToSpecificUser(t.token, {
             tag: `creator_${data.creator_address}`,
-            title: user?.display_name,
-            body: "Sent a file",
+            title: creator?.display_name
+              ? creator.display_name
+              : shortenEthereumAddress(data.creator_address),
+            body: user?.display_name + " sent a file",
             icon: user?.stored_avatar_thumb,
           }, {
             redirectTo: `${
@@ -345,8 +366,8 @@ serveWithOptions(async (req) => {
         try {
           await sendFcmToSpecificUser(token, {
             tag: `hashtag_${data.hashtag}`,
-            title: user?.display_name,
-            body: data.message,
+            title: data.hashtag,
+            body: user?.display_name + ": " + data.message,
             icon: user?.stored_avatar_thumb,
           }, {
             redirectTo: `${Deno.env.get("HASHTAG_BASE_URI")}/${data.hashtag}`,
@@ -360,8 +381,8 @@ serveWithOptions(async (req) => {
         try {
           await sendFcmToSpecificUser(token, {
             tag: `hashtag_${data.hashtag}`,
-            title: user?.display_name,
-            body: "Sent a file",
+            title: data.hashtag,
+            body: user?.display_name + " sent a file",
             icon: user?.stored_avatar_thumb,
           }, {
             redirectTo: `${Deno.env.get("HASHTAG_BASE_URI")}/${data.hashtag}`,
