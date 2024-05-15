@@ -3336,6 +3336,35 @@ body > div > .select-modal {
   align-items: center;
   justify-content: center;
 }
+.user-list-item {
+  cursor: pointer;
+  height: 58px;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+@media (pointer: fine) {
+  .user-list-item:hover {
+    background-color: var(--button-hover-color);
+  }
+}
+.user-list-item:active {
+  background-color: var(--button-hover-color);
+}
+.user-list-item > .user-avatar {
+  width: 36px;
+  height: 36px;
+}
+.user-list-item > .name {
+  flex-grow: 1;
+}
+.user-list-item > .created-at {
+  font-size: 12px;
+  color: var(--sub-text-color);
+}
 .connect-wallet-popup {
   max-width: 420px !important;
 }
@@ -4240,6 +4269,34 @@ body > div > .select-modal {
 .signed-user-chat-room-list-item > .info-container > .last-message > .sent-at {
   font-size: 12px;
   color: var(--sub-text-color);
+}
+.following-list:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.following-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
+  padding: 24px 12px;
+}
+.following-list.hidden {
+  display: none;
+}
+.follower-list:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.follower-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
+  padding: 24px 12px;
+}
+.follower-list.hidden {
+  display: none;
 }
 .point-section {
   padding: 20px 0 80px;
