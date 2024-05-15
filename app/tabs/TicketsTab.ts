@@ -11,15 +11,14 @@ import {
 } from "@common-module/app";
 import {
   ActivityList,
-  CreatorInfoModal,
   NewAssetList,
+  openUserOrCreatorModal,
   SFSignedUserManager,
   SFUserService,
   SignedUserChatRoomList,
   TopAssetList,
   TrendingAssetList,
   UserAvatar,
-  UserInfoModal,
 } from "fsesf";
 
 export default class TicketsTab extends Activatable {
@@ -115,13 +114,7 @@ export default class TicketsTab extends Activatable {
                   user.stored_avatar_thumb,
                 ]),
                 el("span.name", user.display_name),
-                {
-                  click: () => {
-                    user.wallet_address
-                      ? new CreatorInfoModal(user.wallet_address, undefined)
-                      : new UserInfoModal(user);
-                  },
-                },
+                { click: () => openUserOrCreatorModal(user) },
               ),
               ". If you login, ",
               el(
@@ -131,16 +124,10 @@ export default class TicketsTab extends Activatable {
                   user.stored_avatar_thumb,
                 ]),
                 el("span.name", user.display_name),
-                {
-                  click: () => {
-                    user.wallet_address
-                      ? new CreatorInfoModal(user.wallet_address, undefined)
-                      : new UserInfoModal(user);
-                  },
-                },
+                { click: () => openUserOrCreatorModal(user) },
               ),
               " will earn ",
-              el("b", "5 points"),
+              el("b", "10 points"),
               ".",
             ],
             footer: new Button({
