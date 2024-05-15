@@ -4298,6 +4298,17 @@ body > div > .select-modal {
 .follower-list.hidden {
   display: none;
 }
+.post-form {
+  padding: 16px;
+  display: flex;
+}
+.post-form > main > footer {
+  display: flex;
+  justify-content: space-between;
+}
+.post-form > main > footer > button.post {
+  border-radius: 20px;
+}
 .point-section {
   padding: 20px 0 80px;
   display: flex;
@@ -4728,6 +4739,7 @@ body.home > section.room {
   width: 100%;
   max-width: 750px;
   margin: 0 auto;
+  border-bottom: 1px solid var(--line-color);
 }
 .tickets-tab > .referral-info-message-container {
   padding: 16px;
