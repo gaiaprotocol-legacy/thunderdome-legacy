@@ -37,8 +37,8 @@ export default class TicketsTab extends Activatable {
       el("header", el("h1", "Tickets")),
       this.tabs = new Tabs(undefined, [
         {
-          id: "your-tickets",
-          label: "Your Tickets",
+          id: "holding",
+          label: "Holding",
         },
         {
           id: "trending",
@@ -77,7 +77,7 @@ export default class TicketsTab extends Activatable {
       ].forEach((
         list,
       ) => list?.hide());
-      if (id === "your-tickets") this.chatRoomList.show();
+      if (id === "holding") this.chatRoomList.show();
       else if (id === "trending") this.trendingAssetList.show();
       else if (id === "top") this.topAssetList.show();
       else if (id === "new") this.newAssetList.show();

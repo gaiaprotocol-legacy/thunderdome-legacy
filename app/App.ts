@@ -45,51 +45,30 @@ export default class App extends View {
         this.navBar = new AppNavBar({
           id: "sofia-app-nav-bar",
           logo: el("img", { src: "/images/logo-navbar.png" }),
-          menu: SFEnv.dev
-            ? [{
-              id: "home",
-              title: "Home",
-              icon: new MaterialIcon("home"),
-            }, {
-              id: "tickets",
-              title: "Tickets",
-              icon: new MaterialIcon("confirmation_number"),
-            }, {
-              id: "topics",
-              title: "Topics",
-              icon: new MaterialIcon("tag"),
-            }, {
-              id: "points",
-              title: "Points",
-              icon: new MaterialIcon("star"),
-            }, {
-              id: "settings",
-              title: SFSignedUserManager.user ? undefined : "Settings",
-              icon: SFSignedUserManager.user
-                ? el(".avatar")
-                : new MaterialIcon("settings"),
-              toFooter: SFSignedUserManager.user !== undefined,
-            }]
-            : [{
-              id: "tickets",
-              title: "Tickets",
-              icon: new MaterialIcon("confirmation_number"),
-            }, {
-              id: "topics",
-              title: "Topics",
-              icon: new MaterialIcon("tag"),
-            }, {
-              id: "points",
-              title: "Points",
-              icon: new MaterialIcon("star"),
-            }, {
-              id: "settings",
-              title: SFSignedUserManager.user ? undefined : "Settings",
-              icon: SFSignedUserManager.user
-                ? el(".avatar")
-                : new MaterialIcon("settings"),
-              toFooter: SFSignedUserManager.user !== undefined,
-            }],
+          menu: [{
+            id: "home",
+            title: "Home",
+            icon: new MaterialIcon("home"),
+          }, {
+            id: "tickets",
+            title: "Tickets",
+            icon: new MaterialIcon("confirmation_number"),
+          }, {
+            id: "topics",
+            title: "Topics",
+            icon: new MaterialIcon("tag"),
+          }, {
+            id: "points",
+            title: "Points",
+            icon: new MaterialIcon("star"),
+          }, {
+            id: "settings",
+            title: SFSignedUserManager.user ? undefined : "Settings",
+            icon: SFSignedUserManager.user
+              ? el(".avatar")
+              : new MaterialIcon("settings"),
+            toFooter: SFSignedUserManager.user !== undefined,
+          }],
         }),
         this.homeTab = new HomeTab(),
         this.ticketsTab = new TicketsTab(),
