@@ -1,0 +1,50 @@
+.feed-tab {
+    @container (width >=@safe-width) {
+        padding-right: 71px;
+    }
+
+    >header {
+        width        : 100%;
+        max-width    : 750px;
+        margin       : 0 auto;
+        border-bottom: none !important;
+
+        @container (width >=@safe-width) {
+            display: none !important;
+        }
+
+        >h1 {
+            >img {
+                display: block;
+                width  : 24px;
+                height : 24px;
+            }
+        }
+    }
+
+    >.tabs {
+        width    : 100%;
+        max-width: 750px;
+        margin   : 0 auto;
+
+        >ul {
+            >.tab {
+                width: 50%;
+            }
+        }
+    }
+
+    >main {
+        @container (width >=@safe-width) {
+            padding-right: 71px;
+            margin-right : -71px;
+        }
+
+        >.post-form {
+            width        : 100%;
+            max-width    : 750px;
+            margin       : 0 auto;
+            border-bottom: 1px solid var(--line-color);
+        }
+    }
+}

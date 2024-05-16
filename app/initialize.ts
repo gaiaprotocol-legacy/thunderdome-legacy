@@ -127,10 +127,13 @@ export default async function initialize(config: AppConfig) {
     new Store("referral").set("from", params.get("from"), true);
   }
 
-  Router.route(
-    ["", "topic/{topic}", "creator/{creatorAddress}", "{xUsername}"],
-    App,
-  );
+  Router.route([
+    "",
+    "post/{postId}",
+    "topic/{topic}",
+    "creator/{creatorAddress}",
+    "{xUsername}",
+  ], App);
 
   AuthUtil.checkEmailAccess();
 

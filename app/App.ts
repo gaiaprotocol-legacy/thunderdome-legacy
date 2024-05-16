@@ -14,10 +14,9 @@ import {
   CreatorRoom,
   HashtagRoom,
   HashtagUtil,
-  SFEnv,
   SFSignedUserManager,
 } from "fsesf";
-import HomeTab from "./tabs/HomeTab.js";
+import FeedTab from "./tabs/FeedTab.js";
 import PointsTab from "./tabs/PointsTab.js";
 import SettingsTab from "./tabs/SettingsTab.js";
 import TicketsTab from "./tabs/TicketsTab.js";
@@ -25,9 +24,11 @@ import TopicsTab from "./tabs/TopicsTab.js";
 import UserDisplay from "./UserDisplay.js";
 
 export default class App extends View {
+  private currentTab: string | undefined;
+
   private navBar: AppNavBar;
 
-  private homeTab: HomeTab | undefined;
+  private feedTab: FeedTab | undefined;
   private ticketsTab: TicketsTab;
   private topicsTab: TopicsTab;
   private pointsTab: PointsTab;
@@ -36,7 +37,7 @@ export default class App extends View {
   private roomSection: DomNode;
   private room: UserDisplay | HashtagRoom | CreatorRoom | undefined;
 
-  constructor(params: ViewParams, uri: string, data?: any) {
+  constructor() {
     super();
 
     BodyNode.append(
@@ -46,7 +47,7 @@ export default class App extends View {
           id: "sofia-app-nav-bar",
           logo: el("img", { src: "/images/logo-navbar.png" }),
           menu: [{
-            id: "home",
+            id: "feed",
             title: "Home",
             icon: new MaterialIcon("home"),
           }, {
@@ -70,7 +71,7 @@ export default class App extends View {
             toFooter: SFSignedUserManager.user !== undefined,
           }],
         }),
-        this.homeTab = new HomeTab(),
+        this.feedTab = new FeedTab(),
         this.ticketsTab = new TicketsTab(),
         this.topicsTab = new TopicsTab(),
         this.pointsTab = new PointsTab(),
@@ -92,47 +93,24 @@ export default class App extends View {
     }
 
     this.navBar.on("select", (id: string) => {
-      BodyNode.deleteClass("home", "tickets", "topics", "points", "settings")
+      BodyNode.deleteClass("feed", "tickets", "topics", "points", "settings")
         .addClass(id);
-
       [
-        this.homeTab,
+        this.feedTab,
         this.ticketsTab,
         this.topicsTab,
         this.pointsTab,
         this.settingsTab,
       ].forEach((list) => list?.deactivate());
-      if (id === "home") this.homeTab?.activate();
-      else if (id === "tickets") this.ticketsTab.activate();
+      if (id === "feed") {
+        this.feedTab?.activate();
+        if (this.currentTab === "feed") Router.go("/");
+      } else if (id === "tickets") this.ticketsTab.activate();
       else if (id === "topics") this.topicsTab.activate();
       else if (id === "points") this.pointsTab.activate();
       else if (id === "settings") this.settingsTab.activate();
+      this.currentTab = id;
     }).init();
-
-    const assetTabs = [
-      this.ticketsTab,
-      this.topicsTab,
-      this.settingsTab,
-    ];
-
-    if (params.xUsername) {
-      this.room = new UserDisplay(params.xUsername, data).appendTo(
-        this.roomSection,
-      );
-    } else if (params.creatorAddress) {
-      this.room = new CreatorRoom(params.creatorAddress, data).appendTo(
-        this.roomSection,
-      );
-      assetTabs.forEach((list) =>
-        list.activeAsset(undefined, params.creatorAddress!)
-      );
-    } else if (params.topic) {
-      this.room = new HashtagRoom(params.topic, data).appendTo(
-        this.roomSection,
-      );
-      assetTabs.forEach((list) => list.activeAsset(undefined, params.topic!));
-      this.checkAvailableTopic(params.topic);
-    }
   }
 
   public changeParams(params: ViewParams, uri: string, data?: any): void {
@@ -142,43 +120,51 @@ export default class App extends View {
       this.settingsTab,
     ];
 
-    if (params.xUsername) {
-      if (!(this.room instanceof UserDisplay)) {
-        this.room?.delete();
-        this.room = new UserDisplay(params.xUsername).appendTo(
-          this.roomSection,
-        );
-      } else {
-        this.room.loadUser(params.xUsername, data);
-      }
+    if (params.postId) {
+      if (this.currentTab !== "feed") this.navBar.select("feed");
+      this.feedTab?.loadThread(parseInt(params.postId), data);
       assetTabs.forEach((list) => list.deactiveAsset());
-    } else if (params.creatorAddress) {
-      if (!(this.room instanceof CreatorRoom)) {
-        this.room?.delete();
-        this.room = new CreatorRoom(params.creatorAddress, data).appendTo(
-          this.roomSection,
-        );
-      } else {
-        this.room.enter(params.creatorAddress, data);
-      }
-      assetTabs.forEach((list) =>
-        list.activeAsset(undefined, params.creatorAddress!)
-      );
-    } else if (params.topic) {
-      if (!(this.room instanceof HashtagRoom)) {
-        this.room?.delete();
-        this.room = new HashtagRoom(params.topic, data).appendTo(
-          this.roomSection,
-        );
-      } else {
-        this.room.enter(params.topic, data);
-      }
-      assetTabs.forEach((list) => list.activeAsset(undefined, params.topic!));
-      this.checkAvailableTopic(params.topic);
     } else {
-      this.room?.delete();
-      this.room = undefined;
-      assetTabs.forEach((list) => list.deactiveAsset());
+      this.feedTab?.loadFeed();
+
+      if (params.xUsername) {
+        if (!(this.room instanceof UserDisplay)) {
+          this.room?.delete();
+          this.room = new UserDisplay(params.xUsername).appendTo(
+            this.roomSection,
+          );
+        } else {
+          this.room.loadUser(params.xUsername, data);
+        }
+        assetTabs.forEach((list) => list.deactiveAsset());
+      } else if (params.creatorAddress) {
+        if (!(this.room instanceof CreatorRoom)) {
+          this.room?.delete();
+          this.room = new CreatorRoom(params.creatorAddress, data).appendTo(
+            this.roomSection,
+          );
+        } else {
+          this.room.enter(params.creatorAddress, data);
+        }
+        assetTabs.forEach((list) =>
+          list.activeAsset(undefined, params.creatorAddress!)
+        );
+      } else if (params.topic) {
+        if (!(this.room instanceof HashtagRoom)) {
+          this.room?.delete();
+          this.room = new HashtagRoom(params.topic, data).appendTo(
+            this.roomSection,
+          );
+        } else {
+          this.room.enter(params.topic, data);
+        }
+        assetTabs.forEach((list) => list.activeAsset(undefined, params.topic!));
+        this.checkAvailableTopic(params.topic);
+      } else {
+        this.room?.delete();
+        this.room = undefined;
+        assetTabs.forEach((list) => list.deactiveAsset());
+      }
     }
   }
 

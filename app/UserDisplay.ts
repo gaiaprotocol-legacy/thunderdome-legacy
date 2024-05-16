@@ -14,7 +14,6 @@ export default class UserDisplay extends DomNode {
 
   constructor(xUsername: string, user?: SFUserPublic) {
     super(".user-display");
-    this.addAllowedEvents("userLoaded");
     this.append(
       el(
         "header",
@@ -43,10 +42,8 @@ export default class UserDisplay extends DomNode {
     else {
       this.main.empty().append(el(".loading-container", new LoadingSpinner()));
       const user = await SFUserService.fetchByXUsername(xUsername);
-      if (user) {
-        this.renderUser(user);
-        this.emit("userLoaded", user);
-      } else this.main.empty();
+      if (user) this.renderUser(user);
+      else this.main.empty();
     }
   }
 }
