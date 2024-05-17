@@ -3615,6 +3615,26 @@ body > div > .select-modal {
   gap: 16px;
   padding: 20px 0 80px;
 }
+.creator-info-modal > main > section.social:has(.tabs) {
+  position: relative;
+}
+.creator-info-modal > main > section.social:has(.tabs) > .user-post-section,
+.creator-info-modal > main > section.social:has(.tabs) > .x-section {
+  padding: 16px 16px 0;
+}
+.creator-info-modal > main > section.social:has(.tabs) > .user-post-section > header > button.open-in-new,
+.creator-info-modal > main > section.social:has(.tabs) > .x-section > .link-container > button.open-in-new {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  border-left: 1px solid var(--line-color);
+  border-bottom: 1px solid var(--line-color);
+  border-radius: 0 0 0 6px;
+}
+.creator-info-modal > main > section.social:not(:has(.tabs)) > .user-post-section,
+.creator-info-modal > main > section.social:not(:has(.tabs)) > .x-section {
+  padding: 0 16px;
+}
 .creator-metric-section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
