@@ -4585,8 +4585,10 @@ body > div > .select-modal {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  padding-right: 32px;
 }
 .post-content-only > header > .user-avatar {
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
   cursor: pointer;
@@ -4596,14 +4598,24 @@ body > div > .select-modal {
   align-items: flex-start;
   gap: 4px;
   cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .post-content-only > header > .author > .name {
   font-weight: bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .post-content-only > header > .author > .x-username {
   color: var(--sub-text-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .post-content-only > header > .from-now {
+  flex-shrink: 0;
   margin-left: -4px;
   display: flex;
   gap: 4px;
