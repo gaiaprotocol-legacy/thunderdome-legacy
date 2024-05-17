@@ -17,6 +17,7 @@ import {
 
 export default class FeedTab extends Activatable {
   private _mode: "feed" | "thread" | undefined;
+  private currentPostId: number | undefined;
 
   constructor() {
     super(".app-tab.feed-tab");
@@ -30,6 +31,7 @@ export default class FeedTab extends Activatable {
   public loadFeed() {
     if (this._mode === "feed") return;
     this.mode = "feed";
+    this.currentPostId = undefined;
 
     let tabs: Tabs;
     let postForm: PostForm;
@@ -50,7 +52,7 @@ export default class FeedTab extends Activatable {
       ]),
       el(
         "main",
-        postForm = new PostForm(undefined),
+        postForm = new PostForm(),
         postListForYou = new PostListForYou(),
         postListFollowing = new PostListFollowing(),
       ),
@@ -69,8 +71,9 @@ export default class FeedTab extends Activatable {
   }
 
   public loadThread(postId: number, post?: Post) {
-    if (this._mode === "thread") return;
+    if (this._mode === "thread" && this.currentPostId === postId) return;
     this.mode = "thread";
+    this.currentPostId = postId;
 
     this.empty().append(
       el(

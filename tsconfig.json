@@ -76,5 +76,6 @@
     "typechain-types",
     "scripts",
     "legacy-versions",
+    "public",
   ]
 }
