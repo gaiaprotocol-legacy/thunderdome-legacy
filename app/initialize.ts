@@ -56,6 +56,7 @@ export default async function initialize(config: AppConfig) {
     userBaseUri: "",
     creatorOptions: { unit: "ticket", baseUri: "/creator" },
     hashtagOptions: { unit: "ticket", baseUri: "/topic" },
+    postOptions: { baseUri: "/post" },
     additionalFeatures: ["follow"],
   });
 

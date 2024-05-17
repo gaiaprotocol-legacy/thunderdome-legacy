@@ -9,16 +9,27 @@
         margin       : 0 auto;
         border-bottom: none !important;
 
-        @container (width >=@safe-width) {
-            display: none !important;
-        }
-
         >h1 {
             >img {
                 display: block;
                 width  : 24px;
                 height : 24px;
             }
+        }
+    }
+
+    &.feed>header {
+        @container (width >=@safe-width) {
+            display: none !important;
+        }
+    }
+
+    &.thread>header {
+        justify-content: flex-start !important;
+        gap            : 8px;
+
+        >h1 {
+            font-size: 18px;
         }
     }
 
@@ -41,10 +52,16 @@
         }
 
         >.post-form {
-            width        : 100%;
-            max-width    : 750px;
-            margin       : 0 auto;
             border-bottom: 1px solid var(--line-color);
+        }
+
+        >.post-form,
+        >.post-thread,
+        >.post-list-for-you,
+        >.post-list-following {
+            width    : 100%;
+            max-width: 750px;
+            margin   : 0 auto;
         }
     }
 }
