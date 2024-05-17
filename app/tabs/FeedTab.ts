@@ -50,7 +50,7 @@ export default class FeedTab extends Activatable {
       ]),
       el(
         "main",
-        postForm = new PostForm(),
+        postForm = new PostForm(undefined),
         postListForYou = new PostListForYou(),
         postListFollowing = new PostListFollowing(),
       ),

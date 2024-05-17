@@ -3193,9 +3193,11 @@ body > div > .select-modal {
 .user-info-modal > main > section.social:has(.tabs) {
   position: relative;
 }
+.user-info-modal > main > section.social:has(.tabs) > .user-post-section,
 .user-info-modal > main > section.social:has(.tabs) > .x-section {
   padding: 16px 16px 0;
 }
+.user-info-modal > main > section.social:has(.tabs) > .user-post-section > header > button.open-in-new,
 .user-info-modal > main > section.social:has(.tabs) > .x-section > .link-container > button.open-in-new {
   position: absolute;
   top: 48px;
@@ -3204,6 +3206,7 @@ body > div > .select-modal {
   border-bottom: 1px solid var(--line-color);
   border-radius: 0 0 0 6px;
 }
+.user-info-modal > main > section.social:not(:has(.tabs)) > .user-post-section,
 .user-info-modal > main > section.social:not(:has(.tabs)) > .x-section {
   padding: 0 16px;
 }
@@ -3328,6 +3331,21 @@ body > div > .select-modal {
 .bio-section > h2 {
   color: var(--sub-text-color);
   font-size: 12px;
+}
+.user-post-section {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.user-post-section > header > h2 {
+  font-size: 16px;
+}
+.user-post-section > .user-post-list {
+  border: 1px solid var(--line-color);
+  border-radius: 12px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 .x-section {
   padding: 16px;
@@ -4402,6 +4420,13 @@ body > div > .select-modal {
   margin-left: auto;
   border-radius: 20px;
 }
+.user-post-modal > header > .title {
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+}
+.user-post-modal > main {
+  min-height: 300px;
+}
 .post-list-for-you:empty {
   display: flex;
   align-items: center;
@@ -4468,6 +4493,16 @@ body > div > .select-modal {
   justify-content: center;
   padding: 24px 0;
 }
+.post-thread > .post-form {
+  border-bottom: 1px solid var(--line-color);
+}
+.post-thread > .post-single {
+  border-bottom: 1px solid var(--line-color);
+}
+:root {
+  --reposted-color: #00ba7c;
+  --post-liked-color: #f91880;
+}
 .post-single {
   position: relative;
 }
@@ -4487,20 +4522,25 @@ body > div > .select-modal {
   padding: 4px 12px 12px 56px;
   display: flex;
   font-size: 12px;
+  gap: 2px;
 }
 .post-single > footer > button {
   padding: 8px;
   border-radius: 20px;
   color: var(--sub-text-color);
-  font-weight: normal;
+}
+.post-single > footer > button.reposted {
+  color: var(--reposted-color);
+}
+.post-single > footer > button.liked {
+  color: var(--post-liked-color);
 }
 .post-single > footer > button > .icon {
   font-size: 20px;
 }
 .post-single.main > footer {
   border-top: 1px solid var(--line-color);
-  padding-top: 4px;
-  padding-left: 8px;
+  padding: 8px 12px 8px 8px;
 }
 .post-content-only {
   padding: 12px 16px;
@@ -4516,11 +4556,13 @@ body > div > .select-modal {
 .post-content-only > header > .user-avatar {
   width: 40px;
   height: 40px;
+  cursor: pointer;
 }
 .post-content-only > header > .author {
   display: flex;
   align-items: flex-start;
   gap: 4px;
+  cursor: pointer;
 }
 .post-content-only > header > .author > .name {
   font-weight: bold;
@@ -4529,6 +4571,7 @@ body > div > .select-modal {
   color: var(--sub-text-color);
 }
 .post-content-only > header > .from-now {
+  margin-left: 4px;
   display: flex;
   gap: 4px;
   color: var(--sub-text-color);
