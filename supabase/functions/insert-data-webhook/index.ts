@@ -49,11 +49,38 @@ interface HashtagMessage {
   };
 }
 
+interface Post {
+  id: number;
+  parent_post_id?: number;
+  quoted_post_id?: number;
+  author: string;
+  message?: string;
+  rich?: {
+    files?: {
+      url: string;
+      fileName: string;
+      fileType: string;
+      fileSize: number;
+    }[];
+  };
+}
+
+interface PostLike {
+  post_id: number;
+  user_id: string;
+}
+
 interface InsertPayload {
   type: "INSERT";
   table: string;
   schema: string;
-  record: ContractEvent | CreatorMessage | HashtagMessage | Feedback;
+  record:
+    | ContractEvent
+    | CreatorMessage
+    | HashtagMessage
+    | Feedback
+    | Post
+    | PostLike;
   old_record: null;
 }
 
@@ -411,6 +438,98 @@ serveWithOptions(async (req) => {
           tag: "feedback",
           title: "New feedback",
           body: (payload.record as Feedback).feedback,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  } else if (
+    payload.type === "INSERT" && payload.table === "posts"
+  ) {
+    const data = payload.record as Post;
+
+    if (data.parent_post_id) {
+      const { data: posts, error: getPostsError } = await supabase.from("posts")
+        .select("author").eq("id", data.parent_post_id);
+      if (getPostsError) throw getPostsError;
+
+      const { data: tokens, error: getTokensError } = await supabase.from(
+        "fcm_tokens",
+      ).select("token").eq("user_id", posts[0].author);
+      if (getTokensError) throw getTokensError;
+
+      const { data: users, error: getUsersError } = await supabase.from(
+        "users_public",
+      ).select("display_name").eq("user_id", data.author);
+      if (getUsersError) throw getUsersError;
+
+      for (const t of tokens) {
+        try {
+          await sendFcmToSpecificUser(t.token, {
+            tag: "post_reply",
+            title: "New reply",
+            body: `${users[0].display_name} replied to your post.`,
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    if (data.quoted_post_id) {
+      const { data: posts, error: getPostsError } = await supabase.from("posts")
+        .select("author").eq("id", data.quoted_post_id);
+      if (getPostsError) throw getPostsError;
+
+      const { data: tokens, error: getTokensError } = await supabase.from(
+        "fcm_tokens",
+      ).select("token").eq("user_id", posts[0].author);
+      if (getTokensError) throw getTokensError;
+
+      const { data: users, error: getUsersError } = await supabase.from(
+        "users_public",
+      ).select("display_name").eq("user_id", data.author);
+      if (getUsersError) throw getUsersError;
+
+      const isRepost = data.message === undefined && data.rich === undefined;
+      for (const t of tokens) {
+        try {
+          await sendFcmToSpecificUser(t.token, {
+            tag: isRepost ? "post_repost" : "post_quote",
+            title: isRepost ? "New repost" : "New quote",
+            body: `${users[0].display_name} ${
+              isRepost ? "reposted" : "quoted"
+            } your post.`,
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  } else if (
+    payload.type === "INSERT" && payload.table === "post_likes"
+  ) {
+    const data = payload.record as PostLike;
+    const { data: posts, error: getPostsError } = await supabase.from("posts")
+      .select("author").eq("id", data.post_id);
+    if (getPostsError) throw getPostsError;
+
+    const { data: tokens, error: getTokensError } = await supabase.from(
+      "fcm_tokens",
+    ).select("token").eq("user_id", posts[0].author);
+    if (getTokensError) throw getTokensError;
+
+    const { data: users, error: getUsersError } = await supabase.from(
+      "users_public",
+    ).select("display_name").eq("user_id", data.user_id);
+    if (getUsersError) throw getUsersError;
+
+    for (const t of tokens) {
+      try {
+        await sendFcmToSpecificUser(t.token, {
+          tag: "post_like",
+          title: "New like",
+          body: `${users[0].display_name} liked your post.`,
         });
       } catch (e) {
         console.error(e);
