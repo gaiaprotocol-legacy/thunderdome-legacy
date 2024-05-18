@@ -1,4 +1,11 @@
-import { Activatable, el } from "@common-module/app";
+import {
+  Activatable,
+  Button,
+  ButtonType,
+  el,
+  MaterialIcon,
+} from "@common-module/app";
+import { PointLeaderboardModal, PointSection } from "point-module";
 import TitleBarUserButton from "../component/TitleBarUserButton.js";
 
 export default class PointsTab extends Activatable {
@@ -7,10 +14,18 @@ export default class PointsTab extends Activatable {
     this.append(
       el(
         "header",
-        new TitleBarUserButton(),
+        el(".left", new TitleBarUserButton()),
         el("h1", "Points"),
+        el(
+          ".right",
+          new Button({
+            type: ButtonType.Circle,
+            icon: new MaterialIcon("leaderboard"),
+            click: () => new PointLeaderboardModal(),
+          }),
+        ),
       ),
-      el("main"),
+      el("main", new PointSection()),
     );
   }
 }

@@ -10,7 +10,7 @@ export default class SettingsTab extends Activatable {
     this.append(
       el(
         "header",
-        new TitleBarUserButton(),
+        el(".left", new TitleBarUserButton()),
         el("h1", "Settings"),
       ),
       el("main", this.mePanel = new MePanel()),

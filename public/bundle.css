@@ -5034,21 +5034,25 @@ body > section.app > .app-tab > header {
   justify-content: center;
   border-bottom: 1px solid var(--line-color);
 }
-body > section.app > .app-tab > header > .title-bar-user-button {
+body > section.app > .app-tab > header > .left {
   position: absolute;
-  left: 4px;
+  right: 4px;
   top: 0;
   height: 100%;
+  display: flex;
+  align-items: center;
+}
+body > section.app > .app-tab > header > .left > .title-bar-user-button {
   display: none;
   align-items: center;
   cursor: pointer;
 }
 @container (width < 1280px) {
-  body > section.app > .app-tab > header > .title-bar-user-button {
+  body > section.app > .app-tab > header > .left > .title-bar-user-button {
     display: flex;
   }
 }
-body > section.app > .app-tab > header > .title-bar-user-button > .avatar {
+body > section.app > .app-tab > header > .left > .title-bar-user-button > .avatar {
   margin: 8px;
   width: 24px;
   height: 24px;
@@ -5056,7 +5060,7 @@ body > section.app > .app-tab > header > .title-bar-user-button > .avatar {
 body > section.app > .app-tab > header > h1 {
   font-weight: var(--bold-weight);
 }
-body > section.app > .app-tab > header > button {
+body > section.app > .app-tab > header > .right {
   position: absolute;
   right: 4px;
   top: 0;
@@ -5069,6 +5073,13 @@ body > section.app > .app-tab > main {
   height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+body > section.app > .app-tab > main > p.wip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sub-text-color);
+  padding: 24px 12px;
 }
 body > section.viewer {
   flex-grow: 1;
@@ -5124,5 +5135,12 @@ body > section.viewer:empty::before {
   .feed-tab > header > h1:not(.mobile) {
     display: none;
   }
+}
+.topics-tab > header {
+  border-bottom: none !important;
+}
+.topics-tab > .hashtag-search-bar {
+  padding: 0 10px 10px;
+  border-bottom: 1px solid var(--line-color);
 }
 

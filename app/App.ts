@@ -2,12 +2,24 @@ import {
   AppNavBar,
   AvatarUtil,
   BodyNode,
+  DomNode,
   el,
   MaterialIcon,
+  Router,
   View,
   ViewParams,
 } from "@common-module/app";
-import { SFSignedUserManager } from "fsesf";
+import { FCM } from "@common-module/social";
+import {
+  CreatorInfo,
+  CreatorRoom,
+  HashtagInfo,
+  HashtagRoom,
+  HashtagUtil,
+  Post,
+  SFSignedUserManager,
+  SFUserPublic,
+} from "fsesf";
 import CommunitiesTab from "./tab/CommunitiesTab.js";
 import FeedTab from "./tab/FeedTab.js";
 import NotificationsTab from "./tab/NotificationsTab.js";
@@ -15,6 +27,8 @@ import PointsTab from "./tab/PointsTab.js";
 import SettingsTab from "./tab/SettingsTab.js";
 import TicketsTab from "./tab/TicketsTab.js";
 import TopicsTab from "./tab/TopicsTab.js";
+import PostViewer from "./viewer/PostViewer.js";
+import UserViewer from "./viewer/UserViewer.js";
 
 export default class App extends View {
   private navBar: AppNavBar;
@@ -26,6 +40,14 @@ export default class App extends View {
   private pointsTab: PointsTab;
   private notificationsTab: NotificationsTab;
   private settingsTab: SettingsTab;
+
+  private viewerSection: DomNode;
+  private viewer:
+    | UserViewer
+    | PostViewer
+    | CreatorRoom
+    | HashtagRoom
+    | undefined;
 
   constructor() {
     super();
@@ -70,7 +92,7 @@ export default class App extends View {
         this.notificationsTab = new NotificationsTab(),
         this.settingsTab = new SettingsTab(),
       ),
-      el("section.viewer", {
+      this.viewerSection = el("section.viewer", {
         "data-empty-message": "Please select content to view.",
       }),
     );
@@ -106,6 +128,75 @@ export default class App extends View {
   }
 
   public changeParams(params: ViewParams, uri: string, data?: any): void {
-    console.log(params, uri, data);
+    const assetTabs = [this.ticketsTab, this.topicsTab, this.settingsTab];
+    if (params.xUsername) {
+      assetTabs.forEach((t) => t.deactiveAsset());
+      this.openUserViewer(params.xUsername, data);
+    } else if (params.postId) {
+      assetTabs.forEach((t) => t.deactiveAsset());
+      this.openPostViewer(parseInt(params.postId), data);
+    } else if (params.creatorAddress) {
+      assetTabs.forEach((t) =>
+        t.activeAsset(undefined, params.creatorAddress!)
+      );
+      this.enterCreatorRoom(params.creatorAddress, data);
+    } else if (params.topic) {
+      assetTabs.forEach((t) => t.activeAsset(undefined, params.topic!));
+      this.enterHashtagRoom(params.topic, data);
+    } else {
+      this.viewer?.delete();
+      this.viewer = undefined;
+      assetTabs.forEach((t) => t.deactiveAsset());
+    }
+  }
+
+  private openUserViewer(xUsername: string, user?: SFUserPublic): void {
+    if (this.viewer instanceof UserViewer) {
+      this.viewer.loadUser(xUsername, user);
+    } else {
+      this.viewer?.delete();
+      this.viewer = new UserViewer(xUsername, user).appendTo(
+        this.viewerSection,
+      );
+    }
+  }
+
+  private openPostViewer(postId: number, post?: Post): void {
+    if (this.viewer instanceof PostViewer) {
+      this.viewer.loadThread(postId, post);
+    } else {
+      this.viewer?.delete();
+      this.viewer = new PostViewer(postId, post).appendTo(this.viewerSection);
+    }
+  }
+  private enterCreatorRoom(
+    creatorAddress: string,
+    creatorInfo?: CreatorInfo,
+  ): void {
+    if (this.viewer instanceof CreatorRoom) {
+      this.viewer.enter(creatorAddress, creatorInfo);
+    } else {
+      this.viewer?.delete();
+      this.viewer = new CreatorRoom(creatorAddress, creatorInfo).appendTo(
+        this.viewerSection,
+      );
+    }
+
+    FCM.closeAllNotifications(`creator_${creatorAddress}`);
+  }
+
+  private enterHashtagRoom(topic: string, hashtagInfo?: HashtagInfo): void {
+    if (this.viewer instanceof HashtagRoom) {
+      this.viewer.enter(topic, hashtagInfo);
+    } else {
+      this.viewer?.delete();
+      this.viewer = new HashtagRoom(topic, hashtagInfo).appendTo(
+        this.viewerSection,
+      );
+    }
+
+    if (HashtagUtil.available(topic)) {
+      FCM.closeAllNotifications(`hashtag_${topic}`);
+    } else setTimeout(() => Router.goNoHistory("/"));
   }
 }

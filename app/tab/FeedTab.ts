@@ -7,7 +7,7 @@ export default class FeedTab extends Activatable {
     this.append(
       el(
         "header",
-        new TitleBarUserButton(),
+        el(".left", new TitleBarUserButton()),
         el("h1", "Feed"),
         el("h1.mobile", el("img", { src: "/images/logo-navbar.png" })),
       ),

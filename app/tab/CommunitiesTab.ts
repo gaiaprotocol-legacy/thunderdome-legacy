@@ -7,10 +7,10 @@ export default class CommunitiesTab extends Activatable {
     this.append(
       el(
         "header",
-        new TitleBarUserButton(),
+        el(".left", new TitleBarUserButton()),
         el("h1", "Communities"),
       ),
-      el("main"),
+      el("main", el("p.wip", "No communities yet. Stay tuned!")),
     );
   }
 }

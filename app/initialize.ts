@@ -128,8 +128,8 @@ export default async function initialize(config: AppConfig) {
   Router.route([
     "",
     "{xUsername}",
-    "creator/{creatorAddress}",
     "post/{postId}",
+    "creator/{creatorAddress}",
     "topic/{topic}",
   ], App);
 

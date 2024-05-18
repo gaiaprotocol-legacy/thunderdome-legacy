@@ -7,7 +7,7 @@ export default class NotificationsTab extends Activatable {
     this.append(
       el(
         "header",
-        new TitleBarUserButton(),
+        el(".left", new TitleBarUserButton()),
         el("h1", "Notifications"),
       ),
       el("main"),
