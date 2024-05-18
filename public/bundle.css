@@ -5031,7 +5031,7 @@ body > section.app > .app-tab > header {
 }
 body > section.app > .app-tab > header > .left {
   position: absolute;
-  right: 4px;
+  left: 4px;
   top: 0;
   height: 100%;
   display: flex;
