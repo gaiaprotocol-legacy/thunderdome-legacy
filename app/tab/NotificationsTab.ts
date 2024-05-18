@@ -10,7 +10,7 @@ export default class NotificationsTab extends Activatable {
         el(".left", new TitleBarUserButton()),
         el("h1", "Notifications"),
       ),
-      el("main"),
+      el("main", el("p.wip", "No notifications yet. Stay tuned!")),
     );
   }
 }

@@ -491,7 +491,7 @@ serveWithOptions(async (req) => {
       ).select("display_name").eq("user_id", data.author);
       if (getUsersError) throw getUsersError;
 
-      const isRepost = data.message === undefined && data.rich === undefined;
+      const isRepost = data.message === null && data.rich === null;
       for (const t of tokens) {
         try {
           await sendFcmToSpecificUser(t.token, {
