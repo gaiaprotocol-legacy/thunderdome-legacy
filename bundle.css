@@ -450,15 +450,10 @@ button.component.disabled {
   border-right: none;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   overflow-y: visible;
 }
-.bottom-menu-tabs.component::before,
-.bottom-menu-tabs.component::after {
-  content: '';
-  margin: 0 -4%;
-}
 .bottom-menu-tabs.component > .tab {
+  flex-grow: 1;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -524,19 +519,8 @@ button.component.disabled {
   .app-nav-bar.component > ul {
     flex-grow: 1;
     flex-direction: row;
-    justify-content: space-between;
     gap: 0;
     padding-bottom: 0;
-  }
-  .app-nav-bar.component > ul:not(:has( > :nth-child(5)))::before,
-  .app-nav-bar.component > ul:not(:has( > :nth-child(5)))::after {
-    content: '';
-    margin: 0 -4%;
-  }
-  .app-nav-bar.component > ul:has( > :nth-child(5))::before,
-  .app-nav-bar.component > ul:has( > :nth-child(5))::after {
-    content: '';
-    margin: 0 -2%;
   }
 }
 .app-nav-bar.component > ul > .app-nav-bar-menu {
@@ -545,6 +529,11 @@ button.component.disabled {
   align-items: center;
   gap: 4px;
   cursor: pointer;
+}
+@container (width < 1280px) {
+  .app-nav-bar.component > ul > .app-nav-bar-menu {
+    flex-grow: 1;
+  }
 }
 .app-nav-bar.component > ul > .app-nav-bar-menu.to-footer {
   margin-top: auto;
@@ -2159,8 +2148,14 @@ body > div > .select-modal {
   flex-grow: 1;
 }
 .hashtag-info-modal > header > .title {
+  display: flex;
+  align-items: center;
   font-size: 18px;
   font-weight: var(--bold-weight);
+}
+.hashtag-info-modal > header > .title > button {
+  margin-left: auto;
+  margin-right: 2px;
 }
 .hashtag-info-modal > main {
   display: flex;
@@ -3336,7 +3331,7 @@ body > div > .select-modal {
   font-size: 16px;
 }
 .profile-section > button.follow {
-  border-radius: 16px;
+  border-radius: 21px;
 }
 .user-metric-section {
   display: grid;
@@ -3681,8 +3676,14 @@ body > div > .select-modal {
   filter: grayscale(1);
 }
 .creator-info-modal > header > .title {
+  display: flex;
+  align-items: center;
   font-size: 18px;
   font-weight: var(--bold-weight);
+}
+.creator-info-modal > header > .title > button {
+  margin-left: auto;
+  margin-right: 2px;
 }
 .creator-info-modal > main {
   display: flex;
@@ -5112,8 +5113,10 @@ body > section.viewer:empty::before {
     display: none;
   }
 }
-.feed-tab > header {
-  border-bottom: none !important;
+@container (width < 1280px) {
+  .feed-tab > header {
+    border-bottom: none !important;
+  }
 }
 .feed-tab > header > h1 > img {
   display: block;
