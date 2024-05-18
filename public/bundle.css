@@ -732,6 +732,78 @@ button.component.disabled {
 .popup.component > footer:empty {
   display: none;
 }
+@keyframes show-side-panel {
+  from {
+    opacity: 0;
+    right: -40px;
+  }
+  to {
+    opacity: 1;
+    right: 0;
+  }
+}
+@keyframes hide-side-panel {
+  from {
+    opacity: 1;
+    right: 0;
+  }
+  to {
+    opacity: 0;
+    right: -40px;
+  }
+}
+@keyframes show-left-side-panel {
+  from {
+    opacity: 0;
+    left: -40px;
+  }
+  to {
+    opacity: 1;
+    left: 0;
+  }
+}
+@keyframes hide-left-side-panel {
+  from {
+    opacity: 1;
+    left: 0;
+  }
+  to {
+    opacity: 0;
+    left: -40px;
+  }
+}
+.side-panel.component {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  border-left: 1px solid var(--line-color);
+  background-color: var(--modal-bg-color);
+  overflow-y: auto;
+  padding-bottom: 120px;
+  container-type: inline-size;
+  animation: show-side-panel 0.3s ease-out;
+}
+.side-panel.component.to-left {
+  right: auto;
+  left: 0;
+  border-left: none;
+  border-right: 1px solid var(--line-color);
+  animation: show-left-side-panel 0.3s ease-out;
+}
+@container (width < 1280px) {
+  .side-panel.component {
+    width: 80%;
+  }
+}
+.side-panel.component.hide {
+  animation: hide-side-panel 0.3s ease-out forwards;
+}
+.side-panel.component.hide.to-left {
+  animation: hide-left-side-panel 0.3s ease-out forwards;
+}
 @keyframes show-drawer {
   from {
     opacity: 0;
@@ -4960,18 +5032,26 @@ body > section.app > .app-tab > header {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px solid var(--line-color);
 }
 body > section.app > .app-tab > header > .title-bar-user-button {
   position: absolute;
   left: 4px;
-  top: 4px;
+  top: 0;
   height: 100%;
+  display: none;
   align-items: center;
+  cursor: pointer;
 }
 @container (width < 1280px) {
   body > section.app > .app-tab > header > .title-bar-user-button {
     display: flex;
   }
+}
+body > section.app > .app-tab > header > .title-bar-user-button > .avatar {
+  margin: 8px;
+  width: 24px;
+  height: 24px;
 }
 body > section.app > .app-tab > header > h1 {
   font-weight: var(--bold-weight);
@@ -4979,7 +5059,7 @@ body > section.app > .app-tab > header > h1 {
 body > section.app > .app-tab > header > button {
   position: absolute;
   right: 4px;
-  top: 4px;
+  top: 0;
   height: 100%;
   display: flex;
   align-items: center;

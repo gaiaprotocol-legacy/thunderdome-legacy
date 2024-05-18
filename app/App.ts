@@ -30,7 +30,6 @@ export default class App extends View {
   constructor() {
     super();
 
-    let avatar;
     BodyNode.append(
       el(
         "section.app",
@@ -58,7 +57,7 @@ export default class App extends View {
           }, {
             id: "settings",
             icon: SFSignedUserManager.user
-              ? avatar = el(".avatar")
+              ? el(".avatar")
               : new MaterialIcon("settings"),
             toFooter: SFSignedUserManager.user !== undefined,
           }],
@@ -76,11 +75,14 @@ export default class App extends View {
       }),
     );
 
-    if (avatar && SFSignedUserManager.user) {
-      AvatarUtil.selectLoadable(avatar, [
-        SFSignedUserManager.user.avatar_thumb,
-        SFSignedUserManager.user.stored_avatar_thumb,
-      ]);
+    if (SFSignedUserManager.user) {
+      const icon = this.navBar.findMenu("settings")?.icon;
+      if (icon) {
+        AvatarUtil.selectLoadable(icon, [
+          SFSignedUserManager.user.avatar_thumb,
+          SFSignedUserManager.user.stored_avatar_thumb,
+        ]);
+      }
     }
 
     this.navBar.on("select", (id: string) => {

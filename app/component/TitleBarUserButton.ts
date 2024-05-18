@@ -7,6 +7,7 @@ import {
   MaterialIcon,
 } from "@common-module/app";
 import { SFSignedUserManager } from "fsesf";
+import UserSidePanel from "./UserSidePanel.js";
 
 export default class TitleBarUserButton extends DomNode {
   constructor() {
@@ -19,6 +20,8 @@ export default class TitleBarUserButton extends DomNode {
         SFSignedUserManager.user.avatar_thumb,
         SFSignedUserManager.user.stored_avatar_thumb,
       ]);
+
+      this.onDom("click", () => new UserSidePanel());
     } else {
       this.append(
         new Button({
