@@ -1119,6 +1119,7 @@ button.component.disabled {
 }
 .rich-display.component > .image-container {
   position: relative;
+  display: flex;
 }
 .rich-display.component > .image-container.loading {
   min-width: 64px;
@@ -5136,11 +5137,130 @@ body > section.viewer:empty::before {
     display: none;
   }
 }
+.feed-tab > .tabs > ul > .tab {
+  width: 50%;
+}
+.feed-tab > main > .post-form {
+  border-bottom: 1px solid var(--line-color);
+}
 .topics-tab > header {
   border-bottom: none !important;
 }
 .topics-tab > .hashtag-search-bar {
   padding: 0 10px 10px;
   border-bottom: 1px solid var(--line-color);
+}
+.user-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.user-viewer > header {
+  flex-shrink: 0;
+  height: 50px;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 6px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+@container (width < 1280px) {
+  .user-viewer > header {
+    display: flex;
+  }
+}
+.user-viewer > header > button.back {
+  display: flex;
+}
+.user-viewer > main {
+  flex-grow: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.user-viewer > main:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-viewer > main:empty::before {
+  margin: 0 auto;
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
+}
+.user-viewer > main > .loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.user-viewer > main > .loading-container > .loading-spinner {
+  margin: 0 auto;
+}
+.user-viewer > main > .user-info-container {
+  max-width: 632px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 30px 0 80px;
+}
+.user-viewer > main > .user-info-container > section.social:has(.tabs) {
+  position: relative;
+}
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .user-post-section,
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .x-section {
+  padding: 16px 16px 0;
+}
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .user-post-section > header > button.open-in-new,
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .x-section > .link-container > button.open-in-new {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  border-left: 1px solid var(--line-color);
+  border-bottom: 1px solid var(--line-color);
+  border-radius: 0 0 0 6px;
+}
+.user-viewer > main > .user-info-container > section.social:not(:has(.tabs)) > .user-post-section,
+.user-viewer > main > .user-info-container > section.social:not(:has(.tabs)) > .x-section {
+  padding: 0 16px;
+}
+.post-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.post-viewer > header {
+  flex-shrink: 0;
+  height: 50px;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 6px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+@container (width < 1280px) {
+  .post-viewer > header {
+    display: flex;
+  }
+}
+.post-viewer > header > button.back {
+  display: flex;
+}
+.post-viewer > main {
+  flex-grow: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.post-viewer > main:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.post-viewer > main:empty::before {
+  margin: 0 auto;
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
 }
 
