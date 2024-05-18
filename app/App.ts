@@ -121,7 +121,7 @@ export default class App extends View {
     ];
 
     if (params.postId) {
-      if (this.currentTab !== "feed") this.navBar.select("feed");
+      //if (this.currentTab !== "feed") this.navBar.select("feed");
       this.feedTab?.loadThread(parseInt(params.postId), data);
       assetTabs.forEach((list) => list.deactiveAsset());
     } else {
