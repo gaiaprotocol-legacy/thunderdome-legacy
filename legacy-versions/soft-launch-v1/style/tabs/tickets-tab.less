@@ -1,0 +1,24 @@
+.tickets-tab {
+    >.referral-info-message-container {
+        padding: 16px;
+
+        @container (width < @safe-width) {
+            padding: 12px;
+        }
+
+        >.info-message-box>main>p>.user {
+            display    : inline-flex;
+            gap        : 4px;
+            align-items: center;
+
+            >.user-avatar {
+                width : 12px;
+                height: 12px;
+
+                &.online::after {
+                    display: none;
+                }
+            }
+        }
+    }
+}

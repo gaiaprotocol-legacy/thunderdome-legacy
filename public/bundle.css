@@ -1,3 +1,6 @@
+/*!***********************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
+  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -98,6 +101,9 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
+  \*********************************************************************************************************************************************/
 :root {
   --primary-color: #C1A87D;
   --line-color: #252527;
@@ -574,7 +580,7 @@ button.component.disabled {
     font-size: 28px;
   }
   .app-nav-bar.component > ul > .app-nav-bar-menu > .title {
-    font-size: 10px;
+    display: none;
   }
 }
 .app-nav-bar.component > ul > .app-nav-bar-menu.active {
@@ -4936,6 +4942,11 @@ body > section.app > .app-nav-bar > ul > .app-nav-bar-menu > .avatar {
 body > section.app > .app-nav-bar > ul > .app-nav-bar-menu.active > .avatar {
   outline: 1px solid var(--primary-color);
 }
+@container (width < 1280px) {
+  body > section.app > .app-nav-bar > ul > .app-nav-bar-menu.settings {
+    display: none;
+  }
+}
 body > section.app > .app-tab {
   flex-grow: 1;
   flex-direction: column;
@@ -4950,23 +4961,28 @@ body > section.app > .app-tab > header {
   align-items: center;
   justify-content: center;
 }
+body > section.app > .app-tab > header > .title-bar-user-button {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  height: 100%;
+  align-items: center;
+}
+@container (width < 1280px) {
+  body > section.app > .app-tab > header > .title-bar-user-button {
+    display: flex;
+  }
+}
 body > section.app > .app-tab > header > h1 {
   font-weight: var(--bold-weight);
 }
-body > section.app > .app-tab > header > .right {
+body > section.app > .app-tab > header > button {
   position: absolute;
   right: 4px;
-  top: 0;
+  top: 4px;
   height: 100%;
   display: flex;
   align-items: center;
-}
-body > section.app > .app-tab > .hashtag-search-bar {
-  padding: 0 10px 10px;
-  border-bottom: 1px solid var(--line-color);
-}
-body > section.app > .app-tab:not(:has(.hashtag-search-bar)) > header {
-  border-bottom: 1px solid var(--line-color);
 }
 body > section.app > .app-tab > main {
   flex-grow: 1;
@@ -4974,13 +4990,13 @@ body > section.app > .app-tab > main {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-body > section.room {
+body > section.viewer {
   flex-grow: 1;
   border-left: 1px solid var(--line-color);
   background-color: var(--page-bg-color);
 }
 @container (width < 1280px) {
-  body > section.room {
+  body > section.viewer {
     border-left: none;
     position: fixed;
     border-radius: 0;
@@ -4992,172 +5008,41 @@ body > section.room {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
-body > section.room:empty {
+body > section.viewer:empty {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-body > section.room:empty::before {
+body > section.viewer:empty::before {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
   padding: 24px 12px;
 }
 @container (width < 1280px) {
-  body > section.room:empty {
+  body > section.viewer:empty {
     display: none;
   }
-}
-body.feed > section.app {
-  width: calc(100% - 71px);
-}
-@container (width < 1280px) {
-  body.feed > section.app {
-    width: 100%;
-  }
-}
-body.feed > section.room {
-  display: none;
-}
-.user-display {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.user-display > header {
-  flex-shrink: 0;
-  height: 50px;
-  border-bottom: 1px solid var(--line-color);
-  padding: 0 6px;
-  display: none;
-  align-items: center;
-  gap: 10px;
-}
-@container (width < 1280px) {
-  .user-display > header {
-    display: flex;
-  }
-}
-.user-display > header > button.back {
-  display: flex;
-}
-.user-display > main {
-  flex-grow: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.user-display > main > .loading-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-.user-display > main > .loading-container > .loading-spinner {
-  margin: 0 auto;
-}
-.user-display > main:empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.user-display > main:empty::before {
-  margin: 0 auto;
-  display: block;
-  content: attr(data-empty-message);
-  color: var(--sub-text-color);
-}
-.user-display > main > .user-info-container {
-  max-width: 632px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 30px 0 80px;
-}
-.welcome-popup > header > h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: var(--bold-weight);
-}
-.welcome-popup > main {
-  padding: 0 20px;
-}
-@container (width >= 1280px) {
-  .feed-tab {
-    padding-right: 71px;
-  }
-}
-.feed-tab > header {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-  border-bottom: none !important;
 }
 .feed-tab > header > h1 > img {
   display: block;
   width: 24px;
   height: 24px;
 }
-@container (width >= 1280px) {
-  .feed-tab.feed > header {
-    display: none !important;
-  }
-}
-.feed-tab.thread > header {
-  justify-content: flex-start !important;
-  gap: 8px;
-}
-.feed-tab.thread > header > h1 {
-  font-size: 18px;
-}
-.feed-tab > .tabs {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-}
-.feed-tab > .tabs > ul > .tab {
-  width: 50%;
-}
-@container (width >= 1280px) {
-  .feed-tab > main {
-    padding-right: 71px;
-    margin-right: -71px;
-  }
-}
-.feed-tab > main > .post-form {
-  border-bottom: 1px solid var(--line-color);
-}
-.feed-tab > main > .post-form,
-.feed-tab > main > .post-thread,
-.feed-tab > main > .post-list-for-you,
-.feed-tab > main > .post-list-following {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-}
-.feed-tab.thread > main {
-  padding-bottom: 320px;
-}
-.tickets-tab > .referral-info-message-container {
-  padding: 16px;
+.feed-tab > header > h1.mobile {
+  display: none;
 }
 @container (width < 1280px) {
-  .tickets-tab > .referral-info-message-container {
-    padding: 12px;
+  .feed-tab > header > h1.mobile {
+    display: flex;
   }
 }
-.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user {
-  display: inline-flex;
-  gap: 4px;
-  align-items: center;
+.feed-tab > header > h1:not(.mobile) {
+  display: flex;
 }
-.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar {
-  width: 12px;
-  height: 12px;
-}
-.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar.online::after {
-  display: none;
+@container (width < 1280px) {
+  .feed-tab > header > h1:not(.mobile) {
+    display: none;
+  }
 }
 

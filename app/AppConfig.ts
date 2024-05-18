@@ -5,12 +5,4 @@ export default interface AppConfig {
 
   supabaseUrl: string;
   supabaseAnonKey: string;
-
-  chains: { [chainName: string]: ChainInfo };
-  defaultChain: string;
-  contractAddresses: {
-    [chainName: string]: { [contractType: number]: string };
-  };
-
-  walletConnectProjectId: string;
 }

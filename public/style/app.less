@@ -33,6 +33,12 @@ body {
                 &.active>.avatar {
                     outline: 1px solid var(--primary-color);
                 }
+
+                &.settings {
+                    @container (width < @safe-width) {
+                        display: none;
+                    }
+                }
             }
         }
 
@@ -51,28 +57,30 @@ body {
                 align-items    : center;
                 justify-content: center;
 
+                >.title-bar-user-button {
+                    position   : absolute;
+                    left       : 4px;
+                    top        : 4px;
+                    height     : 100%;
+                    //display    : none;
+                    align-items: center;
+
+                    @container (width < @safe-width) {
+                        display: flex;
+                    }
+                }
+
                 >h1 {
                     font-weight: var(--bold-weight);
                 }
 
-                >.right {
+                >button {
                     position   : absolute;
                     right      : 4px;
-                    top        : 0;
+                    top        : 4px;
                     height     : 100%;
                     display    : flex;
                     align-items: center;
-                }
-            }
-
-            >.hashtag-search-bar {
-                padding      : 0 10px 10px;
-                border-bottom: 1px solid var(--line-color);
-            }
-
-            &:not(:has(.hashtag-search-bar)) {
-                >header {
-                    border-bottom: 1px solid var(--line-color);
                 }
             }
 
@@ -85,7 +93,7 @@ body {
         }
     }
 
-    >section.room {
+    >section.viewer {
         flex-grow       : 1;
         border-left     : 1px solid var(--line-color);
         background-color: var(--page-bg-color);
@@ -117,20 +125,6 @@ body {
             @container (width < @safe-width) {
                 display: none;
             }
-        }
-    }
-
-    &.feed {
-        >section.app {
-            width: calc(100% - 71px);
-
-            @container (width < @safe-width) {
-                width: 100%;
-            }
-        }
-
-        >section.room {
-            display: none;
         }
     }
 }
