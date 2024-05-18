@@ -1,0 +1,43 @@
+.post-viewer {
+    display       : flex;
+    flex-direction: column;
+    height        : 100%;
+
+    >header {
+        flex-shrink  : 0;
+        height       : 50px;
+        border-bottom: 1px solid var(--line-color);
+        padding      : 0 6px;
+        display      : none;
+        align-items  : center;
+        gap          : 10px;
+
+        @container (width < @safe-width) {
+            display: flex;
+        }
+
+        >button.back {
+            display: flex;
+        }
+    }
+
+    >main {
+        flex-grow          : 1;
+        overflow-y         : auto;
+        overscroll-behavior: contain;
+        padding-bottom     : 320px;
+
+        &:empty {
+            display        : flex;
+            align-items    : center;
+            justify-content: center;
+
+            &::before {
+                margin : 0 auto;
+                display: block;
+                content: attr(data-empty-message);
+                color  : var(--sub-text-color);
+            }
+        }
+    }
+}

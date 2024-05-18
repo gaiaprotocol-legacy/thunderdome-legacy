@@ -574,7 +574,7 @@ button.component.disabled {
     font-size: 28px;
   }
   .app-nav-bar.component > ul > .app-nav-bar-menu > .title {
-    font-size: 10px;
+    display: none;
   }
 }
 .app-nav-bar.component > ul > .app-nav-bar-menu.active {
@@ -725,6 +725,78 @@ button.component.disabled {
 }
 .popup.component > footer:empty {
   display: none;
+}
+@keyframes show-side-panel {
+  from {
+    opacity: 0;
+    right: -40px;
+  }
+  to {
+    opacity: 1;
+    right: 0;
+  }
+}
+@keyframes hide-side-panel {
+  from {
+    opacity: 1;
+    right: 0;
+  }
+  to {
+    opacity: 0;
+    right: -40px;
+  }
+}
+@keyframes show-left-side-panel {
+  from {
+    opacity: 0;
+    left: -40px;
+  }
+  to {
+    opacity: 1;
+    left: 0;
+  }
+}
+@keyframes hide-left-side-panel {
+  from {
+    opacity: 1;
+    left: 0;
+  }
+  to {
+    opacity: 0;
+    left: -40px;
+  }
+}
+.side-panel.component {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  border-left: 1px solid var(--line-color);
+  background-color: var(--modal-bg-color);
+  overflow-y: auto;
+  padding-bottom: 120px;
+  container-type: inline-size;
+  animation: show-side-panel 0.3s ease-out;
+}
+.side-panel.component.to-left {
+  right: auto;
+  left: 0;
+  border-left: none;
+  border-right: 1px solid var(--line-color);
+  animation: show-left-side-panel 0.3s ease-out;
+}
+@container (width < 1280px) {
+  .side-panel.component {
+    width: 80%;
+  }
+}
+.side-panel.component.hide {
+  animation: hide-side-panel 0.3s ease-out forwards;
+}
+.side-panel.component.hide.to-left {
+  animation: hide-left-side-panel 0.3s ease-out forwards;
 }
 @keyframes show-drawer {
   from {
@@ -1041,6 +1113,7 @@ button.component.disabled {
 }
 .rich-display.component > .image-container {
   position: relative;
+  display: flex;
 }
 .rich-display.component > .image-container.loading {
   min-width: 64px;
@@ -4936,6 +5009,11 @@ body > section.app > .app-nav-bar > ul > .app-nav-bar-menu > .avatar {
 body > section.app > .app-nav-bar > ul > .app-nav-bar-menu.active > .avatar {
   outline: 1px solid var(--primary-color);
 }
+@container (width < 1280px) {
+  body > section.app > .app-nav-bar > ul > .app-nav-bar-menu.settings {
+    display: none;
+  }
+}
 body > section.app > .app-tab {
   flex-grow: 1;
   flex-direction: column;
@@ -4949,6 +5027,30 @@ body > section.app > .app-tab > header {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px solid var(--line-color);
+}
+body > section.app > .app-tab > header > .left {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+body > section.app > .app-tab > header > .left > .title-bar-user-button {
+  display: none;
+  align-items: center;
+  cursor: pointer;
+}
+@container (width < 1280px) {
+  body > section.app > .app-tab > header > .left > .title-bar-user-button {
+    display: flex;
+  }
+}
+body > section.app > .app-tab > header > .left > .title-bar-user-button > .avatar {
+  margin: 8px;
+  width: 24px;
+  height: 24px;
 }
 body > section.app > .app-tab > header > h1 {
   font-weight: var(--bold-weight);
@@ -4961,26 +5063,26 @@ body > section.app > .app-tab > header > .right {
   display: flex;
   align-items: center;
 }
-body > section.app > .app-tab > .hashtag-search-bar {
-  padding: 0 10px 10px;
-  border-bottom: 1px solid var(--line-color);
-}
-body > section.app > .app-tab:not(:has(.hashtag-search-bar)) > header {
-  border-bottom: 1px solid var(--line-color);
-}
 body > section.app > .app-tab > main {
   flex-grow: 1;
   height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-body > section.room {
+body > section.app > .app-tab > main > p.wip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sub-text-color);
+  padding: 24px 12px;
+}
+body > section.viewer {
   flex-grow: 1;
   border-left: 1px solid var(--line-color);
   background-color: var(--page-bg-color);
 }
 @container (width < 1280px) {
-  body > section.room {
+  body > section.viewer {
     border-left: none;
     position: fixed;
     border-radius: 0;
@@ -4992,39 +5094,62 @@ body > section.room {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
-body > section.room:empty {
+body > section.viewer:empty {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-body > section.room:empty::before {
+body > section.viewer:empty::before {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
   padding: 24px 12px;
 }
 @container (width < 1280px) {
-  body > section.room:empty {
+  body > section.viewer:empty {
     display: none;
   }
 }
-body.feed > section.app {
-  width: calc(100% - 71px);
+.feed-tab > header > h1 > img {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
-@container (width < 1280px) {
-  body.feed > section.app {
-    width: 100%;
-  }
-}
-body.feed > section.room {
+.feed-tab > header > h1.mobile {
   display: none;
 }
-.user-display {
+@container (width < 1280px) {
+  .feed-tab > header > h1.mobile {
+    display: flex;
+  }
+}
+.feed-tab > header > h1:not(.mobile) {
+  display: flex;
+}
+@container (width < 1280px) {
+  .feed-tab > header > h1:not(.mobile) {
+    display: none;
+  }
+}
+.feed-tab > .tabs > ul > .tab {
+  width: 50%;
+}
+.feed-tab > main > .post-form {
+  border-bottom: 1px solid var(--line-color);
+}
+.topics-tab > header {
+  border-bottom: none !important;
+}
+.topics-tab > .hashtag-search-bar {
+  padding: 0 10px 10px;
+  border-bottom: 1px solid var(--line-color);
+}
+.user-viewer {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
-.user-display > header {
+.user-viewer > header {
   flex-shrink: 0;
   height: 50px;
   border-bottom: 1px solid var(--line-color);
@@ -5034,39 +5159,39 @@ body.feed > section.room {
   gap: 10px;
 }
 @container (width < 1280px) {
-  .user-display > header {
+  .user-viewer > header {
     display: flex;
   }
 }
-.user-display > header > button.back {
+.user-viewer > header > button.back {
   display: flex;
 }
-.user-display > main {
+.user-viewer > main {
   flex-grow: 1;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.user-display > main > .loading-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-.user-display > main > .loading-container > .loading-spinner {
-  margin: 0 auto;
-}
-.user-display > main:empty {
+.user-viewer > main:empty {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.user-display > main:empty::before {
+.user-viewer > main:empty::before {
   margin: 0 auto;
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
 }
-.user-display > main > .user-info-container {
+.user-viewer > main > .loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.user-viewer > main > .loading-container > .loading-spinner {
+  margin: 0 auto;
+}
+.user-viewer > main > .user-info-container {
   max-width: 632px;
   margin: 0 auto;
   display: flex;
@@ -5074,90 +5199,63 @@ body.feed > section.room {
   gap: 16px;
   padding: 30px 0 80px;
 }
-.welcome-popup > header > h1 {
+.user-viewer > main > .user-info-container > section.social:has(.tabs) {
+  position: relative;
+}
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .user-post-section,
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .x-section {
+  padding: 16px 16px 0;
+}
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .user-post-section > header > button.open-in-new,
+.user-viewer > main > .user-info-container > section.social:has(.tabs) > .x-section > .link-container > button.open-in-new {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  border-left: 1px solid var(--line-color);
+  border-bottom: 1px solid var(--line-color);
+  border-radius: 0 0 0 6px;
+}
+.user-viewer > main > .user-info-container > section.social:not(:has(.tabs)) > .user-post-section,
+.user-viewer > main > .user-info-container > section.social:not(:has(.tabs)) > .x-section {
+  padding: 0 16px;
+}
+.post-viewer {
   display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.post-viewer > header {
+  flex-shrink: 0;
+  height: 50px;
+  border-bottom: 1px solid var(--line-color);
+  padding: 0 6px;
+  display: none;
   align-items: center;
   gap: 10px;
-  font-size: 18px;
-  font-weight: var(--bold-weight);
-}
-.welcome-popup > main {
-  padding: 0 20px;
-}
-@container (width >= 1280px) {
-  .feed-tab {
-    padding-right: 71px;
-  }
-}
-.feed-tab > header {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-  border-bottom: none !important;
-}
-.feed-tab > header > h1 > img {
-  display: block;
-  width: 24px;
-  height: 24px;
-}
-@container (width >= 1280px) {
-  .feed-tab.feed > header {
-    display: none !important;
-  }
-}
-.feed-tab.thread > header {
-  justify-content: flex-start !important;
-  gap: 8px;
-}
-.feed-tab.thread > header > h1 {
-  font-size: 18px;
-}
-.feed-tab > .tabs {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-}
-.feed-tab > .tabs > ul > .tab {
-  width: 50%;
-}
-@container (width >= 1280px) {
-  .feed-tab > main {
-    padding-right: 71px;
-    margin-right: -71px;
-  }
-}
-.feed-tab > main > .post-form {
-  border-bottom: 1px solid var(--line-color);
-}
-.feed-tab > main > .post-form,
-.feed-tab > main > .post-thread,
-.feed-tab > main > .post-list-for-you,
-.feed-tab > main > .post-list-following {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-}
-.feed-tab.thread > main {
-  padding-bottom: 320px;
-}
-.tickets-tab > .referral-info-message-container {
-  padding: 16px;
 }
 @container (width < 1280px) {
-  .tickets-tab > .referral-info-message-container {
-    padding: 12px;
+  .post-viewer > header {
+    display: flex;
   }
 }
-.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user {
-  display: inline-flex;
-  gap: 4px;
+.post-viewer > header > button.back {
+  display: flex;
+}
+.post-viewer > main {
+  flex-grow: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 320px;
+}
+.post-viewer > main:empty {
+  display: flex;
   align-items: center;
+  justify-content: center;
 }
-.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar {
-  width: 12px;
-  height: 12px;
-}
-.tickets-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar.online::after {
-  display: none;
+.post-viewer > main:empty::before {
+  margin: 0 auto;
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
 }
 
