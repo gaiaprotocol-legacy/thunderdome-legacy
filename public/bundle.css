@@ -2159,48 +2159,47 @@ body > div > .select-modal {
   flex-grow: 1;
 }
 .hashtag-info-modal > header > .title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.hashtag-info-modal > header > .title > .image-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.hashtag-info-modal > header > .title > .image-container > img {
-  max-width: 36px;
-  max-height: 36px;
-  border-radius: 6px;
-}
-.hashtag-info-modal > header > .title > .hashtag {
   font-size: 18px;
   font-weight: var(--bold-weight);
 }
 .hashtag-info-modal > main {
-  padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0 80px;
 }
-.hashtag-info-modal > main > .actions {
-  padding: 20px;
-  border-bottom: 1px solid var(--line-color);
+.hashtag-info-modal > main > .info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
 }
-@container (width < 1280px) {
-  .hashtag-info-modal > main > .actions {
-    padding: 12px;
-  }
+.hashtag-info-modal > main > .info > .image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.hashtag-info-modal > main > .actions > button {
+.hashtag-info-modal > main > .info > .image-container > img {
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+}
+.hashtag-info-modal > main > .info > .hashtag {
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+}
+.hashtag-info-modal > main > .info > button {
   border-radius: 21px;
 }
 .hashtag-info-modal > main > .metrics {
-  padding: 20px;
+  padding: 0 16px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 @container (width < 1280px) {
   .hashtag-info-modal > main > .metrics {
-    padding: 12px;
+    padding: 0 12px;
     gap: 8px;
   }
 }
@@ -2239,7 +2238,6 @@ body > div > .select-modal {
   padding: 0 20px 20px 20px;
   display: flex;
   gap: 10px;
-  border-bottom: 1px solid var(--line-color);
 }
 @container (width < 1280px) {
   .hashtag-info-modal > main > .trade {
@@ -3304,7 +3302,7 @@ body > div > .select-modal {
   border-radius: 50%;
   background-color: var(--online-color);
 }
-.profile-section .link {
+.profile-section > .link {
   display: flex;
   gap: 4px;
   align-items: center;
@@ -3316,21 +3314,21 @@ body > div > .select-modal {
   color: var(--sub-text-color);
   max-width: 100%;
 }
-.profile-section .link > .loading-content {
+.profile-section > .link > .loading-content {
   margin-right: 8px;
 }
-.profile-section .link > .url {
+.profile-section > .link > .url {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.profile-section .link > button.copy {
+.profile-section > .link > button.copy {
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.profile-section .link > button.copy > .icon {
+.profile-section > .link > button.copy > .icon {
   font-size: 16px;
 }
 .profile-section > button.follow {
@@ -5109,6 +5107,9 @@ body > section.viewer:empty::before {
   body > section.viewer:empty {
     display: none;
   }
+}
+.feed-tab > header {
+  border-bottom: none !important;
 }
 .feed-tab > header > h1 > img {
   display: block;
