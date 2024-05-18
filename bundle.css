@@ -2178,6 +2178,10 @@ body > div > .select-modal {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+  background-color: var(--placeholder-bg-color);
 }
 .hashtag-info-modal > main > .info > .image-container > img {
   width: 100px;
