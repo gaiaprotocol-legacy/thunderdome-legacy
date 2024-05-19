@@ -38,9 +38,9 @@ export default async function initialize(config: AppConfig) {
     serviceName: "Thunder Dome",
     serviceUrl: "https://thunderdome.so",
 
-    overviewUrl: "https://x.com/ThunderDomeFTM", //TODO:
+    overviewUrl: "https://x.com/ThunderDomeSo", //TODO:
     socialUrls: {
-      x: "https://x.com/ThunderDomeFTM",
+      x: "https://x.com/ThunderDomeSo",
     },
 
     messageForWalletLinking: "Link Wallet to Thunder Dome",

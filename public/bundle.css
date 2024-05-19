@@ -1534,6 +1534,11 @@ body > div > .select-modal {
   justify-content: center;
   font-size: 24px;
 }
+@container (width < 1280px) {
+  .downloading-overlay {
+    font-size: 18px;
+  }
+}
 .layout {
   height: 100%;
 }
