@@ -4451,6 +4451,13 @@ body > div > .select-modal {
 .follower-list.hidden {
   display: none;
 }
+.post-modal > header > .title {
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+}
+.post-modal > main {
+  padding-bottom: 320px;
+}
 .post-form {
   padding: 16px 16px 12px;
   display: flex;
@@ -4741,10 +4748,10 @@ body > div > .select-modal {
   flex-direction: column;
   gap: 8px;
 }
-.post-content-only > main > p > .more {
+.post-content-only > main > p > a {
   color: var(--primary-color);
 }
-.post-content-only > main > p > .more:hover {
+.post-content-only > main > p > a:hover {
   text-decoration: underline;
 }
 .post-content-only > main > .post-content-only.quote {

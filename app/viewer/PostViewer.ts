@@ -31,6 +31,8 @@ export default class PostViewer extends DomNode {
   }
 
   public async loadThread(postId: number, post?: Post) {
-    this.main.empty().append(new PostThread(postId, post ? [post] : undefined));
+    this.main.empty().append(
+      new PostThread(postId, post ? [post] : undefined, false),
+    );
   }
 }
