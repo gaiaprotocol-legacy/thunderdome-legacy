@@ -1,5 +1,5 @@
 import { Activatable, el } from "@common-module/app";
-import { NotificationList } from "fsesf";
+import { LoginRequired, NotificationList, SFSignedUserManager } from "fsesf";
 import TitleBarUserButton from "../component/TitleBarUserButton.js";
 
 export default class NotificationsTab extends Activatable {
@@ -11,7 +11,12 @@ export default class NotificationsTab extends Activatable {
         el(".left", new TitleBarUserButton()),
         el("h1", "Notifications"),
       ),
-      el("main", new NotificationList()),
+      el(
+        "main",
+        SFSignedUserManager.signed
+          ? new NotificationList()
+          : new LoginRequired(),
+      ),
     );
   }
 }
