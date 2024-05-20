@@ -5273,6 +5273,33 @@ body > section.viewer:empty::before {
 .feed-tab > .referral-info-message-container > .info-message-box > main > p > .user > .user-avatar.online::after {
   display: none;
 }
+.tickets-tab > main {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 80px;
+}
+.tickets-tab > main > header {
+  padding: 20px 10px 10px 18px;
+  display: flex;
+  align-items: center;
+}
+.tickets-tab > main > header > h2 {
+  flex-grow: 1;
+  font-weight: var(--bold-weight);
+  color: var(--primary-color);
+}
+.tickets-tab > main > header > button {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+.tickets-tab > main > header > button > .title > .loading-spinner:after {
+  width: 12px;
+  height: 12px;
+}
+.tickets-tab > main > .horizontal-trending-asset-list {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
 .topics-tab > header {
   border-bottom: none !important;
 }

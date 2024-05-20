@@ -1,7 +1,9 @@
 import { Activatable, el, Tabs } from "@common-module/app";
 import {
   ActivityList,
+  HorizontalTrendingAssetList,
   NewAssetList,
+  SignedUserAssetManager,
   SignedUserChatRoomList,
   TopAssetList,
   TrendingAssetList,
@@ -25,15 +27,21 @@ export default class TicketsTab extends Activatable {
         el(".left", new TitleBarUserButton()),
         el("h1", "Tickets"),
       ),
-      this.tabs = new Tabs(undefined, [
-        { id: "holding", label: "Holding" },
-        { id: "trending", label: "Trending" },
-        { id: "top", label: "Top" },
-        { id: "new", label: "New" },
-        { id: "activity", label: "Activity" },
-      ]),
       el(
         "main",
+        ...(SignedUserAssetManager.holdingAssets.length < 5
+          ? [
+            el("header", el("h2", "Trending")),
+            new HorizontalTrendingAssetList(),
+          ]
+          : []),
+        this.tabs = new Tabs(undefined, [
+          { id: "holding", label: "Holding" },
+          { id: "trending", label: "Trending" },
+          { id: "top", label: "Top" },
+          { id: "new", label: "New" },
+          { id: "activity", label: "Activity" },
+        ]),
         this.holdingList = new SignedUserChatRoomList(),
         this.trendingAssetList = new TrendingAssetList(),
         this.topAssetList = new TopAssetList(),
