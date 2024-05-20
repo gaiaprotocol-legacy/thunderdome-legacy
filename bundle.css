@@ -4526,7 +4526,7 @@ body > div > .select-modal {
   margin-left: auto;
   border-radius: 20px;
 }
-.post-popup > main > .post-content-only.has-child::before {
+.post-form-popup > main > .post-content-only.has-child::before {
   height: calc(100% - 52px);
 }
 .user-post-modal > header > .title {
@@ -4779,6 +4779,92 @@ body > div > .select-modal {
 .post-content-only.quote > main {
   margin-top: 0;
   margin-left: 0;
+}
+.notification-list:empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.notification-list:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--sub-text-color);
+  padding: 24px 12px;
+}
+.notification-list > .loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+.notification-list > .notification-list-item {
+  border-bottom: 1px solid var(--line-color);
+}
+.notification-list-item > .commented-message {
+  color: var(--sub-text-color);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 8px 40px 0;
+  margin-bottom: -4px;
+}
+.notification-list-item > .commented-message > .icon {
+  font-size: 20px;
+}
+:root {
+  --notification-buy-creator-color: #00A67E;
+  --notification-sell-creator-color: #FB6565;
+  --notification-follow-color: #1D9BF0;
+  --notification-repost-color: var(--reposted-color);
+  --notification-post-like-color: var(--post-liked-color);
+}
+.notification-content {
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+.notification-content > .icon-container > .icon {
+  font-size: 30px;
+}
+.notification-content.buy_creator > .icon-container {
+  color: var(--notification-buy-creator-color);
+}
+.notification-content.sell_creator > .icon-container {
+  color: var(--notification-sell-creator-color);
+}
+.notification-content.follow > .icon-container {
+  color: var(--notification-follow-color);
+}
+.notification-content.repost > .icon-container {
+  color: var(--notification-repost-color);
+}
+.notification-content.post_like > .icon-container {
+  color: var(--notification-post-like-color);
+}
+.notification-content > main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.notification-content > main > .sender-avatars {
+  display: flex;
+  gap: 4px;
+}
+.notification-content > main > .sender-avatars > .user-avatar {
+  width: 32px;
+  height: 32px;
+}
+.notification-content > main > .message > .sender {
+  font-weight: bold;
+}
+.notification-content > main > .message > .sender:hover {
+  text-decoration: underline;
+}
+.notification-content > main > .sub-text {
+  color: var(--sub-text-color);
 }
 .point-section {
   padding: 20px 0 80px;
