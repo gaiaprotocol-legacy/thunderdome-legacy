@@ -5298,9 +5298,7 @@ body > section.viewer:empty::before {
 }
 .tickets-tab > main > .horizontal-trending-asset-list {
   flex-shrink: 0;
-}
-.tickets-tab > main > .tabs {
-  margin-top: 12px;
+  margin-bottom: 12px;
 }
 .topics-tab > header {
   border-bottom: none !important;
