@@ -4625,6 +4625,11 @@ body > div > .select-modal {
 }
 .post-single {
   position: relative;
+  cursor: pointer;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: text;
+  user-select: text;
 }
 .post-single > .quoted-message {
   color: var(--sub-text-color);
@@ -4677,11 +4682,6 @@ body > div > .select-modal {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  cursor: pointer;
-  -webkit-user-drag: none;
-  user-drag: none;
-  -webkit-user-select: text;
-  user-select: text;
 }
 .post-content-only.has-child::before {
   content: '';
