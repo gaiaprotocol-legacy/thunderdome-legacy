@@ -37,8 +37,12 @@ export default class FeedTab extends Activatable {
     );
 
     this.postForm.on("post", (post: Post) => {
-      this.postListForYou.prepend(new PostSingle(post));
-      this.postListFollowing.prepend(new PostSingle(post));
+      this.postListForYou.prepend(
+        new PostSingle(post, { hasChild: false, main: false }),
+      );
+      this.postListFollowing.prepend(
+        new PostSingle(post, { hasChild: false, main: false }),
+      );
     });
 
     this.tabs.on("select", (id: string) => {
