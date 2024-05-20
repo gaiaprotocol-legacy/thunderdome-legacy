@@ -4678,6 +4678,10 @@ body > div > .select-modal {
   flex-direction: column;
   gap: 4px;
   cursor: pointer;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: text;
+  user-select: text;
 }
 .post-content-only.has-child::before {
   content: '';
