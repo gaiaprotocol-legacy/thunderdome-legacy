@@ -4451,18 +4451,11 @@ body > div > .select-modal {
 .follower-list.hidden {
   display: none;
 }
-.post-popup > header > h1 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.post-modal > header > .title {
   font-size: 18px;
   font-weight: var(--bold-weight);
-  text-transform: capitalize;
 }
-.post-popup > header > button.close {
-  margin-left: auto;
-}
-.post-popup > main {
+.post-modal > main {
   padding-bottom: 320px;
 }
 .post-form {
