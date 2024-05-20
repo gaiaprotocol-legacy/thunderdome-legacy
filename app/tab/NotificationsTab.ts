@@ -1,4 +1,5 @@
 import { Activatable, el } from "@common-module/app";
+import { NotificationList } from "fsesf";
 import TitleBarUserButton from "../component/TitleBarUserButton.js";
 
 export default class NotificationsTab extends Activatable {
@@ -10,7 +11,7 @@ export default class NotificationsTab extends Activatable {
         el(".left", new TitleBarUserButton()),
         el("h1", "Notifications"),
       ),
-      el("main", el("p.wip", "No notifications yet. Stay tuned!")),
+      el("main", new NotificationList()),
     );
   }
 }
