@@ -1774,6 +1774,9 @@ body > div > .select-modal {
   width: 100%;
   border-radius: 16px;
 }
+.horizontal-trending-asset-list-item > footer > button.unfollow {
+  filter: grayscale(1);
+}
 .holding-asset-list:empty {
   display: flex;
   align-items: center;
@@ -3342,8 +3345,12 @@ body > div > .select-modal {
 .profile-section > .link > button.copy > .icon {
   font-size: 16px;
 }
-.profile-section > button.follow {
+.profile-section > button.follow,
+.profile-section > button.unfollow {
   border-radius: 21px;
+}
+.profile-section > button.unfollow {
+  filter: grayscale(1);
 }
 .user-metric-section {
   display: grid;
