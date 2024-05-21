@@ -5321,6 +5321,9 @@ body > section.viewer:empty::before {
   padding: 0 10px 10px;
   border-bottom: 1px solid var(--line-color);
 }
+.notifications-tab > main {
+  padding-bottom: 80px;
+}
 .user-viewer {
   display: flex;
   flex-direction: column;
