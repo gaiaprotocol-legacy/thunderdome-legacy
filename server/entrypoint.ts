@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
 
     if (post) {
       let metaTags = `
-        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:card" content="summary">
         <meta name="twitter:site" content="@ThunderDomeSo">
         <meta name="twitter:title" content="${
         post.author.display_name + " (" + post.author.x_username + ")"
