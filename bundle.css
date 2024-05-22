@@ -228,7 +228,7 @@ button {
 }
 @container (width < 1280px) {
   .snackbar.component {
-    bottom: calc(110px + env(safe-area-inset-bottom));
+    bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }
 .snackbar.component > main {
