@@ -4817,6 +4817,9 @@ body > div > .select-modal {
   margin-top: 0;
   margin-left: 0;
 }
+.notification-list {
+  position: relative;
+}
 .notification-list:empty {
   display: flex;
   align-items: center;
@@ -4829,10 +4832,10 @@ body > div > .select-modal {
   padding: 24px 12px;
 }
 .notification-list > .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .notification-list > .notification-list-item {
   border-bottom: 1px solid var(--line-color);
