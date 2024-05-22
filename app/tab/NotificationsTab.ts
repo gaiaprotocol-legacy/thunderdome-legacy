@@ -1,8 +1,11 @@
-import { Activatable, el } from "@common-module/app";
+import { Activatable, ComponentUtil, DomNode, el } from "@common-module/app";
 import { LoginRequired, NotificationList, SFSignedUserManager } from "fsesf";
 import TitleBarUserButton from "../component/TitleBarUserButton.js";
 
 export default class NotificationsTab extends Activatable {
+  private main: DomNode;
+  private notificationList: NotificationList | undefined;
+
   constructor() {
     super(".app-tab.notifications-tab");
     this.append(
@@ -11,12 +14,18 @@ export default class NotificationsTab extends Activatable {
         el(".left", new TitleBarUserButton()),
         el("h1", "Notifications"),
       ),
-      el(
+      this.main = el(
         "main",
         SFSignedUserManager.signed
-          ? new NotificationList()
+          ? this.notificationList = new NotificationList()
           : new LoginRequired(),
       ),
     );
+
+    ComponentUtil.enablePullToRefresh(this.main, () => this.refresh());
+  }
+
+  private refresh() {
+    this.notificationList?.loadNotifications();
   }
 }

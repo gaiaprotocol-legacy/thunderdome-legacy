@@ -228,7 +228,7 @@ button {
 }
 @container (width < 1280px) {
   .snackbar.component {
-    bottom: calc(110px + env(safe-area-inset-bottom));
+    bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }
 .snackbar.component > main {
@@ -4557,6 +4557,9 @@ body > div > .select-modal {
 .user-post-modal > main {
   min-height: 300px;
 }
+.post-list-for-you {
+  position: relative;
+}
 .post-list-for-you:empty {
   display: flex;
   align-items: center;
@@ -4569,13 +4572,19 @@ body > div > .select-modal {
   padding: 24px 12px;
 }
 .post-list-for-you > .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px;
+  background-color: var(--overlay-color);
+  border-radius: 50%;
 }
 .post-list-for-you > .post-single {
   border-bottom: 1px solid var(--line-color);
+}
+.post-list-following {
+  position: relative;
 }
 .post-list-following:empty {
   display: flex;
@@ -4589,10 +4598,13 @@ body > div > .select-modal {
   padding: 24px 12px;
 }
 .post-list-following > .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px;
+  background-color: var(--overlay-color);
+  border-radius: 50%;
 }
 .post-list-following > .post-single {
   border-bottom: 1px solid var(--line-color);
@@ -4811,6 +4823,9 @@ body > div > .select-modal {
   margin-top: 0;
   margin-left: 0;
 }
+.notification-list {
+  position: relative;
+}
 .notification-list:empty {
   display: flex;
   align-items: center;
@@ -4823,10 +4838,13 @@ body > div > .select-modal {
   padding: 24px 12px;
 }
 .notification-list > .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px;
+  background-color: var(--overlay-color);
+  border-radius: 50%;
 }
 .notification-list > .notification-list-item {
   border-bottom: 1px solid var(--line-color);

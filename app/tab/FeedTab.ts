@@ -2,6 +2,8 @@ import {
   Activatable,
   Button,
   ButtonType,
+  ComponentUtil,
+  DomNode,
   el,
   InfoMessageBox,
   msg,
@@ -27,6 +29,7 @@ export default class FeedTab extends Activatable {
 
   private tabs: Tabs;
 
+  private main: DomNode;
   private postForm: PostForm;
   private postListForYou: PostListForYou;
   private postListFollowing: PostListFollowing;
@@ -44,7 +47,7 @@ export default class FeedTab extends Activatable {
         { id: "for-you", label: "For You" },
         { id: "following", label: "Following" },
       ]),
-      el(
+      this.main = el(
         "main",
         this.postForm = new PostForm(),
         this.postListForYou = new PostListForYou(),
@@ -87,6 +90,14 @@ export default class FeedTab extends Activatable {
         );
       }
     }
+
+    ComponentUtil.enablePullToRefresh(this.main, () => this.refresh());
+  }
+
+  public refresh() {
+    this.main.domElement.scrollTo({ top: 0, behavior: "smooth" });
+    if (this.postListForYou.loaded) this.postListForYou.load();
+    if (this.postListFollowing.loaded) this.postListFollowing.load();
   }
 
   private async loadReferrer() {

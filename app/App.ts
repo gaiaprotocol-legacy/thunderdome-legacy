@@ -108,6 +108,7 @@ export default class App extends View {
     }
 
     this.navBar.on("select", (id: string) => {
+      if (id === "feed" && this.feedTab.activated) this.feedTab.refresh();
       [
         this.feedTab,
         this.ticketsTab,
