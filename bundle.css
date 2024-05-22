@@ -4576,6 +4576,9 @@ body > div > .select-modal {
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 8px;
+  background-color: var(--overlay-color);
+  border-radius: 50%;
 }
 .post-list-for-you > .post-single {
   border-bottom: 1px solid var(--line-color);
@@ -4599,6 +4602,9 @@ body > div > .select-modal {
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 8px;
+  background-color: var(--overlay-color);
+  border-radius: 50%;
 }
 .post-list-following > .post-single {
   border-bottom: 1px solid var(--line-color);
@@ -4836,6 +4842,9 @@ body > div > .select-modal {
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
+  padding: 8px;
+  background-color: var(--overlay-color);
+  border-radius: 50%;
 }
 .notification-list > .notification-list-item {
   border-bottom: 1px solid var(--line-color);
