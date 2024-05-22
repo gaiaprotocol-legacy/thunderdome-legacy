@@ -4557,6 +4557,9 @@ body > div > .select-modal {
 .user-post-modal > main {
   min-height: 300px;
 }
+.post-list-for-you {
+  position: relative;
+}
 .post-list-for-you:empty {
   display: flex;
   align-items: center;
@@ -4569,13 +4572,16 @@ body > div > .select-modal {
   padding: 24px 12px;
 }
 .post-list-for-you > .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .post-list-for-you > .post-single {
   border-bottom: 1px solid var(--line-color);
+}
+.post-list-following {
+  position: relative;
 }
 .post-list-following:empty {
   display: flex;
@@ -4589,10 +4595,10 @@ body > div > .select-modal {
   padding: 24px 12px;
 }
 .post-list-following > .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .post-list-following > .post-single {
   border-bottom: 1px solid var(--line-color);
