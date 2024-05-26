@@ -10,7 +10,7 @@ import {
   SplashLoader,
   Store,
 } from "@common-module/app";
-import { AndroidFcmNotification, FCM } from "@common-module/social";
+import { AndroidFcmNotification, FCM, SEnv } from "@common-module/social";
 import {
   BlockTimeManager,
   BuyCreatorPopup,
@@ -32,6 +32,10 @@ import AppConfig from "./AppConfig.js";
 
 export default async function initialize(config: AppConfig) {
   inject_fsesf_msg();
+
+  SEnv.init({
+    giphyKey: "fGPT88mQsiWG5Wm1YH10fwXJifFKSWoK",
+  });
 
   SFEnv.init({
     dev: config.dev,
