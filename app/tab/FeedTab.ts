@@ -17,7 +17,6 @@ import {
   PostForm,
   PostListFollowing,
   PostListForYou,
-  PostSingle,
   SFSignedUserManager,
   SFUserService,
   UserAvatar,
@@ -56,22 +55,8 @@ export default class FeedTab extends Activatable {
     );
 
     this.postForm.on("post", (post: Post) => {
-      this.postListForYou.prepend(
-        new PostSingle(post, {
-          hasChild: false,
-          main: false,
-          full: false,
-          toPopup: false,
-        }),
-      );
-      this.postListFollowing.prepend(
-        new PostSingle(post, {
-          hasChild: false,
-          main: false,
-          full: false,
-          toPopup: false,
-        }),
-      );
+      this.postListForYou.addPost(post, 0);
+      this.postListFollowing.addPost(post, 0);
     });
 
     this.tabs.on("select", (id: string) => {

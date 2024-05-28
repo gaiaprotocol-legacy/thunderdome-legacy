@@ -1,6 +1,3 @@
-/*!***********************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
-  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -101,9 +98,6 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
-/*!*********************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
-  \*********************************************************************************************************************************************/
 :root {
   --primary-color: #C1A87D;
   --line-color: #252527;
@@ -653,6 +647,17 @@ button.component.disabled {
   height: 100%;
   background-color: var(--list-loading-bar-color);
   animation: list-loading-bar-loading 2s linear infinite;
+}
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+@container (width < 1280px) {
+  .loading-overlay {
+    font-size: 18px;
+  }
 }
 .exitable {
   position: fixed;
@@ -1585,17 +1590,6 @@ body > div > .select-modal {
   position: fixed;
   z-index: 999999;
 }
-.downloading-overlay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
-@container (width < 1280px) {
-  .downloading-overlay {
-    font-size: 18px;
-  }
-}
 .layout {
   height: 100%;
 }
@@ -2145,14 +2139,6 @@ body > div > .select-modal {
 .hashtag-room > .message-list {
   height: 0px;
   flex-grow: 1;
-  overflow-y: scroll;
-  overscroll-behavior: contain;
-  padding: 20px;
-}
-@container (width < 520px) {
-  .hashtag-room > .message-list {
-    padding: 10px;
-  }
 }
 .hashtag-room-title-bar {
   height: 50px;
@@ -3646,14 +3632,6 @@ body > div > .select-modal {
 .creator-room > .message-list {
   height: 0px;
   flex-grow: 1;
-  overflow-y: scroll;
-  overscroll-behavior: contain;
-  padding: 20px;
-}
-@container (width < 520px) {
-  .creator-room > .message-list {
-    padding: 10px;
-  }
 }
 .creator-room-title-bar {
   height: 50px;
@@ -3826,6 +3804,36 @@ body > div > .select-modal {
   font-size: 12px;
   color: var(--sub-text-color);
 }
+.message-form > .parent-message {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 4px 6px 4px 4px;
+  border-radius: 4px;
+  gap: 6px;
+  font-size: 12px;
+}
+.message-form > .parent-message > .rich-display {
+  max-width: 34px;
+}
+.message-form > .parent-message > .rich-display > .image-container.loading {
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 4px;
+}
+.message-form > .parent-message > .rich-display > .image-container > a > img {
+  border: none;
+  border-radius: 4px;
+}
+.message-form > .parent-message > .message-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.message-form > .parent-message > .message-container > .author-name {
+  font-weight: var(--bold-weight);
+  color: var(--primary-color);
+}
 .message-form > .upload-preview-area,
 .message-form > .gif-preview-area {
   background-color: var(--content-bg-color);
@@ -3878,18 +3886,31 @@ body > div > .select-modal {
   height: 32px;
   border-radius: 16px;
 }
+.message-form:has(>.gif-preview-area:empty):has(>main>form>.input-container>.message-input:empty) > main > section.actions > button.send {
+  display: none;
+}
+.message-form:has( > .gif-preview-area:not(:empty)) > main > section.actions > button.gif,
+.message-form:has( > main > form > .input-container > .message-input:not(:empty)) > main > section.actions > button.gif {
+  display: none;
+}
+.message-form:has( > .gif-preview-area:not(:empty)) > main > section.actions > button.send,
+.message-form:has( > main > form > .input-container > .message-input:not(:empty)) > main > section.actions > button.send {
+  display: flex;
+}
 .message-form > main {
   border-top: 1px solid var(--line-color);
   min-height: 50px;
   display: flex;
 }
-.message-form > main > section.rich {
+.message-form > main > section.rich,
+.message-form > main > section.actions {
   display: flex;
   padding: 0 8px;
   gap: 8px;
   align-items: center;
 }
-.message-form > main > section.rich > button {
+.message-form > main > section.rich > button,
+.message-form > main > section.actions > button {
   cursor: pointer;
 }
 .message-form > main > form {
@@ -3913,24 +3934,46 @@ body > div > .select-modal {
   min-height: 20px;
 }
 .message-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.message-list > .scroll-to-bottom {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background-color: var(--page-bg-color);
+  border: 1px solid var(--outlined-button-line-color);
+  display: none;
+}
+.message-list.show-scroll-to-bottom > .scroll-to-bottom {
+  display: flex;
+}
+.message-list > ul {
+  height: 0px;
+  flex-grow: 1;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 @container (width < 520px) {
-  .message-list {
+  .message-list > ul {
+    padding: 10px;
     gap: 12px;
   }
 }
-.message-list > .loading-spinner {
+.message-list > ul > .loading-spinner {
   margin: 0 auto;
 }
-.message-list:empty {
+.message-list > ul:empty {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.message-list:empty::before {
+.message-list > ul:empty::before {
   display: block;
   content: attr(data-empty-message);
   color: var(--sub-text-color);
@@ -4006,6 +4049,7 @@ body > div > .select-modal {
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
 }
 .message-display.waiting > .message {
@@ -4018,6 +4062,39 @@ body > div > .select-modal {
 }
 .message-display.new {
   animation: new-message-display 0.3s ease-out;
+}
+.message-display > .parent-message {
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 4px 6px 4px 4px;
+  border-radius: 4px;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.message-display > .parent-message > .icon {
+  font-size: 16px;
+}
+.message-display > .parent-message > .rich-display {
+  max-width: 34px;
+}
+.message-display > .parent-message > .rich-display > .image-container.loading {
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 4px;
+}
+.message-display > .parent-message > .rich-display > .image-container > a > img {
+  border: none;
+  border-radius: 4px;
+}
+.message-display > .parent-message > .message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.message-display > .parent-message > .message-container > .author-name {
+  font-weight: var(--bold-weight);
+  color: var(--primary-color);
 }
 .message-display > .rich-display {
   max-width: 240px;
@@ -4088,11 +4165,14 @@ body > div > .select-modal {
     font-size: 11px;
   }
 }
-.message-display > .reactions {
+.message-display > .reaction-container {
   display: flex;
   gap: 4px;
 }
-.message-display > .reactions > .reaction {
+.message-display > .reaction-container:empty {
+  display: none;
+}
+.message-display > .reaction-container > .reaction-display {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -4105,8 +4185,12 @@ body > div > .select-modal {
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-.message-display > .reactions > .reaction:hover {
+.message-display > .reaction-container > .reaction-display:hover {
   background-color: rgba(0, 0, 0, 0.4);
+}
+.message-display > .reaction-container > .reaction-display.reacted {
+  border: 1px solid color-mix(in srgb, var(--primary-color) 50%, transparent);
+  background-color: color-mix(in srgb, var(--primary-color) 20%, rgba(0, 0, 0, 0.2));
 }
 @container (width < 520px) {
   .message-display.authored {
@@ -4307,18 +4391,22 @@ body > div > .select-modal {
   min-height: 50px;
   padding: 8px;
 }
-.post-form > main > .upload-preview-area {
+.post-form > main > .upload-preview-area,
+.post-form > main > .gif-preview-area {
   background-color: var(--content-bg-color);
 }
-.post-form > main > .upload-preview-area:empty {
+.post-form > main > .upload-preview-area:empty,
+.post-form > main > .gif-preview-area:empty {
   display: none;
 }
-.post-form > main > .upload-preview-area::after {
+.post-form > main > .upload-preview-area::after,
+.post-form > main > .gif-preview-area::after {
   content: '';
   display: table;
   clear: both;
 }
-.post-form > main > .upload-preview-area > .preview {
+.post-form > main > .upload-preview-area > .preview,
+.post-form > main > .gif-preview-area > .preview {
   float: left;
   position: relative;
   width: 150px;
@@ -4327,17 +4415,20 @@ body > div > .select-modal {
   margin-right: 10px;
   margin-bottom: 10px;
 }
-.post-form > main > .upload-preview-area > .preview.image {
+.post-form > main > .upload-preview-area > .preview.image,
+.post-form > main > .gif-preview-area > .preview.image {
   background-size: cover;
   background-position: center;
 }
-.post-form > main > .upload-preview-area > .preview.file {
+.post-form > main > .upload-preview-area > .preview.file,
+.post-form > main > .gif-preview-area > .preview.file {
   padding: 10px;
   display: flex;
   align-items: end;
   background-color: rgba(0, 0, 0, 0.5);
 }
-.post-form > main > .upload-preview-area > .preview > button.x {
+.post-form > main > .upload-preview-area > .preview > button.x,
+.post-form > main > .gif-preview-area > .preview > button.x {
   position: absolute;
   top: 4px;
   right: 4px;
@@ -4359,6 +4450,10 @@ body > div > .select-modal {
 }
 .post-form > main > footer {
   display: flex;
+}
+.post-form > main > footer > section.rich {
+  display: flex;
+  gap: 4px;
 }
 .post-form > main > footer > button.post {
   margin-left: auto;
