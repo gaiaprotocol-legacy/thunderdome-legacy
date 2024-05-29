@@ -11,6 +11,8 @@ import {
 } from "@common-module/app";
 import { FCM } from "@common-module/social";
 import {
+  Community,
+  CommunityRoom,
   CreatorInfo,
   CreatorRoom,
   HashtagInfo,
@@ -47,6 +49,7 @@ export default class App extends View {
     | PostViewer
     | CreatorRoom
     | HashtagRoom
+    | CommunityRoom
     | undefined;
 
   constructor() {
@@ -144,6 +147,9 @@ export default class App extends View {
     } else if (params.topic) {
       assetTabs.forEach((t) => t.activeAsset(undefined, params.topic!));
       this.enterHashtagRoom(params.topic, data);
+    } else if (params.communityId) {
+      assetTabs.forEach((t) => t.deactiveAsset());
+      this.enterCommunityRoom(parseInt(params.communityId), data);
     } else {
       this.viewer?.delete();
       this.viewer = undefined;
@@ -199,5 +205,21 @@ export default class App extends View {
     if (HashtagUtil.available(topic)) {
       FCM.closeAllNotifications(`hashtag_${topic}`);
     } else setTimeout(() => Router.goNoHistory("/"));
+  }
+
+  private enterCommunityRoom(
+    communityId: number,
+    communityInfo?: Community,
+  ): void {
+    if (this.viewer instanceof CommunityRoom) {
+      this.viewer.enter(communityId, communityInfo);
+    } else {
+      this.viewer?.delete();
+      this.viewer = new CommunityRoom(communityId, communityInfo).appendTo(
+        this.viewerSection,
+      );
+    }
+
+    FCM.closeAllNotifications(`community_${communityId}`);
   }
 }

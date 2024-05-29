@@ -58,6 +58,7 @@ export default async function initialize(config: AppConfig) {
     creatorOptions: { unit: "ticket", baseUri: "/creator" },
     hashtagOptions: { unit: "ticket", baseUri: "/topic" },
     postOptions: { baseUri: "/post" },
+    communityOptions: { baseUri: "/community" },
     additionalFeatures: ["follow"],
   });
 
@@ -135,6 +136,7 @@ export default async function initialize(config: AppConfig) {
     "post/{postId}",
     "creator/{creatorAddress}",
     "topic/{topic}",
+    "community/{communityId}",
   ], App);
 
   AuthUtil.checkEmailAccess();

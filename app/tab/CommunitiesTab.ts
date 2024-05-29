@@ -1,4 +1,5 @@
 import { Activatable, el } from "@common-module/app";
+import { CommunityList } from "fsesf";
 import TitleBarUserButton from "../component/TitleBarUserButton.js";
 
 export default class CommunitiesTab extends Activatable {
@@ -10,7 +11,7 @@ export default class CommunitiesTab extends Activatable {
         el(".left", new TitleBarUserButton()),
         el("h1", "Communities"),
       ),
-      el("main", el("p.wip", "No communities yet. Stay tuned!")),
+      el("main", new CommunityList()),
     );
   }
 }
