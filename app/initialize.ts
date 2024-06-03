@@ -136,7 +136,7 @@ export default async function initialize(config: AppConfig) {
     "post/{postId}",
     "creator/{creatorAddress}",
     "topic/{topic}",
-    "community/{communityId}",
+    "community/{communitySlug}",
   ], App);
 
   AuthUtil.checkEmailAccess();

@@ -2,6 +2,25 @@ import { serveWithOptions } from "../_shared/cors.ts";
 import { sendFcmToSpecificUser } from "../_shared/fcm.ts";
 import supabase, { isDevMode } from "../_shared/supabase.ts";
 
+interface Feedback {
+  user_id?: string;
+  feedback: string;
+  created_at: string;
+}
+
+interface CommunityApplicationContent {
+  slug: string;
+  name: string;
+  metadata: {
+    description: string;
+    x_username: string;
+    website: string;
+  };
+  tokens: { chain: string; address: string; min_tokens_for_member: number }[];
+  contact_info: string;
+  message: string;
+}
+
 interface ContractEvent {
   chain: string;
   contract_type: string;
@@ -12,12 +31,6 @@ interface ContractEvent {
   args: string[];
   wallet_address?: string;
   asset_id?: string;
-  created_at: string;
-}
-
-interface Feedback {
-  user_id?: string;
-  feedback: string;
   created_at: string;
 }
 
@@ -75,10 +88,11 @@ interface InsertPayload {
   table: string;
   schema: string;
   record:
+    | Feedback
+    | CommunityApplicationContent
     | ContractEvent
     | CreatorMessage
     | HashtagMessage
-    | Feedback
     | Post
     | PostLike;
   old_record: null;
@@ -189,7 +203,57 @@ serveWithOptions(async (req) => {
   const payload: InsertPayload = await req.json();
   if (isDevMode) console.log(payload);
 
-  if (payload.type === "INSERT" && payload.table === "contract_events") {
+  if (payload.type === "INSERT" && payload.table === "feedbacks") {
+    const { data: admins, error: getAdminError } = await supabase.from("admins")
+      .select("user_id");
+    if (getAdminError) throw getAdminError;
+
+    const { data: fcmTokens, error: getFcmTokensError } = await supabase.from(
+      "fcm_tokens",
+    ).select("token").in(
+      "user_id",
+      admins.map((admin) => admin.user_id),
+    );
+    if (getFcmTokensError) throw getFcmTokensError;
+
+    for (const t of fcmTokens) {
+      try {
+        await sendFcmToSpecificUser(t.token, {
+          tag: "feedback",
+          title: "New feedback",
+          body: (payload.record as Feedback).feedback,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  } else if (
+    payload.type === "INSERT" && payload.table === "community_applications"
+  ) {
+    const { data: admins, error: getAdminError } = await supabase.from("admins")
+      .select("user_id");
+    if (getAdminError) throw getAdminError;
+
+    const { data: fcmTokens, error: getFcmTokensError } = await supabase.from(
+      "fcm_tokens",
+    ).select("token").in(
+      "user_id",
+      admins.map((admin) => admin.user_id),
+    );
+    if (getFcmTokensError) throw getFcmTokensError;
+
+    for (const t of fcmTokens) {
+      try {
+        await sendFcmToSpecificUser(t.token, {
+          tag: "community_application",
+          title: "New community application",
+          body: JSON.stringify(payload.record as CommunityApplicationContent),
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  } else if (payload.type === "INSERT" && payload.table === "contract_events") {
     const data = payload.record as ContractEvent;
 
     const { data: users, error: getUserError } = await supabase.from(
@@ -417,30 +481,6 @@ serveWithOptions(async (req) => {
         } catch (e) {
           console.error(e);
         }
-      }
-    }
-  } else if (payload.type === "INSERT" && payload.table === "feedbacks") {
-    const { data: admins, error: getAdminError } = await supabase.from("admins")
-      .select("user_id");
-    if (getAdminError) throw getAdminError;
-
-    const { data: fcmTokens, error: getFcmTokensError } = await supabase.from(
-      "fcm_tokens",
-    ).select("token").in(
-      "user_id",
-      admins.map((admin) => admin.user_id),
-    );
-    if (getFcmTokensError) throw getFcmTokensError;
-
-    for (const t of fcmTokens) {
-      try {
-        await sendFcmToSpecificUser(t.token, {
-          tag: "feedback",
-          title: "New feedback",
-          body: (payload.record as Feedback).feedback,
-        });
-      } catch (e) {
-        console.error(e);
       }
     }
   } else if (

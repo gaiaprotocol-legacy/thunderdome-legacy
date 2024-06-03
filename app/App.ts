@@ -135,25 +135,31 @@ export default class App extends View {
     const assetTabs = [this.ticketsTab, this.topicsTab, this.settingsTab];
     if (params.xUsername) {
       assetTabs.forEach((t) => t.deactiveAsset());
+      this.communitiesTab.deactiveCommunity();
       this.openUserViewer(params.xUsername, data);
     } else if (params.postId) {
       assetTabs.forEach((t) => t.deactiveAsset());
+      this.communitiesTab.deactiveCommunity();
       this.openPostViewer(parseInt(params.postId), data);
     } else if (params.creatorAddress) {
       assetTabs.forEach((t) =>
         t.activeAsset(undefined, params.creatorAddress!)
       );
+      this.communitiesTab.deactiveCommunity();
       this.enterCreatorRoom(params.creatorAddress, data);
     } else if (params.topic) {
       assetTabs.forEach((t) => t.activeAsset(undefined, params.topic!));
+      this.communitiesTab.deactiveCommunity();
       this.enterHashtagRoom(params.topic, data);
-    } else if (params.communityId) {
+    } else if (params.communitySlug) {
       assetTabs.forEach((t) => t.deactiveAsset());
-      this.enterCommunityRoom(parseInt(params.communityId), data);
+      this.communitiesTab.activeCommunity(params.communitySlug);
+      this.enterCommunityRoom(params.communitySlug, data);
     } else {
       this.viewer?.delete();
       this.viewer = undefined;
       assetTabs.forEach((t) => t.deactiveAsset());
+      this.communitiesTab.deactiveCommunity();
     }
   }
 
@@ -208,18 +214,18 @@ export default class App extends View {
   }
 
   private enterCommunityRoom(
-    communityId: number,
+    communitySlug: string,
     communityInfo?: Community,
   ): void {
     if (this.viewer instanceof CommunityRoom) {
-      this.viewer.enter(communityId, communityInfo);
+      this.viewer.enter(communitySlug, communityInfo);
     } else {
       this.viewer?.delete();
-      this.viewer = new CommunityRoom(communityId, communityInfo).appendTo(
+      this.viewer = new CommunityRoom(communitySlug, communityInfo).appendTo(
         this.viewerSection,
       );
     }
 
-    FCM.closeAllNotifications(`community_${communityId}`);
+    FCM.closeAllNotifications(`community_${communitySlug}`);
   }
 }

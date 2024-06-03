@@ -107,6 +107,7 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
     for (const community of communityData) {
       let hasMembership = false;
       const balances: { [chain: string]: { [token: string]: string } } = {};
+      let points = 0;
 
       for (const token of community.tokens) {
         if (token.type === "erc20") {
@@ -117,6 +118,7 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
 
           if (!balances[token.chain]) balances[token.chain] = {};
           balances[token.chain][token.address] = balance.toString();
+          points += Number(ethers.formatEther(balance)) * token.points_per_token;
 
           if (
             balance >= ethers.parseEther(String(token.min_tokens_for_member))
@@ -132,6 +134,7 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
             community_id: community.id,
             user_id: userId,
             holding_tokens: balances,
+            holding_points: points,
           });
         if (upsertError) throw upsertError;
       } else {
