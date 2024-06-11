@@ -19,6 +19,7 @@ supabase functions deploy store-fcm-token
 supabase functions deploy track-contract-events
 supabase functions deploy insert-data-webhook --no-verify-jwt
 supabase functions deploy use-referrel-code
+supabase functions deploy redeem-and-sign-points
 ```
 
 ## 데이터베이스 구조 백업

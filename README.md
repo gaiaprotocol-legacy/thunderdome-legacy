@@ -1,1 +1,3 @@
-# sofia
+# Thunder Dome
+
+POINT_WEIGHT_PER_PRICE = 

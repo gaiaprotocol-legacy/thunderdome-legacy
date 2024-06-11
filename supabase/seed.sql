@@ -45,6 +45,40 @@ end;$$;
 
 ALTER FUNCTION "public"."create_creator"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."decrease_community_member_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update communities
+  set
+    member_count = member_count - 1
+  where
+    id = old.community_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."decrease_community_member_count"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."decrease_community_message_reaction_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update community_messages
+  set reaction_counts = CASE
+      WHEN (reaction_counts ->> old.reaction)::INT = 1 THEN
+          reaction_counts - old.reaction
+      ELSE
+          jsonb_set(
+              reaction_counts,
+              ARRAY[old.reaction],
+              ((reaction_counts ->> old.reaction)::INT - 1)::TEXT::JSONB
+          )
+      END
+  where
+    community_id = old.community_id and id = old.message_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."decrease_community_message_reaction_count"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."decrease_creator_holder_count"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$begin
@@ -57,6 +91,27 @@ CREATE OR REPLACE FUNCTION "public"."decrease_creator_holder_count"() RETURNS "t
 end;$$;
 
 ALTER FUNCTION "public"."decrease_creator_holder_count"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."decrease_creator_message_reaction_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update creator_messages
+  set reaction_counts = CASE
+      WHEN (reaction_counts ->> old.reaction)::INT = 1 THEN
+          reaction_counts - old.reaction
+      ELSE
+          jsonb_set(
+              reaction_counts,
+              ARRAY[old.reaction],
+              ((reaction_counts ->> old.reaction)::INT - 1)::TEXT::JSONB
+          )
+      END
+  where
+    creator_address = old.creator_address and id = old.message_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."decrease_creator_message_reaction_count"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."decrease_follow_count"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -114,6 +169,27 @@ CREATE OR REPLACE FUNCTION "public"."decrease_hashtag_holder_count"() RETURNS "t
 end;$$;
 
 ALTER FUNCTION "public"."decrease_hashtag_holder_count"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."decrease_hashtag_message_reaction_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update hashtag_messages
+  set reaction_counts = CASE
+      WHEN (reaction_counts ->> old.reaction)::INT = 1 THEN
+          reaction_counts - old.reaction
+      ELSE
+          jsonb_set(
+              reaction_counts,
+              ARRAY[old.reaction],
+              ((reaction_counts ->> old.reaction)::INT - 1)::TEXT::JSONB
+          )
+      END
+  where
+    hashtag = old.hashtag and id = old.message_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."decrease_hashtag_message_reaction_count"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."decrease_post_comment_count"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -281,6 +357,247 @@ END;
 $$;
 
 ALTER FUNCTION "public"."get_asset_contract_events"("p_chain" "text", "p_contract_type" "text", "p_asset_id" "text", "last_created_at" timestamp with time zone, "max_count" integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_communities"("last_member_count" integer DEFAULT 2147483647, "max_count" integer DEFAULT 100, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("id" bigint, "slug" "text", "name" "text", "image" "text", "image_thumb" "text", "metadata" "jsonb", "tokens" "jsonb", "member_count" integer, "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "is_member" boolean)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.slug,
+        c.name,
+        c.image,
+        c.image_thumb,
+        c.metadata,
+        c.tokens,
+        c.member_count,
+        c.created_at,
+        c.updated_at,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN 
+                EXISTS (
+                    SELECT 1
+                    FROM public.community_members cm
+                    WHERE cm.community_id = c.id AND cm.user = signed_user_id
+                )
+            ELSE FALSE 
+        END AS is_member
+    FROM 
+        public.communities c
+    WHERE 
+        c.member_count < last_member_count
+    ORDER BY
+        c.member_count DESC;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_communities"("last_member_count" integer, "max_count" integer, "signed_user_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_community"("p_community_id" bigint, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("id" bigint, "slug" "text", "name" "text", "image" "text", "image_thumb" "text", "metadata" "jsonb", "tokens" "jsonb", "member_count" integer, "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "is_member" boolean)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.slug,
+        c.name,
+        c.image,
+        c.image_thumb,
+        c.metadata,
+        c.tokens,
+        c.member_count,
+        c.created_at,
+        c.updated_at,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN 
+                EXISTS (
+                    SELECT 1
+                    FROM public.community_members cm
+                    WHERE cm.community_id = c.id AND cm.user = signed_user_id
+                )
+            ELSE FALSE 
+        END AS is_member
+    FROM 
+        public.communities c
+    WHERE 
+        c.id = p_community_id;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_community"("p_community_id" bigint, "signed_user_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_community_by_slug"("p_slug" "text", "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("id" bigint, "slug" "text", "name" "text", "image" "text", "image_thumb" "text", "metadata" "jsonb", "tokens" "jsonb", "member_count" integer, "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "is_member" boolean)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.slug,
+        c.name,
+        c.image,
+        c.image_thumb,
+        c.metadata,
+        c.tokens,
+        c.member_count,
+        c.created_at,
+        c.updated_at,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN 
+                EXISTS (
+                    SELECT 1
+                    FROM public.community_members cm
+                    WHERE cm.community_id = c.id AND cm.user = signed_user_id
+                )
+            ELSE FALSE 
+        END AS is_member
+    FROM 
+        public.communities c
+    WHERE 
+        c.slug = p_slug;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_community_by_slug"("p_slug" "text", "signed_user_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_community_message"("p_community_id" bigint, "p_message_id" bigint, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("community_id" bigint, "id" bigint, "parent_message_id" bigint, "parent_message_author_display_name" "text", "parent_message_external_author_name" "text", "parent_message_message" "text", "parent_message_translated" "jsonb", "parent_message_rich" "jsonb", "source" "text", "author" "uuid", "external_author_id" "text", "external_author_name" "text", "external_author_avatar" "text", "message" "text", "external_message_id" "text", "translated" "jsonb", "rich" "jsonb", "reaction_counts" "jsonb", "signed_user_reactions" "text"[], "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "author_user_id" "uuid", "author_wallet_address" "text", "author_display_name" "text", "author_avatar" "text", "author_avatar_thumb" "text", "author_stored_avatar" "text", "author_stored_avatar_thumb" "text", "author_x_username" "text")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.community_id,
+        m.id,
+
+        m.parent_message_id,
+        p_u.display_name AS parent_message_author_display_name,
+        p.external_author_name AS parent_message_external_author_name,
+        p.message AS parent_message_message,
+        p.translated AS parent_message_translated,
+        p.rich AS parent_message_rich,
+
+        m.source,
+        m.author,
+        m.external_author_id,
+        m.external_author_name,
+        m.external_author_avatar,
+        m.message,
+        m.external_message_id,
+        m.translated,
+        m.rich,
+
+        m.reaction_counts,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN
+                ARRAY(
+                    SELECT
+                        r.reaction
+                    FROM
+                        public.community_message_reactions r
+                    WHERE
+                        r.community_id = m.community_id AND r.message_id = m.id AND r.reactor = signed_user_id
+                )
+            ELSE
+                null::text[]
+        END AS signed_user_reactions,
+
+        m.created_at,
+        m.updated_at,
+
+        u.user_id AS author_user_id,
+        u.wallet_address AS author_wallet_address,
+        u.display_name AS author_display_name,
+        u.avatar AS author_avatar,
+        u.avatar_thumb AS author_avatar_thumb,
+        u.stored_avatar AS author_stored_avatar,
+        u.stored_avatar_thumb AS author_stored_avatar_thumb,
+        u.x_username AS author_x_username
+    FROM 
+        public.community_messages m
+    LEFT JOIN 
+        public.users_public u ON m.author = u.user_id
+    LEFT JOIN 
+        public.community_messages p ON m.community_id = p.community_id AND m.parent_message_id = p.id
+    LEFT JOIN 
+        public.users_public p_u ON p.author = p_u.user_id
+    WHERE 
+        m.community_id = p_community_id AND m.id = p_message_id;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_community_message"("p_community_id" bigint, "p_message_id" bigint, "signed_user_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_community_messages"("p_community_id" bigint, "last_message_id" bigint DEFAULT NULL::bigint, "max_count" integer DEFAULT 100, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("community_id" bigint, "id" bigint, "parent_message_id" bigint, "parent_message_author_display_name" "text", "parent_message_external_author_name" "text", "parent_message_message" "text", "parent_message_translated" "jsonb", "parent_message_rich" "jsonb", "source" "text", "author" "uuid", "external_author_id" "text", "external_author_name" "text", "external_author_avatar" "text", "message" "text", "external_message_id" "text", "translated" "jsonb", "rich" "jsonb", "reaction_counts" "jsonb", "signed_user_reactions" "text"[], "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "author_user_id" "uuid", "author_wallet_address" "text", "author_display_name" "text", "author_avatar" "text", "author_avatar_thumb" "text", "author_stored_avatar" "text", "author_stored_avatar_thumb" "text", "author_x_username" "text")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.community_id,
+        m.id,
+
+        m.parent_message_id,
+        p_u.display_name AS parent_message_author_display_name,
+        p.external_author_name AS parent_message_external_author_name,
+        p.message AS parent_message_message,
+        p.translated AS parent_message_translated,
+        p.rich AS parent_message_rich,
+
+        m.source,
+        m.author,
+        m.external_author_id,
+        m.external_author_name,
+        m.external_author_avatar,
+        m.message,
+        m.external_message_id,
+        m.translated,
+        m.rich,
+
+        m.reaction_counts,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN
+                ARRAY(
+                    SELECT
+                        r.reaction
+                    FROM
+                        public.community_message_reactions r
+                    WHERE
+                        r.community_id = m.community_id AND r.message_id = m.id AND r.reactor = signed_user_id
+                )
+            ELSE
+                null::text[]
+        END AS signed_user_reactions,
+
+        m.created_at,
+        m.updated_at,
+
+        u.user_id AS author_user_id,
+        u.wallet_address AS author_wallet_address,
+        u.display_name AS author_display_name,
+        u.avatar AS author_avatar,
+        u.avatar_thumb AS author_avatar_thumb,
+        u.stored_avatar AS author_stored_avatar,
+        u.stored_avatar_thumb AS author_stored_avatar_thumb,
+        u.x_username AS author_x_username
+    FROM 
+        public.community_messages m
+    LEFT JOIN 
+        public.users_public u ON m.author = u.user_id
+    LEFT JOIN 
+        public.community_messages p ON m.community_id = p.community_id AND m.parent_message_id = p.id
+    LEFT JOIN 
+        public.users_public p_u ON p.author = p_u.user_id
+    WHERE 
+        m.community_id = p_community_id AND
+        (last_message_id IS NULL OR m.id < last_message_id)
+    ORDER BY
+        m.id DESC;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_community_messages"("p_community_id" bigint, "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."get_contract_event"("p_chain" "text", "p_contract_type" "text", "p_block_number" bigint, "p_log_index" bigint) RETURNS TABLE("chain" "text", "contract_type" "text", "block_number" bigint, "log_index" bigint, "tx" "text", "event_name" "text", "args" "text"[], "wallet_address" "text", "asset_id" "text", "created_at" timestamp with time zone, "user_id" "uuid", "user_wallet_address" "text", "user_display_name" "text", "user_avatar" "text", "user_avatar_thumb" "text", "user_stored_avatar" "text", "user_stored_avatar_thumb" "text", "user_x_username" "text", "asset_name" "text", "asset_image_thumb" "text", "asset_stored_image_thumb" "text")
     LANGUAGE "plpgsql"
@@ -481,6 +798,143 @@ END;
 $$;
 
 ALTER FUNCTION "public"."get_creator_holders"("p_creator_address" "text", "last_balance" bigint, "max_count" integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_creator_message"("p_creator_address" "text", "p_message_id" bigint, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("creator_address" "text", "id" bigint, "parent_message_id" bigint, "parent_message_author_display_name" "text", "parent_message_external_author_name" "text", "parent_message_message" "text", "parent_message_translated" "jsonb", "parent_message_rich" "jsonb", "source" "text", "author" "uuid", "external_author_id" "text", "external_author_name" "text", "external_author_avatar" "text", "message" "text", "external_message_id" "text", "translated" "jsonb", "rich" "jsonb", "reaction_counts" "jsonb", "signed_user_reactions" "text"[], "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "author_user_id" "uuid", "author_wallet_address" "text", "author_display_name" "text", "author_avatar" "text", "author_avatar_thumb" "text", "author_stored_avatar" "text", "author_stored_avatar_thumb" "text", "author_x_username" "text")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.creator_address,
+        m.id,
+
+        m.parent_message_id,
+        p_u.display_name AS parent_message_author_display_name,
+        p.external_author_name AS parent_message_external_author_name,
+        p.message AS parent_message_message,
+        p.translated AS parent_message_translated,
+        p.rich AS parent_message_rich,
+
+        m.source,
+        m.author,
+        m.external_author_id,
+        m.external_author_name,
+        m.external_author_avatar,
+        m.message,
+        m.external_message_id,
+        m.translated,
+        m.rich,
+
+        m.reaction_counts,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN
+                ARRAY(
+                    SELECT
+                        r.reaction
+                    FROM
+                        public.creator_message_reactions r
+                    WHERE
+                        r.creator_address = m.creator_address AND r.message_id = m.id AND r.reactor = signed_user_id
+                )
+            ELSE
+                null::text[]
+        END AS signed_user_reactions,
+
+        m.created_at,
+        m.updated_at,
+
+        u.user_id AS author_user_id,
+        u.wallet_address AS author_wallet_address,
+        u.display_name AS author_display_name,
+        u.avatar AS author_avatar,
+        u.avatar_thumb AS author_avatar_thumb,
+        u.stored_avatar AS author_stored_avatar,
+        u.stored_avatar_thumb AS author_stored_avatar_thumb,
+        u.x_username AS author_x_username
+    FROM 
+        public.creator_messages m
+    LEFT JOIN 
+        public.users_public u ON m.author = u.user_id
+    LEFT JOIN 
+        public.creator_messages p ON m.creator_address = p.creator_address AND m.parent_message_id = p.id
+    LEFT JOIN 
+        public.users_public p_u ON p.author = p_u.user_id
+    WHERE 
+        m.creator_address = p_creator_address AND m.id = p_message_id;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_creator_message"("p_creator_address" "text", "p_message_id" bigint, "signed_user_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_creator_messages"("p_creator_address" "text", "last_message_id" bigint DEFAULT NULL::bigint, "max_count" integer DEFAULT 100, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("creator_address" "text", "id" bigint, "parent_message_id" bigint, "parent_message_author_display_name" "text", "parent_message_external_author_name" "text", "parent_message_message" "text", "parent_message_translated" "jsonb", "parent_message_rich" "jsonb", "source" "text", "author" "uuid", "external_author_id" "text", "external_author_name" "text", "external_author_avatar" "text", "message" "text", "external_message_id" "text", "translated" "jsonb", "rich" "jsonb", "reaction_counts" "jsonb", "signed_user_reactions" "text"[], "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "author_user_id" "uuid", "author_wallet_address" "text", "author_display_name" "text", "author_avatar" "text", "author_avatar_thumb" "text", "author_stored_avatar" "text", "author_stored_avatar_thumb" "text", "author_x_username" "text")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.creator_address,
+        m.id,
+
+        m.parent_message_id,
+        p_u.display_name AS parent_message_author_display_name,
+        p.external_author_name AS parent_message_external_author_name,
+        p.message AS parent_message_message,
+        p.translated AS parent_message_translated,
+        p.rich AS parent_message_rich,
+
+        m.source,
+        m.author,
+        m.external_author_id,
+        m.external_author_name,
+        m.external_author_avatar,
+        m.message,
+        m.external_message_id,
+        m.translated,
+        m.rich,
+
+        m.reaction_counts,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN
+                ARRAY(
+                    SELECT
+                        r.reaction
+                    FROM
+                        public.creator_message_reactions r
+                    WHERE
+                        r.creator_address = m.creator_address AND r.message_id = m.id AND r.reactor = signed_user_id
+                )
+            ELSE
+                null::text[]
+        END AS signed_user_reactions,
+
+        m.created_at,
+        m.updated_at,
+
+        u.user_id AS author_user_id,
+        u.wallet_address AS author_wallet_address,
+        u.display_name AS author_display_name,
+        u.avatar AS author_avatar,
+        u.avatar_thumb AS author_avatar_thumb,
+        u.stored_avatar AS author_stored_avatar,
+        u.stored_avatar_thumb AS author_stored_avatar_thumb,
+        u.x_username AS author_x_username
+    FROM 
+        public.creator_messages m
+    LEFT JOIN 
+        public.users_public u ON m.author = u.user_id
+    LEFT JOIN 
+        public.creator_messages p ON m.creator_address = p.creator_address AND m.parent_message_id = p.id
+    LEFT JOIN 
+        public.users_public p_u ON p.author = p_u.user_id
+    WHERE 
+        m.creator_address = p_creator_address AND
+        (last_message_id IS NULL OR m.id < last_message_id)
+    ORDER BY
+        m.id DESC;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_creator_messages"("p_creator_address" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."get_followers"("p_user_id" "uuid", "last_followed_at" timestamp with time zone DEFAULT NULL::timestamp with time zone, "max_count" integer DEFAULT 50) RETURNS TABLE("user_id" "uuid", "wallet_address" "text", "wallet_type" "text", "display_name" "text", "avatar" "text", "avatar_thumb" "text", "avatar_stored" boolean, "stored_avatar" "text", "stored_avatar_thumb" "text", "x_username" "text", "metadata" "jsonb", "points" integer, "deleted" boolean, "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "last_sign_in_at" timestamp with time zone, "followed_at" timestamp with time zone)
     LANGUAGE "plpgsql"
@@ -699,6 +1153,143 @@ END;
 $$;
 
 ALTER FUNCTION "public"."get_hashtag_leaderboard"("last_rank" integer, "max_count" integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_hashtag_message"("p_hashtag" "text", "p_message_id" bigint, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("hashtag" "text", "id" bigint, "parent_message_id" bigint, "parent_message_author_display_name" "text", "parent_message_external_author_name" "text", "parent_message_message" "text", "parent_message_translated" "jsonb", "parent_message_rich" "jsonb", "source" "text", "author" "uuid", "external_author_id" "text", "external_author_name" "text", "external_author_avatar" "text", "message" "text", "external_message_id" "text", "translated" "jsonb", "rich" "jsonb", "reaction_counts" "jsonb", "signed_user_reactions" "text"[], "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "author_user_id" "uuid", "author_wallet_address" "text", "author_display_name" "text", "author_avatar" "text", "author_avatar_thumb" "text", "author_stored_avatar" "text", "author_stored_avatar_thumb" "text", "author_x_username" "text")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.hashtag,
+        m.id,
+
+        m.parent_message_id,
+        p_u.display_name AS parent_message_author_display_name,
+        p.external_author_name AS parent_message_external_author_name,
+        p.message AS parent_message_message,
+        p.translated AS parent_message_translated,
+        p.rich AS parent_message_rich,
+
+        m.source,
+        m.author,
+        m.external_author_id,
+        m.external_author_name,
+        m.external_author_avatar,
+        m.message,
+        m.external_message_id,
+        m.translated,
+        m.rich,
+
+        m.reaction_counts,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN
+                ARRAY(
+                    SELECT
+                        r.reaction
+                    FROM
+                        public.hashtag_message_reactions r
+                    WHERE
+                        r.hashtag = m.hashtag AND r.message_id = m.id AND r.reactor = signed_user_id
+                )
+            ELSE
+                null::text[]
+        END AS signed_user_reactions,
+
+        m.created_at,
+        m.updated_at,
+
+        u.user_id AS author_user_id,
+        u.wallet_address AS author_wallet_address,
+        u.display_name AS author_display_name,
+        u.avatar AS author_avatar,
+        u.avatar_thumb AS author_avatar_thumb,
+        u.stored_avatar AS author_stored_avatar,
+        u.stored_avatar_thumb AS author_stored_avatar_thumb,
+        u.x_username AS author_x_username
+    FROM 
+        public.hashtag_messages m
+    LEFT JOIN 
+        public.users_public u ON m.author = u.user_id
+    LEFT JOIN 
+        public.hashtag_messages p ON m.hashtag = p.hashtag AND m.parent_message_id = p.id
+    LEFT JOIN 
+        public.users_public p_u ON p.author = p_u.user_id
+    WHERE 
+        m.hashtag = p_hashtag AND m.id = p_message_id;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_hashtag_message"("p_hashtag" "text", "p_message_id" bigint, "signed_user_id" "uuid") OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_hashtag_messages"("p_hashtag" "text", "last_message_id" bigint DEFAULT NULL::bigint, "max_count" integer DEFAULT 100, "signed_user_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("hashtag" "text", "id" bigint, "parent_message_id" bigint, "parent_message_author_display_name" "text", "parent_message_external_author_name" "text", "parent_message_message" "text", "parent_message_translated" "jsonb", "parent_message_rich" "jsonb", "source" "text", "author" "uuid", "external_author_id" "text", "external_author_name" "text", "external_author_avatar" "text", "message" "text", "external_message_id" "text", "translated" "jsonb", "rich" "jsonb", "reaction_counts" "jsonb", "signed_user_reactions" "text"[], "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "author_user_id" "uuid", "author_wallet_address" "text", "author_display_name" "text", "author_avatar" "text", "author_avatar_thumb" "text", "author_stored_avatar" "text", "author_stored_avatar_thumb" "text", "author_x_username" "text")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        m.hashtag,
+        m.id,
+
+        m.parent_message_id,
+        p_u.display_name AS parent_message_author_display_name,
+        p.external_author_name AS parent_message_external_author_name,
+        p.message AS parent_message_message,
+        p.translated AS parent_message_translated,
+        p.rich AS parent_message_rich,
+
+        m.source,
+        m.author,
+        m.external_author_id,
+        m.external_author_name,
+        m.external_author_avatar,
+        m.message,
+        m.external_message_id,
+        m.translated,
+        m.rich,
+
+        m.reaction_counts,
+        CASE
+            WHEN signed_user_id IS NOT NULL THEN
+                ARRAY(
+                    SELECT
+                        r.reaction
+                    FROM
+                        public.hashtag_message_reactions r
+                    WHERE
+                        r.hashtag = m.hashtag AND r.message_id = m.id AND r.reactor = signed_user_id
+                )
+            ELSE
+                null::text[]
+        END AS signed_user_reactions,
+
+        m.created_at,
+        m.updated_at,
+
+        u.user_id AS author_user_id,
+        u.wallet_address AS author_wallet_address,
+        u.display_name AS author_display_name,
+        u.avatar AS author_avatar,
+        u.avatar_thumb AS author_avatar_thumb,
+        u.stored_avatar AS author_stored_avatar,
+        u.stored_avatar_thumb AS author_stored_avatar_thumb,
+        u.x_username AS author_x_username
+    FROM 
+        public.hashtag_messages m
+    LEFT JOIN 
+        public.users_public u ON m.author = u.user_id
+    LEFT JOIN 
+        public.hashtag_messages p ON m.hashtag = p.hashtag AND m.parent_message_id = p.id
+    LEFT JOIN 
+        public.users_public p_u ON p.author = p_u.user_id
+    WHERE 
+        m.hashtag = p_hashtag AND
+        (last_message_id IS NULL OR m.id < last_message_id)
+    ORDER BY
+        m.id DESC;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_hashtag_messages"("p_hashtag" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."get_holding_assets"("p_wallet_address" "text") RETURNS TABLE("chain" "text", "contract_type" "text", "asset_id" "text", "asset_name" "text", "asset_image_thumb" "text", "asset_stored_image_thumb" "text", "supply" bigint, "total_trading_volume" "text", "is_price_up" boolean, "last_message_id" bigint, "last_message_sender" "text", "last_message" "text", "last_message_sent_at" timestamp with time zone, "holder_count" integer, "last_purchased_at" timestamp with time zone, "created_at" timestamp with time zone, "updated_at" timestamp with time zone, "balance" bigint)
     LANGUAGE "plpgsql"
@@ -2033,6 +2624,41 @@ $$;
 
 ALTER FUNCTION "public"."get_user_posts"("p_user_id" "uuid", "last_post_id" bigint, "max_count" integer, "signed_user_id" "uuid") OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."increase_community_member_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update communities
+  set
+    member_count = member_count + 1
+  where
+    id = new.community_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."increase_community_member_count"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."increase_community_message_reaction_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update community_messages
+  set reaction_counts = jsonb_set(
+        CASE
+            WHEN reaction_counts IS NULL THEN '{}'::JSONB
+            ELSE reaction_counts
+        END,
+        ARRAY[new.reaction],
+        COALESCE(
+            (reaction_counts ->> new.reaction)::INT + 1,
+            1
+        )::TEXT::JSONB
+    )
+  where
+    community_id = new.community_id and id = new.message_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."increase_community_message_reaction_count"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."increase_creator_holder_count"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$begin
@@ -2045,6 +2671,28 @@ CREATE OR REPLACE FUNCTION "public"."increase_creator_holder_count"() RETURNS "t
 end;$$;
 
 ALTER FUNCTION "public"."increase_creator_holder_count"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."increase_creator_message_reaction_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update creator_messages
+  set reaction_counts = jsonb_set(
+        CASE
+            WHEN reaction_counts IS NULL THEN '{}'::JSONB
+            ELSE reaction_counts
+        END,
+        ARRAY[new.reaction],
+        COALESCE(
+            (reaction_counts ->> new.reaction)::INT + 1,
+            1
+        )::TEXT::JSONB
+    )
+  where
+    creator_address = new.creator_address and id = new.message_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."increase_creator_message_reaction_count"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."increase_follow_count"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -2102,6 +2750,28 @@ CREATE OR REPLACE FUNCTION "public"."increase_hashtag_holder_count"() RETURNS "t
 end;$$;
 
 ALTER FUNCTION "public"."increase_hashtag_holder_count"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."increase_hashtag_message_reaction_count"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$begin
+  update hashtag_messages
+  set reaction_counts = jsonb_set(
+        CASE
+            WHEN reaction_counts IS NULL THEN '{}'::JSONB
+            ELSE reaction_counts
+        END,
+        ARRAY[new.reaction],
+        COALESCE(
+            (reaction_counts ->> new.reaction)::INT + 1,
+            1
+        )::TEXT::JSONB
+    )
+  where
+    hashtag = new.hashtag and id = new.message_id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."increase_hashtag_message_reaction_count"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."increase_post_comment_count"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -2559,6 +3229,24 @@ end;$$;
 
 ALTER FUNCTION "public"."parse_contract_event"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."set_community_last_message"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+DECLARE
+    v_new_id INT;
+begin
+  update communities set
+    last_message_id = CASE WHEN communities.last_message_id is null THEN 0 ELSE communities.last_message_id + 1 END,
+    last_message_sent_at = now()
+  where id = new.community_id
+  RETURNING last_message_id INTO v_new_id;
+
+  new.id = v_new_id;
+  return new;
+end;$$;
+
+ALTER FUNCTION "public"."set_community_last_message"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."set_creator_last_message"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2590,6 +3278,17 @@ begin
 end;$$;
 
 ALTER FUNCTION "public"."set_creator_last_message"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_creator_message_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$BEGIN
+  IF new.message != old.message OR new.rich != old.rich THEN
+    new.updated_at := now();
+  END IF;
+  RETURN new;
+END;$$;
+
+ALTER FUNCTION "public"."set_creator_message_updated_at"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."set_hashtag_key_last_message"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -2642,6 +3341,28 @@ begin
 end;$$;
 
 ALTER FUNCTION "public"."set_hashtag_last_message"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_hashtag_message_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$BEGIN
+  IF new.message != old.message OR new.rich != old.rich THEN
+    new.updated_at := now();
+  END IF;
+  RETURN new;
+END;$$;
+
+ALTER FUNCTION "public"."set_hashtag_message_updated_at"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."set_message_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$BEGIN
+  IF new.message != old.message OR new.rich != old.rich THEN
+    new.updated_at := now();
+  END IF;
+  RETURN new;
+END;$$;
+
+ALTER FUNCTION "public"."set_message_updated_at"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."set_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -2703,6 +3424,19 @@ $$;
 
 ALTER FUNCTION "public"."set_user_metadata_to_public"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."update_community_last_message"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+begin
+  update communities
+  set
+      last_message_sent_at = now()
+  where id = old.community_id and last_message_id = old.id;
+  return null;
+end;$$;
+
+ALTER FUNCTION "public"."update_community_last_message"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."update_creator_last_message"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -2753,6 +3487,106 @@ CREATE TABLE IF NOT EXISTS "public"."banned_users" (
 
 ALTER TABLE "public"."banned_users" OWNER TO "postgres";
 
+CREATE TABLE IF NOT EXISTS "public"."communities" (
+    "id" bigint NOT NULL,
+    "slug" "text" NOT NULL,
+    "name" "text" NOT NULL,
+    "image" "text" NOT NULL,
+    "image_thumb" "text" NOT NULL,
+    "metadata" "jsonb" NOT NULL,
+    "tokens" "jsonb" NOT NULL,
+    "member_count" integer DEFAULT 0 NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone,
+    "last_message_sent_at" timestamp with time zone DEFAULT '-infinity'::timestamp with time zone NOT NULL,
+    "last_message_id" bigint
+);
+
+ALTER TABLE "public"."communities" OWNER TO "postgres";
+
+ALTER TABLE "public"."communities" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."communities_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE IF NOT EXISTS "public"."community_applications" (
+    "id" bigint NOT NULL,
+    "applicant" "uuid" DEFAULT "auth"."uid"(),
+    "slug" "text" NOT NULL,
+    "name" "text" NOT NULL,
+    "metadata" "jsonb" NOT NULL,
+    "tokens" "jsonb" NOT NULL,
+    "contact_info" "text" NOT NULL,
+    "message" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+ALTER TABLE "public"."community_applications" OWNER TO "postgres";
+
+ALTER TABLE "public"."community_applications" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."community_applications_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE IF NOT EXISTS "public"."community_chat_users" (
+    "community_id" bigint NOT NULL,
+    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "last_seen_message_id" bigint,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone
+);
+
+ALTER TABLE "public"."community_chat_users" OWNER TO "postgres";
+
+CREATE TABLE IF NOT EXISTS "public"."community_members" (
+    "community_id" bigint NOT NULL,
+    "user" "uuid" NOT NULL,
+    "holding_tokens" "jsonb" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone,
+    "holding_points" integer DEFAULT 0 NOT NULL
+);
+
+ALTER TABLE "public"."community_members" OWNER TO "postgres";
+
+CREATE TABLE IF NOT EXISTS "public"."community_message_reactions" (
+    "community_id" bigint NOT NULL,
+    "message_id" bigint NOT NULL,
+    "reactor" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "reaction" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+ALTER TABLE "public"."community_message_reactions" OWNER TO "postgres";
+
+CREATE TABLE IF NOT EXISTS "public"."community_messages" (
+    "community_id" bigint NOT NULL,
+    "id" bigint NOT NULL,
+    "parent_message_id" bigint,
+    "source" "text" NOT NULL,
+    "author" "uuid" DEFAULT "auth"."uid"(),
+    "external_author_id" "text",
+    "external_author_name" "text",
+    "external_author_avatar" "text",
+    "message" "text",
+    "external_message_id" "text",
+    "translated" "jsonb",
+    "rich" "jsonb",
+    "reaction_counts" "jsonb",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone
+);
+
+ALTER TABLE "public"."community_messages" OWNER TO "postgres";
+
 CREATE TABLE IF NOT EXISTS "public"."contract_events" (
     "chain" "text" NOT NULL,
     "contract_type" "text" NOT NULL,
@@ -2788,6 +3622,16 @@ CREATE TABLE IF NOT EXISTS "public"."creator_holders" (
 
 ALTER TABLE "public"."creator_holders" OWNER TO "postgres";
 
+CREATE TABLE IF NOT EXISTS "public"."creator_message_reactions" (
+    "creator_address" "text" NOT NULL,
+    "message_id" bigint NOT NULL,
+    "reactor" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "reaction" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+ALTER TABLE "public"."creator_message_reactions" OWNER TO "postgres";
+
 CREATE TABLE IF NOT EXISTS "public"."creator_messages" (
     "creator_address" "text" NOT NULL,
     "id" bigint NOT NULL,
@@ -2802,7 +3646,8 @@ CREATE TABLE IF NOT EXISTS "public"."creator_messages" (
     "rich" "jsonb",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "parent_message_id" bigint,
-    "reaction_counts" "jsonb"
+    "reaction_counts" "jsonb",
+    "updated_at" timestamp with time zone
 );
 
 ALTER TABLE "public"."creator_messages" OWNER TO "postgres";
@@ -2854,7 +3699,7 @@ ALTER TABLE "public"."fcm_tokens" OWNER TO "postgres";
 
 CREATE TABLE IF NOT EXISTS "public"."feedbacks" (
     "id" bigint NOT NULL,
-    "user_id" "uuid",
+    "user_id" "uuid" DEFAULT "auth"."uid"(),
     "feedback" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
@@ -2898,6 +3743,16 @@ CREATE TABLE IF NOT EXISTS "public"."hashtag_holders" (
 
 ALTER TABLE "public"."hashtag_holders" OWNER TO "postgres";
 
+CREATE TABLE IF NOT EXISTS "public"."hashtag_message_reactions" (
+    "hashtag" "text" NOT NULL,
+    "message_id" bigint NOT NULL,
+    "reactor" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "reaction" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+ALTER TABLE "public"."hashtag_message_reactions" OWNER TO "postgres";
+
 CREATE TABLE IF NOT EXISTS "public"."hashtag_messages" (
     "hashtag" "text" NOT NULL,
     "id" bigint NOT NULL,
@@ -2912,7 +3767,8 @@ CREATE TABLE IF NOT EXISTS "public"."hashtag_messages" (
     "rich" "jsonb",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "parent_message_id" bigint,
-    "reaction_counts" "jsonb"
+    "reaction_counts" "jsonb",
+    "updated_at" timestamp with time zone
 );
 
 ALTER TABLE "public"."hashtag_messages" OWNER TO "postgres";
@@ -2962,6 +3818,44 @@ ALTER TABLE "public"."notifications" OWNER TO "postgres";
 
 ALTER TABLE "public"."notifications" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
     SEQUENCE NAME "public"."notifications_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE IF NOT EXISTS "public"."points_marketplace_products" (
+    "product_id" bigint NOT NULL,
+    "name" "text" NOT NULL,
+    "description" "text" NOT NULL,
+    "image" "text" NOT NULL,
+    "asset_type" smallint NOT NULL,
+    "asset_address" "text" NOT NULL,
+    "token_id" "text",
+    "price_points_per_unit" double precision NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone,
+    "symbol" "text" NOT NULL
+);
+
+ALTER TABLE "public"."points_marketplace_products" OWNER TO "postgres";
+
+CREATE TABLE IF NOT EXISTS "public"."points_marketplace_purchase_pending" (
+    "id" bigint NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "wallet_address" "text" NOT NULL,
+    "chain" "text" NOT NULL,
+    "product_id" bigint NOT NULL,
+    "amount" bigint NOT NULL,
+    "points" double precision NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+ALTER TABLE "public"."points_marketplace_purchase_pending" OWNER TO "postgres";
+
+ALTER TABLE "public"."points_marketplace_purchase_pending" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."points_marketplace_purchase_pending_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3029,6 +3923,15 @@ CREATE TABLE IF NOT EXISTS "public"."tracked_event_blocks" (
 
 ALTER TABLE "public"."tracked_event_blocks" OWNER TO "postgres";
 
+CREATE TABLE IF NOT EXISTS "public"."unsubscribed_communities" (
+    "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
+    "community_id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone
+);
+
+ALTER TABLE "public"."unsubscribed_communities" OWNER TO "postgres";
+
 CREATE TABLE IF NOT EXISTS "public"."unsubscribed_creators" (
     "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
     "creator_address" "text" NOT NULL,
@@ -3089,6 +3992,24 @@ ALTER TABLE ONLY "public"."admins"
 ALTER TABLE ONLY "public"."banned_users"
     ADD CONSTRAINT "banned_users_pkey" PRIMARY KEY ("user_id");
 
+ALTER TABLE ONLY "public"."communities"
+    ADD CONSTRAINT "communities_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."community_applications"
+    ADD CONSTRAINT "community_applications_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."community_chat_users"
+    ADD CONSTRAINT "community_chat_users_pkey" PRIMARY KEY ("community_id", "user_id");
+
+ALTER TABLE ONLY "public"."community_members"
+    ADD CONSTRAINT "community_members_pkey" PRIMARY KEY ("community_id", "user");
+
+ALTER TABLE ONLY "public"."community_message_reactions"
+    ADD CONSTRAINT "community_message_reactions_pkey" PRIMARY KEY ("community_id", "message_id", "reactor", "reaction");
+
+ALTER TABLE ONLY "public"."community_messages"
+    ADD CONSTRAINT "community_messages_pkey" PRIMARY KEY ("community_id", "id");
+
 ALTER TABLE ONLY "public"."contract_events"
     ADD CONSTRAINT "contract_events_pkey" PRIMARY KEY ("chain", "contract_type", "block_number", "log_index");
 
@@ -3097,6 +4018,9 @@ ALTER TABLE ONLY "public"."creator_chat_users"
 
 ALTER TABLE ONLY "public"."creator_holders"
     ADD CONSTRAINT "creator_holders_pkey" PRIMARY KEY ("creator_address", "wallet_address");
+
+ALTER TABLE ONLY "public"."creator_message_reactions"
+    ADD CONSTRAINT "creator_message_reactions_pkey" PRIMARY KEY ("creator_address", "message_id", "reactor", "reaction");
 
 ALTER TABLE ONLY "public"."creator_messages"
     ADD CONSTRAINT "creator_messages_pkey" PRIMARY KEY ("creator_address", "id");
@@ -3122,6 +4046,9 @@ ALTER TABLE ONLY "public"."hashtag_chat_users"
 ALTER TABLE ONLY "public"."hashtag_holders"
     ADD CONSTRAINT "hashtag_holders_pkey" PRIMARY KEY ("hashtag", "wallet_address");
 
+ALTER TABLE ONLY "public"."hashtag_message_reactions"
+    ADD CONSTRAINT "hashtag_message_reactions_pkey" PRIMARY KEY ("hashtag", "message_id", "reactor", "reaction");
+
 ALTER TABLE ONLY "public"."hashtag_messages"
     ADD CONSTRAINT "hashtag_messages_pkey" PRIMARY KEY ("hashtag", "id");
 
@@ -3130,6 +4057,12 @@ ALTER TABLE ONLY "public"."hashtags"
 
 ALTER TABLE ONLY "public"."notifications"
     ADD CONSTRAINT "notifications_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."points_marketplace_products"
+    ADD CONSTRAINT "points_marketplace_products_pkey" PRIMARY KEY ("product_id");
+
+ALTER TABLE ONLY "public"."points_marketplace_purchase_pending"
+    ADD CONSTRAINT "points_marketplace_purchase_pending_pkey" PRIMARY KEY ("id");
 
 ALTER TABLE ONLY "public"."post_likes"
     ADD CONSTRAINT "post_likes_pkey" PRIMARY KEY ("post_id", "user_id");
@@ -3145,6 +4078,9 @@ ALTER TABLE ONLY "public"."subscribed_hashtags"
 
 ALTER TABLE ONLY "public"."tracked_event_blocks"
     ADD CONSTRAINT "tracked_event_blocks_pkey" PRIMARY KEY ("chain", "contract_type");
+
+ALTER TABLE ONLY "public"."unsubscribed_communities"
+    ADD CONSTRAINT "unsubscribed_communities_pkey" PRIMARY KEY ("user_id", "community_id");
 
 ALTER TABLE ONLY "public"."unsubscribed_creators"
     ADD CONSTRAINT "unsubscribed_creators_pkey" PRIMARY KEY ("user_id", "creator_address");
@@ -3167,6 +4103,8 @@ CREATE INDEX "posts_quoted_post_id_idx" ON "public"."posts" USING "btree" ("quot
 
 CREATE OR REPLACE TRIGGER "create_creator" AFTER UPDATE ON "public"."users_public" FOR EACH ROW EXECUTE FUNCTION "public"."create_creator"();
 
+CREATE OR REPLACE TRIGGER "decrease_community_member_count" AFTER DELETE ON "public"."community_members" FOR EACH ROW EXECUTE FUNCTION "public"."decrease_community_member_count"();
+
 CREATE OR REPLACE TRIGGER "decrease_creator_holder_count" AFTER DELETE ON "public"."creator_holders" FOR EACH ROW EXECUTE FUNCTION "public"."decrease_creator_holder_count"();
 
 CREATE OR REPLACE TRIGGER "decrease_follow_count" AFTER DELETE ON "public"."follows" FOR EACH ROW EXECUTE FUNCTION "public"."decrease_follow_count"();
@@ -3183,6 +4121,8 @@ CREATE OR REPLACE TRIGGER "delete_creator_last_message" AFTER DELETE ON "public"
 
 CREATE OR REPLACE TRIGGER "delete_hashtag_last_message" AFTER DELETE ON "public"."hashtag_messages" FOR EACH ROW EXECUTE FUNCTION "public"."delete_hashtag_last_message"();
 
+CREATE OR REPLACE TRIGGER "increase_community_member_count" AFTER INSERT ON "public"."community_members" FOR EACH ROW EXECUTE FUNCTION "public"."increase_community_member_count"();
+
 CREATE OR REPLACE TRIGGER "increase_creator_holder_count" AFTER INSERT ON "public"."creator_holders" FOR EACH ROW EXECUTE FUNCTION "public"."increase_creator_holder_count"();
 
 CREATE OR REPLACE TRIGGER "increase_follow_count" AFTER INSERT ON "public"."follows" FOR EACH ROW EXECUTE FUNCTION "public"."increase_follow_count"();
@@ -3196,6 +4136,8 @@ CREATE OR REPLACE TRIGGER "increase_post_like_count" AFTER INSERT ON "public"."p
 CREATE OR REPLACE TRIGGER "increase_referral_points" AFTER INSERT ON "public"."referral_used" FOR EACH ROW EXECUTE FUNCTION "public"."increase_referral_points"();
 
 CREATE OR REPLACE TRIGGER "increase_repost_count" AFTER INSERT ON "public"."posts" FOR EACH ROW EXECUTE FUNCTION "public"."increase_repost_count"();
+
+CREATE OR REPLACE TRIGGER "insert_community_application_webhook" AFTER INSERT ON "public"."community_applications" FOR EACH ROW EXECUTE FUNCTION "supabase_functions"."http_request"('https://dwzrduviqvesskxhtcbu.supabase.co/functions/v1/insert-data-webhook', 'POST', '{"Content-type":"application/json"}', '{"secret":"f4d19080-75f5-450b-ae9b-86c5577864f8"}', '1000');
 
 CREATE OR REPLACE TRIGGER "insert_contract_event_webhook" AFTER INSERT ON "public"."contract_events" FOR EACH ROW EXECUTE FUNCTION "supabase_functions"."http_request"('https://dwzrduviqvesskxhtcbu.supabase.co/functions/v1/insert-data-webhook', 'POST', '{"Content-type":"application/json"}', '{"secret":"f4d19080-75f5-450b-ae9b-86c5577864f8"}', '1000');
 
@@ -3219,9 +4161,17 @@ CREATE OR REPLACE TRIGGER "notify_repost" AFTER INSERT ON "public"."posts" FOR E
 
 CREATE OR REPLACE TRIGGER "parse_contract_event" AFTER INSERT ON "public"."contract_events" FOR EACH ROW EXECUTE FUNCTION "public"."parse_contract_event"();
 
+CREATE OR REPLACE TRIGGER "set_communities_updated_at" BEFORE UPDATE ON "public"."communities" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
+
+CREATE OR REPLACE TRIGGER "set_community_last_message" BEFORE INSERT ON "public"."community_messages" FOR EACH ROW EXECUTE FUNCTION "public"."set_community_last_message"();
+
+CREATE OR REPLACE TRIGGER "set_community_members_updated_at" BEFORE UPDATE ON "public"."community_members" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
+
 CREATE OR REPLACE TRIGGER "set_creator_holders_updated_at" BEFORE UPDATE ON "public"."creator_holders" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
 
 CREATE OR REPLACE TRIGGER "set_creator_last_message" BEFORE INSERT ON "public"."creator_messages" FOR EACH ROW EXECUTE FUNCTION "public"."set_creator_last_message"();
+
+CREATE OR REPLACE TRIGGER "set_creator_message_updated_at" BEFORE UPDATE ON "public"."creator_messages" FOR EACH ROW EXECUTE FUNCTION "public"."set_creator_message_updated_at"();
 
 CREATE OR REPLACE TRIGGER "set_creators_updated_at" BEFORE UPDATE ON "public"."creators" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
 
@@ -3229,7 +4179,11 @@ CREATE OR REPLACE TRIGGER "set_hashtag_holders_updated_at" BEFORE UPDATE ON "pub
 
 CREATE OR REPLACE TRIGGER "set_hashtag_last_message" BEFORE INSERT ON "public"."hashtag_messages" FOR EACH ROW EXECUTE FUNCTION "public"."set_hashtag_last_message"();
 
+CREATE OR REPLACE TRIGGER "set_hashtag_message_updated_at" BEFORE UPDATE ON "public"."hashtag_messages" FOR EACH ROW EXECUTE FUNCTION "public"."set_hashtag_message_updated_at"();
+
 CREATE OR REPLACE TRIGGER "set_hashtags_updated_at" BEFORE UPDATE ON "public"."hashtags" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
+
+CREATE OR REPLACE TRIGGER "set_message_updated_at" BEFORE UPDATE ON "public"."community_messages" FOR EACH ROW EXECUTE FUNCTION "public"."set_message_updated_at"();
 
 CREATE OR REPLACE TRIGGER "set_posts_updated_at" BEFORE UPDATE ON "public"."posts" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
 
@@ -3238,6 +4192,20 @@ CREATE OR REPLACE TRIGGER "set_tracked_event_blocks_updated_at" BEFORE UPDATE ON
 CREATE OR REPLACE TRIGGER "set_user_wallets_updated_at" BEFORE UPDATE ON "public"."user_wallets" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
 
 CREATE OR REPLACE TRIGGER "set_users_public_updated_at" BEFORE UPDATE ON "public"."users_public" FOR EACH ROW EXECUTE FUNCTION "public"."set_updated_at"();
+
+CREATE OR REPLACE TRIGGER "trigger_decrease_community_message_reaction_count" AFTER DELETE ON "public"."community_message_reactions" FOR EACH ROW EXECUTE FUNCTION "public"."decrease_community_message_reaction_count"();
+
+CREATE OR REPLACE TRIGGER "trigger_decrease_creator_message_reaction_count" AFTER DELETE ON "public"."creator_message_reactions" FOR EACH ROW EXECUTE FUNCTION "public"."decrease_creator_message_reaction_count"();
+
+CREATE OR REPLACE TRIGGER "trigger_decrease_hashtag_message_reaction_count" AFTER DELETE ON "public"."hashtag_message_reactions" FOR EACH ROW EXECUTE FUNCTION "public"."decrease_hashtag_message_reaction_count"();
+
+CREATE OR REPLACE TRIGGER "trigger_increase_community_message_reaction_count" AFTER INSERT ON "public"."community_message_reactions" FOR EACH ROW EXECUTE FUNCTION "public"."increase_community_message_reaction_count"();
+
+CREATE OR REPLACE TRIGGER "trigger_increase_creator_message_reaction_count" AFTER INSERT ON "public"."creator_message_reactions" FOR EACH ROW EXECUTE FUNCTION "public"."increase_creator_message_reaction_count"();
+
+CREATE OR REPLACE TRIGGER "trigger_increase_hashtag_message_reaction_count" AFTER INSERT ON "public"."hashtag_message_reactions" FOR EACH ROW EXECUTE FUNCTION "public"."increase_hashtag_message_reaction_count"();
+
+CREATE OR REPLACE TRIGGER "update_community_last_message" AFTER UPDATE ON "public"."community_messages" FOR EACH ROW EXECUTE FUNCTION "public"."update_community_last_message"();
 
 CREATE OR REPLACE TRIGGER "update_creator_last_message" AFTER UPDATE ON "public"."creator_messages" FOR EACH ROW EXECUTE FUNCTION "public"."update_creator_last_message"();
 
@@ -3248,6 +4216,21 @@ ALTER TABLE ONLY "public"."admins"
 
 ALTER TABLE ONLY "public"."banned_users"
     ADD CONSTRAINT "banned_users_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."community_applications"
+    ADD CONSTRAINT "community_applications_applicant_fkey" FOREIGN KEY ("applicant") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."community_members"
+    ADD CONSTRAINT "community_members_user_id_fkey" FOREIGN KEY ("user") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."community_message_reactions"
+    ADD CONSTRAINT "community_message_reactions_reactor_fkey" FOREIGN KEY ("reactor") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."community_messages"
+    ADD CONSTRAINT "community_messages_author_fkey" FOREIGN KEY ("author") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."creator_message_reactions"
+    ADD CONSTRAINT "creator_message_reactions_reactor_fkey" FOREIGN KEY ("reactor") REFERENCES "public"."users_public"("user_id");
 
 ALTER TABLE ONLY "public"."creator_messages"
     ADD CONSTRAINT "creator_messages_author_fkey" FOREIGN KEY ("author") REFERENCES "public"."users_public"("user_id");
@@ -3267,11 +4250,20 @@ ALTER TABLE ONLY "public"."follows"
 ALTER TABLE ONLY "public"."follows"
     ADD CONSTRAINT "follows_follower_id_fkey" FOREIGN KEY ("follower_id") REFERENCES "public"."users_public"("user_id");
 
+ALTER TABLE ONLY "public"."hashtag_message_reactions"
+    ADD CONSTRAINT "hashtag_message_reactions_reactor_fkey" FOREIGN KEY ("reactor") REFERENCES "public"."users_public"("user_id");
+
 ALTER TABLE ONLY "public"."hashtag_messages"
     ADD CONSTRAINT "hashtag_messages_author_fkey" FOREIGN KEY ("author") REFERENCES "public"."users_public"("user_id");
 
 ALTER TABLE ONLY "public"."notifications"
     ADD CONSTRAINT "notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."points_marketplace_purchase_pending"
+    ADD CONSTRAINT "points_marketplace_purchase_pending_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."points_marketplace_products"("product_id");
+
+ALTER TABLE ONLY "public"."points_marketplace_purchase_pending"
+    ADD CONSTRAINT "points_marketplace_purchase_pending_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
 
 ALTER TABLE ONLY "public"."post_likes"
     ADD CONSTRAINT "post_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
@@ -3281,6 +4273,9 @@ ALTER TABLE ONLY "public"."posts"
 
 ALTER TABLE ONLY "public"."subscribed_hashtags"
     ADD CONSTRAINT "subscribed_hashtags_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
+
+ALTER TABLE ONLY "public"."unsubscribed_communities"
+    ADD CONSTRAINT "unsubscribed_communities_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
 
 ALTER TABLE ONLY "public"."unsubscribed_creators"
     ADD CONSTRAINT "unsubscribed_creators_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users_public"("user_id");
@@ -3295,6 +4290,14 @@ ALTER TABLE "public"."admins" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."banned_users" ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "can add reaction only authed" ON "public"."community_message_reactions" FOR INSERT TO "authenticated" WITH CHECK (("reactor" = "auth"."uid"()));
+
+CREATE POLICY "can add reaction only authed" ON "public"."creator_message_reactions" FOR INSERT TO "authenticated" WITH CHECK (("reactor" = "auth"."uid"()));
+
+CREATE POLICY "can add reaction only authed" ON "public"."hashtag_message_reactions" FOR INSERT TO "authenticated" WITH CHECK (("reactor" = "auth"."uid"()));
+
+CREATE POLICY "can delete only authed" ON "public"."community_messages" FOR DELETE TO "authenticated" USING (("author" = "auth"."uid"()));
+
 CREATE POLICY "can delete only authed" ON "public"."creator_messages" FOR DELETE TO "authenticated" USING (("author" = "auth"."uid"()));
 
 CREATE POLICY "can delete only authed" ON "public"."hashtag_messages" FOR DELETE TO "authenticated" USING (("author" = "auth"."uid"()));
@@ -3303,21 +4306,35 @@ CREATE POLICY "can delete only authed" ON "public"."posts" FOR DELETE TO "authen
 
 CREATE POLICY "can delete only authed" ON "public"."subscribed_hashtags" FOR DELETE TO "authenticated" USING (("user_id" = "auth"."uid"()));
 
+CREATE POLICY "can delete only authed" ON "public"."unsubscribed_communities" FOR DELETE TO "authenticated" USING (("user_id" = "auth"."uid"()));
+
 CREATE POLICY "can delete only authed" ON "public"."unsubscribed_creators" FOR DELETE TO "authenticated" USING (("user_id" = "auth"."uid"()));
 
 CREATE POLICY "can follow only follower" ON "public"."follows" FOR INSERT TO "authenticated" WITH CHECK ((("follower_id" = "auth"."uid"()) AND ("follower_id" <> "followee_id")));
 
 CREATE POLICY "can like only authed" ON "public"."post_likes" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
 
+CREATE POLICY "can remove reaction only authed" ON "public"."community_message_reactions" FOR DELETE TO "authenticated" USING (("reactor" = "auth"."uid"()));
+
+CREATE POLICY "can remove reaction only authed" ON "public"."creator_message_reactions" FOR DELETE TO "authenticated" USING (("reactor" = "auth"."uid"()));
+
+CREATE POLICY "can remove reaction only authed" ON "public"."hashtag_message_reactions" FOR DELETE TO "authenticated" USING (("reactor" = "auth"."uid"()));
+
 CREATE POLICY "can unfollow only follower" ON "public"."follows" FOR DELETE TO "authenticated" USING (("follower_id" = "auth"."uid"()));
 
 CREATE POLICY "can unlike only authed" ON "public"."post_likes" FOR DELETE TO "authenticated" USING (("user_id" = "auth"."uid"()));
+
+CREATE POLICY "can update only authed" ON "public"."community_messages" FOR UPDATE TO "authenticated" USING ((((("message" IS NOT NULL) AND ("message" <> ''::"text") AND ("length"("message") <= 1000)) OR (("message" IS NULL) AND ("rich" IS NOT NULL))) AND ("author" = "auth"."uid"())));
 
 CREATE POLICY "can update only authed" ON "public"."creator_messages" FOR UPDATE TO "authenticated" USING (("author" = "auth"."uid"()));
 
 CREATE POLICY "can update only authed" ON "public"."hashtag_messages" FOR UPDATE TO "authenticated" USING (("author" = "auth"."uid"()));
 
 CREATE POLICY "can update only authed" ON "public"."posts" FOR UPDATE TO "authenticated" USING ((((("message" IS NOT NULL) AND ("message" <> ''::"text") AND ("length"("message") <= 2000)) OR (("message" IS NULL) AND ("rich" IS NOT NULL))) AND ("author" = "auth"."uid"())));
+
+CREATE POLICY "can view only admin" ON "public"."community_applications" FOR SELECT TO "authenticated" USING ((( SELECT "admins"."user_id"
+   FROM "public"."admins"
+  WHERE ("admins"."user_id" = "auth"."uid"())) IS NOT NULL));
 
 CREATE POLICY "can view only admin" ON "public"."feedbacks" FOR SELECT TO "authenticated" USING ((( SELECT "admins"."user_id"
    FROM "public"."admins"
@@ -3333,7 +4350,11 @@ CREATE POLICY "can view only user" ON "public"."notifications" FOR SELECT TO "au
 
 CREATE POLICY "can view only user" ON "public"."subscribed_hashtags" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
 
+CREATE POLICY "can view only user" ON "public"."unsubscribed_communities" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
+
 CREATE POLICY "can view only user" ON "public"."unsubscribed_creators" FOR SELECT TO "authenticated" USING (("user_id" = "auth"."uid"()));
+
+CREATE POLICY "can write everyone" ON "public"."community_applications" FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "can write everyone" ON "public"."feedbacks" FOR INSERT WITH CHECK (true);
 
@@ -3347,17 +4368,33 @@ CREATE POLICY "can write only authed" ON "public"."posts" FOR INSERT TO "authent
 
 CREATE POLICY "can write only authed" ON "public"."subscribed_hashtags" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
 
+CREATE POLICY "can write only authed" ON "public"."unsubscribed_communities" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
+
 CREATE POLICY "can write only authed" ON "public"."unsubscribed_creators" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
 
 CREATE POLICY "check hashtag length" ON "public"."hashtag_holders" FOR INSERT WITH CHECK (("length"("hashtag") < 32));
 
 CREATE POLICY "check hashtag length" ON "public"."hashtags" FOR INSERT WITH CHECK (("length"("hashtag") < 32));
 
+ALTER TABLE "public"."communities" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."community_applications" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."community_chat_users" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."community_members" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."community_message_reactions" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."community_messages" ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE "public"."contract_events" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."creator_chat_users" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."creator_holders" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."creator_message_reactions" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."creator_messages" ENABLE ROW LEVEL SECURITY;
 
@@ -3375,19 +4412,29 @@ ALTER TABLE "public"."hashtag_chat_users" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."hashtag_holders" ENABLE ROW LEVEL SECURITY;
 
+ALTER TABLE "public"."hashtag_message_reactions" ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE "public"."hashtag_messages" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."hashtags" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."notifications" ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "only authed" ON "public"."community_chat_users" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
+
 CREATE POLICY "only authed" ON "public"."creator_chat_users" FOR INSERT TO "authenticated" WITH CHECK (("user_id" = "auth"."uid"()));
 
 CREATE POLICY "only authed" ON "public"."hashtag_chat_users" FOR INSERT TO "authenticated" WITH CHECK ((("length"("hashtag") < 32) AND ("user_id" = "auth"."uid"())));
 
+CREATE POLICY "only user" ON "public"."community_chat_users" FOR UPDATE TO "authenticated" USING (("user_id" = "auth"."uid"())) WITH CHECK (("user_id" = "auth"."uid"()));
+
 CREATE POLICY "only user" ON "public"."creator_chat_users" FOR UPDATE TO "authenticated" USING (("user_id" = "auth"."uid"())) WITH CHECK (("user_id" = "auth"."uid"()));
 
 CREATE POLICY "only user" ON "public"."hashtag_chat_users" FOR UPDATE TO "authenticated" USING (("user_id" = "auth"."uid"())) WITH CHECK (("user_id" = "auth"."uid"()));
+
+ALTER TABLE "public"."points_marketplace_products" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."points_marketplace_purchase_pending" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."post_likes" ENABLE ROW LEVEL SECURITY;
 
@@ -3399,17 +4446,29 @@ ALTER TABLE "public"."subscribed_hashtags" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."tracked_event_blocks" ENABLE ROW LEVEL SECURITY;
 
+ALTER TABLE "public"."unsubscribed_communities" ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE "public"."unsubscribed_creators" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."user_wallets" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."users_public" ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY "view everyone" ON "public"."communities" FOR SELECT USING (true);
+
+CREATE POLICY "view everyone" ON "public"."community_chat_users" FOR SELECT USING (true);
+
+CREATE POLICY "view everyone" ON "public"."community_members" FOR SELECT USING (true);
+
+CREATE POLICY "view everyone" ON "public"."community_message_reactions" FOR SELECT USING (true);
+
 CREATE POLICY "view everyone" ON "public"."contract_events" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."creator_chat_users" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."creator_holders" FOR SELECT USING (true);
+
+CREATE POLICY "view everyone" ON "public"."creator_message_reactions" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."creators" FOR SELECT USING (true);
 
@@ -3419,9 +4478,13 @@ CREATE POLICY "view everyone" ON "public"."hashtag_chat_users" FOR SELECT USING 
 
 CREATE POLICY "view everyone" ON "public"."hashtag_holders" FOR SELECT USING (true);
 
+CREATE POLICY "view everyone" ON "public"."hashtag_message_reactions" FOR SELECT USING (true);
+
 CREATE POLICY "view everyone" ON "public"."hashtag_messages" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."hashtags" FOR SELECT USING (true);
+
+CREATE POLICY "view everyone" ON "public"."points_marketplace_products" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."post_likes" FOR SELECT USING (true);
 
@@ -3430,6 +4493,10 @@ CREATE POLICY "view everyone" ON "public"."posts" FOR SELECT USING (true);
 CREATE POLICY "view everyone" ON "public"."user_wallets" FOR SELECT USING (true);
 
 CREATE POLICY "view everyone" ON "public"."users_public" FOR SELECT USING (true);
+
+CREATE POLICY "view only holder or owner" ON "public"."community_messages" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."community_members"
+  WHERE (("community_members"."community_id" = "community_messages"."community_id") AND ("community_members"."user" = "auth"."uid"())))));
 
 CREATE POLICY "view only holder or owner" ON "public"."creator_messages" FOR SELECT TO "authenticated" USING ((("creator_address" = ( SELECT "users_public"."wallet_address"
    FROM "public"."users_public"
@@ -3440,6 +4507,12 @@ CREATE POLICY "view only holder or owner" ON "public"."creator_messages" FOR SEL
           WHERE ("users_public"."user_id" = "auth"."uid"()))))))::numeric)));
 
 ALTER TABLE "public"."wallet_linking_nonces" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "write only holder or owner" ON "public"."community_messages" FOR INSERT TO "authenticated" WITH CHECK ((((("message" IS NOT NULL) AND ("message" <> ''::"text") AND ("length"("message") <= 1000)) OR (("message" IS NULL) AND ("rich" IS NOT NULL))) AND ("author" = "auth"."uid"()) AND (( SELECT "banned_users"."user_id"
+   FROM "public"."banned_users"
+  WHERE ("banned_users"."user_id" = "auth"."uid"())) IS NULL) AND (EXISTS ( SELECT 1
+   FROM "public"."community_members"
+  WHERE (("community_members"."community_id" = "community_messages"."community_id") AND ("community_members"."user" = "auth"."uid"()))))));
 
 CREATE POLICY "write only holder or owner" ON "public"."creator_messages" FOR INSERT TO "authenticated" WITH CHECK ((((("message" IS NOT NULL) AND ("message" <> ''::"text") AND ("length"("message") <= 1000)) OR (("message" IS NULL) AND ("rich" IS NOT NULL))) AND ("author" = "auth"."uid"()) AND (( SELECT "banned_users"."user_id"
    FROM "public"."banned_users"
@@ -3452,6 +4525,8 @@ CREATE POLICY "write only holder or owner" ON "public"."creator_messages" FOR IN
           WHERE ("users_public"."user_id" = "auth"."uid"()))))))::numeric))));
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."community_messages";
 
 ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."contract_events";
 
@@ -3470,9 +4545,21 @@ GRANT ALL ON FUNCTION "public"."create_creator"() TO "anon";
 GRANT ALL ON FUNCTION "public"."create_creator"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_creator"() TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."decrease_community_member_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."decrease_community_member_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."decrease_community_member_count"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."decrease_community_message_reaction_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."decrease_community_message_reaction_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."decrease_community_message_reaction_count"() TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."decrease_creator_holder_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."decrease_creator_holder_count"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."decrease_creator_holder_count"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."decrease_creator_message_reaction_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."decrease_creator_message_reaction_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."decrease_creator_message_reaction_count"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."decrease_follow_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."decrease_follow_count"() TO "authenticated";
@@ -3489,6 +4576,10 @@ GRANT ALL ON FUNCTION "public"."decrease_following_count"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."decrease_hashtag_holder_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."decrease_hashtag_holder_count"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."decrease_hashtag_holder_count"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."decrease_hashtag_message_reaction_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."decrease_hashtag_message_reaction_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."decrease_hashtag_message_reaction_count"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."decrease_post_comment_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."decrease_post_comment_count"() TO "authenticated";
@@ -3518,6 +4609,26 @@ GRANT ALL ON FUNCTION "public"."get_asset_contract_events"("p_chain" "text", "p_
 GRANT ALL ON FUNCTION "public"."get_asset_contract_events"("p_chain" "text", "p_contract_type" "text", "p_asset_id" "text", "last_created_at" timestamp with time zone, "max_count" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_asset_contract_events"("p_chain" "text", "p_contract_type" "text", "p_asset_id" "text", "last_created_at" timestamp with time zone, "max_count" integer) TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."get_communities"("last_member_count" integer, "max_count" integer, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_communities"("last_member_count" integer, "max_count" integer, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_communities"("last_member_count" integer, "max_count" integer, "signed_user_id" "uuid") TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_community"("p_community_id" bigint, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_community"("p_community_id" bigint, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_community"("p_community_id" bigint, "signed_user_id" "uuid") TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_community_by_slug"("p_slug" "text", "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_community_by_slug"("p_slug" "text", "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_community_by_slug"("p_slug" "text", "signed_user_id" "uuid") TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_community_message"("p_community_id" bigint, "p_message_id" bigint, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_community_message"("p_community_id" bigint, "p_message_id" bigint, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_community_message"("p_community_id" bigint, "p_message_id" bigint, "signed_user_id" "uuid") TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_community_messages"("p_community_id" bigint, "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_community_messages"("p_community_id" bigint, "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_community_messages"("p_community_id" bigint, "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."get_contract_event"("p_chain" "text", "p_contract_type" "text", "p_block_number" bigint, "p_log_index" bigint) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_contract_event"("p_chain" "text", "p_contract_type" "text", "p_block_number" bigint, "p_log_index" bigint) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_contract_event"("p_chain" "text", "p_contract_type" "text", "p_block_number" bigint, "p_log_index" bigint) TO "service_role";
@@ -3533,6 +4644,14 @@ GRANT ALL ON FUNCTION "public"."get_creator"("p_creator_address" "text") TO "ser
 GRANT ALL ON FUNCTION "public"."get_creator_holders"("p_creator_address" "text", "last_balance" bigint, "max_count" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_creator_holders"("p_creator_address" "text", "last_balance" bigint, "max_count" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_creator_holders"("p_creator_address" "text", "last_balance" bigint, "max_count" integer) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_creator_message"("p_creator_address" "text", "p_message_id" bigint, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_creator_message"("p_creator_address" "text", "p_message_id" bigint, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_creator_message"("p_creator_address" "text", "p_message_id" bigint, "signed_user_id" "uuid") TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_creator_messages"("p_creator_address" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_creator_messages"("p_creator_address" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_creator_messages"("p_creator_address" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."get_followers"("p_user_id" "uuid", "last_followed_at" timestamp with time zone, "max_count" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_followers"("p_user_id" "uuid", "last_followed_at" timestamp with time zone, "max_count" integer) TO "authenticated";
@@ -3553,6 +4672,14 @@ GRANT ALL ON FUNCTION "public"."get_hashtag_holders"("p_hashtag" "text", "last_b
 GRANT ALL ON FUNCTION "public"."get_hashtag_leaderboard"("last_rank" integer, "max_count" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_hashtag_leaderboard"("last_rank" integer, "max_count" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_hashtag_leaderboard"("last_rank" integer, "max_count" integer) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_hashtag_message"("p_hashtag" "text", "p_message_id" bigint, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_hashtag_message"("p_hashtag" "text", "p_message_id" bigint, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_hashtag_message"("p_hashtag" "text", "p_message_id" bigint, "signed_user_id" "uuid") TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_hashtag_messages"("p_hashtag" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_hashtag_messages"("p_hashtag" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_hashtag_messages"("p_hashtag" "text", "last_message_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."get_holding_assets"("p_wallet_address" "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."get_holding_assets"("p_wallet_address" "text") TO "authenticated";
@@ -3610,9 +4737,21 @@ GRANT ALL ON FUNCTION "public"."get_user_posts"("p_user_id" "uuid", "last_post_i
 GRANT ALL ON FUNCTION "public"."get_user_posts"("p_user_id" "uuid", "last_post_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_user_posts"("p_user_id" "uuid", "last_post_id" bigint, "max_count" integer, "signed_user_id" "uuid") TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."increase_community_member_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."increase_community_member_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."increase_community_member_count"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."increase_community_message_reaction_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."increase_community_message_reaction_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."increase_community_message_reaction_count"() TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."increase_creator_holder_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."increase_creator_holder_count"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."increase_creator_holder_count"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."increase_creator_message_reaction_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."increase_creator_message_reaction_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."increase_creator_message_reaction_count"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."increase_follow_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."increase_follow_count"() TO "authenticated";
@@ -3629,6 +4768,10 @@ GRANT ALL ON FUNCTION "public"."increase_following_count"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."increase_hashtag_holder_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."increase_hashtag_holder_count"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."increase_hashtag_holder_count"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."increase_hashtag_message_reaction_count"() TO "anon";
+GRANT ALL ON FUNCTION "public"."increase_hashtag_message_reaction_count"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."increase_hashtag_message_reaction_count"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."increase_post_comment_count"() TO "anon";
 GRANT ALL ON FUNCTION "public"."increase_post_comment_count"() TO "authenticated";
@@ -3666,9 +4809,17 @@ GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "anon";
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."parse_contract_event"() TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."set_community_last_message"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_community_last_message"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_community_last_message"() TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."set_creator_last_message"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_creator_last_message"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_creator_last_message"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_creator_message_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_creator_message_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_creator_message_updated_at"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."set_hashtag_key_last_message"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_hashtag_key_last_message"() TO "authenticated";
@@ -3678,6 +4829,14 @@ GRANT ALL ON FUNCTION "public"."set_hashtag_last_message"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_hashtag_last_message"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_hashtag_last_message"() TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."set_hashtag_message_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_hashtag_message_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_hashtag_message_updated_at"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."set_message_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_message_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_message_updated_at"() TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "service_role";
@@ -3685,6 +4844,10 @@ GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_user_metadata_to_public"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."update_community_last_message"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_community_last_message"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_community_last_message"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."update_creator_last_message"() TO "anon";
 GRANT ALL ON FUNCTION "public"."update_creator_last_message"() TO "authenticated";
@@ -3702,6 +4865,38 @@ GRANT ALL ON TABLE "public"."banned_users" TO "anon";
 GRANT ALL ON TABLE "public"."banned_users" TO "authenticated";
 GRANT ALL ON TABLE "public"."banned_users" TO "service_role";
 
+GRANT ALL ON TABLE "public"."communities" TO "anon";
+GRANT ALL ON TABLE "public"."communities" TO "authenticated";
+GRANT ALL ON TABLE "public"."communities" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."communities_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."communities_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."communities_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."community_applications" TO "anon";
+GRANT ALL ON TABLE "public"."community_applications" TO "authenticated";
+GRANT ALL ON TABLE "public"."community_applications" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."community_applications_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."community_applications_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."community_applications_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."community_chat_users" TO "anon";
+GRANT ALL ON TABLE "public"."community_chat_users" TO "authenticated";
+GRANT ALL ON TABLE "public"."community_chat_users" TO "service_role";
+
+GRANT ALL ON TABLE "public"."community_members" TO "anon";
+GRANT ALL ON TABLE "public"."community_members" TO "authenticated";
+GRANT ALL ON TABLE "public"."community_members" TO "service_role";
+
+GRANT ALL ON TABLE "public"."community_message_reactions" TO "anon";
+GRANT ALL ON TABLE "public"."community_message_reactions" TO "authenticated";
+GRANT ALL ON TABLE "public"."community_message_reactions" TO "service_role";
+
+GRANT ALL ON TABLE "public"."community_messages" TO "anon";
+GRANT ALL ON TABLE "public"."community_messages" TO "authenticated";
+GRANT ALL ON TABLE "public"."community_messages" TO "service_role";
+
 GRANT ALL ON TABLE "public"."contract_events" TO "anon";
 GRANT ALL ON TABLE "public"."contract_events" TO "authenticated";
 GRANT ALL ON TABLE "public"."contract_events" TO "service_role";
@@ -3713,6 +4908,10 @@ GRANT ALL ON TABLE "public"."creator_chat_users" TO "service_role";
 GRANT ALL ON TABLE "public"."creator_holders" TO "anon";
 GRANT ALL ON TABLE "public"."creator_holders" TO "authenticated";
 GRANT ALL ON TABLE "public"."creator_holders" TO "service_role";
+
+GRANT ALL ON TABLE "public"."creator_message_reactions" TO "anon";
+GRANT ALL ON TABLE "public"."creator_message_reactions" TO "authenticated";
+GRANT ALL ON TABLE "public"."creator_message_reactions" TO "service_role";
 
 GRANT ALL ON TABLE "public"."creator_messages" TO "anon";
 GRANT ALL ON TABLE "public"."creator_messages" TO "authenticated";
@@ -3754,6 +4953,10 @@ GRANT ALL ON TABLE "public"."hashtag_holders" TO "anon";
 GRANT ALL ON TABLE "public"."hashtag_holders" TO "authenticated";
 GRANT ALL ON TABLE "public"."hashtag_holders" TO "service_role";
 
+GRANT ALL ON TABLE "public"."hashtag_message_reactions" TO "anon";
+GRANT ALL ON TABLE "public"."hashtag_message_reactions" TO "authenticated";
+GRANT ALL ON TABLE "public"."hashtag_message_reactions" TO "service_role";
+
 GRANT ALL ON TABLE "public"."hashtag_messages" TO "anon";
 GRANT ALL ON TABLE "public"."hashtag_messages" TO "authenticated";
 GRANT ALL ON TABLE "public"."hashtag_messages" TO "service_role";
@@ -3773,6 +4976,18 @@ GRANT ALL ON TABLE "public"."notifications" TO "service_role";
 GRANT ALL ON SEQUENCE "public"."notifications_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."notifications_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."notifications_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."points_marketplace_products" TO "anon";
+GRANT ALL ON TABLE "public"."points_marketplace_products" TO "authenticated";
+GRANT ALL ON TABLE "public"."points_marketplace_products" TO "service_role";
+
+GRANT ALL ON TABLE "public"."points_marketplace_purchase_pending" TO "anon";
+GRANT ALL ON TABLE "public"."points_marketplace_purchase_pending" TO "authenticated";
+GRANT ALL ON TABLE "public"."points_marketplace_purchase_pending" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."points_marketplace_purchase_pending_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."points_marketplace_purchase_pending_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."points_marketplace_purchase_pending_id_seq" TO "service_role";
 
 GRANT ALL ON TABLE "public"."post_likes" TO "anon";
 GRANT ALL ON TABLE "public"."post_likes" TO "authenticated";
@@ -3797,6 +5012,10 @@ GRANT ALL ON TABLE "public"."subscribed_hashtags" TO "service_role";
 GRANT ALL ON TABLE "public"."tracked_event_blocks" TO "anon";
 GRANT ALL ON TABLE "public"."tracked_event_blocks" TO "authenticated";
 GRANT ALL ON TABLE "public"."tracked_event_blocks" TO "service_role";
+
+GRANT ALL ON TABLE "public"."unsubscribed_communities" TO "anon";
+GRANT ALL ON TABLE "public"."unsubscribed_communities" TO "authenticated";
+GRANT ALL ON TABLE "public"."unsubscribed_communities" TO "service_role";
 
 GRANT ALL ON TABLE "public"."unsubscribed_creators" TO "anon";
 GRANT ALL ON TABLE "public"."unsubscribed_creators" TO "authenticated";

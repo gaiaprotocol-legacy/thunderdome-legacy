@@ -1,3 +1,6 @@
+/*!***********************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
+  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -98,6 +101,9 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
+  \*********************************************************************************************************************************************/
 :root {
   --primary-color: #C1A87D;
   --line-color: #252527;
@@ -5141,10 +5147,12 @@ body > div > .select-modal {
   height: 0px;
   flex-grow: 1;
 }
-.community-room:has(.community-member-requirement-panel) > .message-list {
+.community-room:has(.community-member-requirement-panel) > .message-list,
+.community-room:has(.community-member-requirement-panel) > .message-form {
   display: none;
 }
 .community-room-title-bar {
+  flex-shrink: 0;
   height: 50px;
   border-bottom: 1px solid var(--line-color);
   padding: 0 20px;
@@ -5322,6 +5330,16 @@ body > div > .select-modal {
   font-weight: var(--bold-weight);
   color: var(--primary-color);
 }
+.point-section > .activities {
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.point-section > .activities > button {
+  height: 40px;
+  border-radius: 20px;
+}
 .point-section > ul.earning-methods {
   display: flex;
   flex-direction: column;
@@ -5463,6 +5481,64 @@ body > div > .select-modal {
 .referee-list-item > .created-at {
   font-size: 12px;
   color: var(--sub-text-color);
+}
+.marketplace-modal > header > .title {
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+}
+.marketplace-modal > main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 80px;
+}
+.marketplace-modal > main .points {
+  border: 1px solid var(--line-color);
+  border-radius: 4px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.marketplace-modal > main .points h3 {
+  color: var(--sub-text-color);
+  font-size: 12px;
+}
+.marketplace-modal > main .points .value {
+  font-size: 16px;
+}
+.marketplace-product-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.marketplace-product-list-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--line-color);
+  border-radius: 8px;
+}
+.marketplace-product-list-item > header > img {
+  border-radius: 4px;
+}
+.marketplace-product-list-item > main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.marketplace-product-list-item > main > h3 {
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+}
+.marketplace-product-list-item > main > p {
+  font-size: 12px;
+  color: var(--sub-text-color);
+}
+.marketplace-product-list-item > footer {
+  display: flex;
+  flex-direction: column;
 }
 :root {
   --primary-color: #50a7ea;

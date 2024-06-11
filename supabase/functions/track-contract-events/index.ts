@@ -4,6 +4,7 @@ import HashtagTradeContract from "../_shared/contracts/HashtagTradeContract.ts";
 import TicketsContract from "../_shared/contracts/TicketsContract.ts";
 import { serveWithOptions } from "../_shared/cors.ts";
 import supabase from "../_shared/supabase.ts";
+import PointsMarketplaceContract from "../_shared/contracts/PointsMarketplaceContract.ts";
 
 serveWithOptions(async (req) => {
   let { chain, contractType, blockPeriod } = await req.json();
@@ -19,13 +20,20 @@ serveWithOptions(async (req) => {
   );
   const signer = new ethers.JsonRpcSigner(provider, ethers.ZeroAddress);
 
-  let contract: CreatorTradeContract | TicketsContract | HashtagTradeContract;
+  let contract:
+    | CreatorTradeContract
+    | HashtagTradeContract
+    | TicketsContract
+    | PointsMarketplaceContract;
+
   if (contractType === "creator-trade") {
     contract = new CreatorTradeContract(signer);
   } else if (contractType === "hashtag-trade") {
     contract = new HashtagTradeContract(signer);
   } else if (contractType === "tickets") {
     contract = new TicketsContract(chain, signer);
+  } else if (contractType === "points-marketplace") {
+    contract = new PointsMarketplaceContract(signer);
   } else throw new Error("Invalid contractType");
 
   const { data, error: fetchEventBlockError } = await supabase.from(
@@ -33,7 +41,7 @@ serveWithOptions(async (req) => {
   ).select().eq("chain", chain).eq("contract_type", contractType);
   if (fetchEventBlockError) throw fetchEventBlockError;
 
-  let toBlock = (data?.[0]?.block_number ?? contract.deployBlockNumber) +
+  let toBlock = (data?.[0]?.block_number ?? (contract.deployBlockNumber ?? 0)) +
     blockPeriod;
 
   const currentBlock = await provider.getBlockNumber();
@@ -65,6 +73,8 @@ serveWithOptions(async (req) => {
       data.asset_id = contractType === "hashtag-trade"
         ? ethers.decodeBytes32String(args[1])
         : args[1];
+    } else if (eventName === "ProductPurchased") {
+      data.wallet_address = args[0];
     }
 
     const { error: saveEventError } = await supabase
