@@ -118,7 +118,8 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
 
           if (!balances[token.chain]) balances[token.chain] = {};
           balances[token.chain][token.address] = balance.toString();
-          points += Number(ethers.formatEther(balance)) * token.points_per_token;
+          points += Number(ethers.formatEther(balance)) *
+            token.points_per_token;
 
           if (
             balance >= ethers.parseEther(String(token.min_tokens_for_member))
@@ -132,14 +133,14 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
         const { error: upsertError } = await supabase.from("community_members")
           .upsert({
             community_id: community.id,
-            user_id: userId,
+            user: userId,
             holding_tokens: balances,
             holding_points: points,
           });
         if (upsertError) throw upsertError;
       } else {
         const { error: deleteError } = await supabase.from("community_members")
-          .delete().eq("community_id", community.id).eq("user_id", userId);
+          .delete().eq("community_id", community.id).eq("user", userId);
         if (deleteError) throw deleteError;
       }
     }
