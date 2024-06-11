@@ -32,7 +32,7 @@ serveWithOptions(async (req) => {
 
   const points = Math.ceil(
     productData[0].price_points_per_unit *
-      Number(ethers.formatEther(amount)),
+      Number(BigInt(amount) / ethers.parseEther("1")),
   );
   if (points < 1) throw new Error("Invalid points amount");
 
