@@ -1,6 +1,3 @@
-/*!***********************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
-  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -101,9 +98,6 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
-/*!*********************************************************************************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
-  \*********************************************************************************************************************************************/
 :root {
   --primary-color: #C1A87D;
   --line-color: #252527;
@@ -111,6 +105,10 @@ meter {
   --placeholder-bg-color: rgba(255, 255, 255, 0.1);
   --windows-scrollbar-color: rgba(128, 128, 128, 0.5);
   --bold-weight: 500;
+  --error-color: #ff8d90;
+  --error-bg-color: #503036;
+  --warning-color: #d7b700;
+  --warning-bg-color: #42381d;
   --page-bg-color: #121212;
   --title-text-color: #f4f4f4;
   --paragraph-text-color: #E7E9EA;
@@ -5489,10 +5487,15 @@ body > div > .select-modal {
 .marketplace-modal > main {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 16px 80px;
+  padding-bottom: 80px;
 }
-.marketplace-modal > main .points {
+.marketplace-modal > main > .tab.products {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 0;
+}
+.marketplace-modal > main > .tab.products > .points {
   border: 1px solid var(--line-color);
   border-radius: 4px;
   padding: 10px 12px;
@@ -5500,12 +5503,15 @@ body > div > .select-modal {
   flex-direction: column;
   gap: 8px;
 }
-.marketplace-modal > main .points h3 {
+.marketplace-modal > main > .tab.products > .points h3 {
   color: var(--sub-text-color);
   font-size: 12px;
 }
-.marketplace-modal > main .points .value {
+.marketplace-modal > main > .tab.products > .points .value {
   font-size: 16px;
+}
+.marketplace-modal > main > .tab.products.hidden {
+  display: none;
 }
 .marketplace-product-list {
   display: grid;
@@ -5539,6 +5545,98 @@ body > div > .select-modal {
 .marketplace-product-list-item > footer {
   display: flex;
   flex-direction: column;
+}
+.buy-marketplace-product-popup {
+  max-width: 500px !important;
+}
+.buy-marketplace-product-popup > header > h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+}
+.buy-marketplace-product-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+.buy-marketplace-product-popup > main > p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.buy-marketplace-product-popup > main > .quantity-input {
+  align-items: center;
+}
+.buy-marketplace-product-popup > main > .quantity-input input {
+  text-align: center;
+}
+.buy-marketplace-product-popup > main > table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid var(--line-color);
+}
+.buy-marketplace-product-popup > main > table tr > th {
+  padding: 8px 10px;
+  border: 1px solid var(--line-color);
+  color: var(--title-text-color);
+  font-weight: var(--bold-weight);
+}
+.buy-marketplace-product-popup > main > table tr > td {
+  padding: 8px 10px;
+  border: 1px solid var(--line-color);
+}
+.pending-purchase-list {
+  overflow-x: auto;
+}
+.pending-purchase-list > table {
+  width: 100%;
+  min-width: 600px;
+  color: #ccc;
+}
+.pending-purchase-list > table > thead > tr > th {
+  border-bottom: 1px solid var(--line-color);
+  padding: 12px;
+  font-weight: var(--bold-weight);
+  color: #fff;
+}
+.pending-purchase-list > table > tbody:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--disable-color);
+  padding: 24px 12px;
+}
+.pending-purchase-list > table > tbody > tr > td {
+  border-bottom: 1px solid var(--line-color);
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+.pending-purchase-list > table > tbody > tr > td > .product-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line-color);
+  border-radius: 19px;
+  padding: 5px 14px 5px 5px;
+}
+.pending-purchase-list > table > tbody > tr > td > .product-info > img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+.pending-purchase-list > table > tbody > tr > td > .pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--warning-color);
+  border-radius: 19px;
+  padding: 5px 14px;
+  background-color: var(--warning-bg-color);
+  color: var(--warning-color);
 }
 :root {
   --primary-color: #50a7ea;

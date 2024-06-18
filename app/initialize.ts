@@ -65,7 +65,7 @@ export default async function initialize(config: AppConfig) {
   PMEnv.init({
     pointWeightPerPrice: 4,
     pointsMarketplaceContractAddress:
-      "0x41f49E5c3b55213225AdfFEaCCC8be50A63becD6",
+      "0x02E8A0044B6fE61af2D1343c9207bcEFBFF4a1cC",
   });
 
   AppInitializer.initialize(

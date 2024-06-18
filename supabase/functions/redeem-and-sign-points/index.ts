@@ -68,9 +68,11 @@ serveWithOptions(async (req) => {
       "address",
       "uint256",
       "uint256",
+      "uint256",
     ],
     [
       userPublic.wallet_address,
+      amount,
       timestamp,
       signingNonce,
     ],
