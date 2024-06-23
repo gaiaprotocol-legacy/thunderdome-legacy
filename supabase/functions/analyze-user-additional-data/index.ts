@@ -111,10 +111,14 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
 
       for (const token of community.tokens) {
         if (token.type === "erc20") {
-          const balance = await new ERC20Contract(
+          const contract = new ERC20Contract(
             getSinger(token.chain),
             token.address,
-          ).balanceOf(userPublic.wallet_address);
+          );
+          const balance = ethers.parseEther(ethers.formatUnits(
+            await contract.balanceOf(userPublic.wallet_address),
+            await contract.decimals(),
+          ));
 
           if (!balances[token.chain]) balances[token.chain] = {};
           balances[token.chain][token.address] = balance.toString();
@@ -133,14 +137,14 @@ async function checkCommunityMembership(userId: string, userPublic: any) {
         const { error: upsertError } = await supabase.from("community_members")
           .upsert({
             community_id: community.id,
-            user: userId,
+            user_id: userId,
             holding_tokens: balances,
             holding_points: points,
           });
         if (upsertError) throw upsertError;
       } else {
         const { error: deleteError } = await supabase.from("community_members")
-          .delete().eq("community_id", community.id).eq("user", userId);
+          .delete().eq("community_id", community.id).eq("user_id", userId);
         if (deleteError) throw deleteError;
       }
     }
