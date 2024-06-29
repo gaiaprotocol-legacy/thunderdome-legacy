@@ -5,6 +5,7 @@ import {
   BrowserInfo,
   Confirm,
   el,
+  NewRouter,
   PolyfillUtil,
   Router,
   SplashLoader,
@@ -59,7 +60,7 @@ export default async function initialize(config: AppConfig) {
     hashtagOptions: { unit: "ticket", baseUri: "/topic" },
     postOptions: { baseUri: "/post" },
     communityOptions: { baseUri: "/community" },
-    additionalFeatures: ["follow"],
+    additionalFeatures: ["follow", "referral"],
   });
 
   PMEnv.init({
@@ -185,4 +186,6 @@ export default async function initialize(config: AppConfig) {
       });
     }
   });
+
+  console.log(NewRouter);
 }

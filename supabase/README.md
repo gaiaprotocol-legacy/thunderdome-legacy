@@ -12,9 +12,8 @@ supabase secrets set --env-file ./supabase/.env.development
 
 ## Edge Function 배포
 ```
+supabase functions deploy api
 supabase functions deploy analyze-user-additional-data
-supabase functions deploy new-wallet-linking-nonce
-supabase functions deploy link-wallet-to-user
 supabase functions deploy store-fcm-token
 supabase functions deploy track-contract-events
 supabase functions deploy insert-data-webhook --no-verify-jwt
