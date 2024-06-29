@@ -1,10 +1,11 @@
 import { ethers } from "https://esm.sh/ethers@6.7.0";
 import CreatorTradeContract from "../_shared/contracts/CreatorTradeContract.ts";
 import HashtagTradeContract from "../_shared/contracts/HashtagTradeContract.ts";
+import HashtagTradeWithReferralContract from "../_shared/contracts/HashtagTradeWithReferralContract.ts";
+import PointsMarketplaceContract from "../_shared/contracts/PointsMarketplaceContract.ts";
 import TicketsContract from "../_shared/contracts/TicketsContract.ts";
 import { serveWithOptions } from "../_shared/cors.ts";
 import supabase from "../_shared/supabase.ts";
-import PointsMarketplaceContract from "../_shared/contracts/PointsMarketplaceContract.ts";
 
 serveWithOptions(async (req) => {
   let { chain, contractType, blockPeriod } = await req.json();
@@ -15,6 +16,7 @@ serveWithOptions(async (req) => {
     else blockPeriod = 750;
   }
 
+  const referralEnabled = Deno.env.get("REFERRAL_ENABLED") === "true";
   const provider = new ethers.JsonRpcProvider(
     Deno.env.get(`${chain.toUpperCase()}_RPC_URL`),
   );
@@ -23,13 +25,16 @@ serveWithOptions(async (req) => {
   let contract:
     | CreatorTradeContract
     | HashtagTradeContract
+    | HashtagTradeWithReferralContract
     | TicketsContract
     | PointsMarketplaceContract;
 
   if (contractType === "creator-trade") {
     contract = new CreatorTradeContract(signer);
   } else if (contractType === "hashtag-trade") {
-    contract = new HashtagTradeContract(signer);
+    contract = referralEnabled
+      ? new HashtagTradeWithReferralContract(signer)
+      : new HashtagTradeContract(signer);
   } else if (contractType === "tickets") {
     contract = new TicketsContract(chain, signer);
   } else if (contractType === "points-marketplace") {
