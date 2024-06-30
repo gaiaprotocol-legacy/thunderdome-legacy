@@ -1,10 +1,7 @@
 import { response, serveWithOptions } from "../_shared/api.ts";
 import { getSignedUser } from "../_shared/supabase.ts";
 import { createOracleSignature } from "./oracle-sign.ts";
-import { getReferralUser } from "./referral.ts";
 import { generateWalletLinkingNonce, linkWalletToUser } from "./user-wallet.ts";
-import { ethers } from "https://esm.sh/ethers@6.7.0";
-import HashtagTradeWithReferralContract from "../_shared/contracts/HashtagTradeWithReferralContract.ts";
 
 serveWithOptions(async (req) => {
   const url = new URL(req.url);
@@ -30,33 +27,13 @@ serveWithOptions(async (req) => {
   }
 
   if (uri === "create-oracle-signature") {
-    const { chain } = await req.json();
-    if (!chain) throw new Error("Missing chain");
+    const { chain, contractType } = await req.json();
+    if (!chain || !contractType) {
+      throw new Error("Missing chain or contract type");
+    }
     const user = await getSignedUser(req);
     if (!user) throw new Error("Unauthorized");
-    const referralUser = await getReferralUser(user.id);
-    if (!referralUser?.wallet_address) return response("0x");
-
-    const additionalFeePercent = 0n;
-
-    const provider = new ethers.JsonRpcProvider(
-      Deno.env.get(`${chain.toUpperCase()}_RPC_URL`),
-    );
-    const signer = new ethers.JsonRpcSigner(provider, ethers.ZeroAddress);
-    const contract = new HashtagTradeWithReferralContract(signer);
-    const referralFeePercent = await contract.referralFeePercent();
-    const signingNonce = await contract.signingNonce();
-
-    const signature = await createOracleSignature(
-      additionalFeePercent,
-      referralUser.wallet_address,
-      referralFeePercent,
-      signingNonce,
-    );
-    return response({
-      additionalFeePercent: additionalFeePercent.toString(),
-      referrer: referralUser.wallet_address,
-      signature,
-    });
+    const result = await createOracleSignature(user.id, chain, contractType);
+    return response(result);
   }
 });

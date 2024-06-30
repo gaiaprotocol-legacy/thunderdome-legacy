@@ -60,7 +60,7 @@ export default async function initialize(config: AppConfig) {
     hashtagOptions: { unit: "ticket", baseUri: "/topic" },
     postOptions: { baseUri: "/post" },
     communityOptions: { baseUri: "/community" },
-    additionalFeatures: ["follow", "referral"],
+    additionalFeatures: ["follow", "referral", "sonic"],
   });
 
   PMEnv.init({

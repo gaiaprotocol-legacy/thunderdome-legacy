@@ -1,5 +1,6 @@
 import { ethers } from "https://esm.sh/ethers@6.7.0";
 import CreatorTradeContract from "../_shared/contracts/CreatorTradeContract.ts";
+import CreatorTradeForSonicContract from "../_shared/contracts/CreatorTradeForSonicContract.ts";
 import HashtagTradeContract from "../_shared/contracts/HashtagTradeContract.ts";
 import HashtagTradeWithReferralContract from "../_shared/contracts/HashtagTradeWithReferralContract.ts";
 import PointsMarketplaceContract from "../_shared/contracts/PointsMarketplaceContract.ts";
@@ -17,6 +18,8 @@ serveWithOptions(async (req) => {
   }
 
   const referralEnabled = Deno.env.get("REFERRAL_ENABLED") === "true";
+  const sonicEnabled = Deno.env.get("SONIC_ENABLED") === "true";
+
   const provider = new ethers.JsonRpcProvider(
     Deno.env.get(`${chain.toUpperCase()}_RPC_URL`),
   );
@@ -24,13 +27,16 @@ serveWithOptions(async (req) => {
 
   let contract:
     | CreatorTradeContract
+    | CreatorTradeForSonicContract
     | HashtagTradeContract
     | HashtagTradeWithReferralContract
     | TicketsContract
     | PointsMarketplaceContract;
 
   if (contractType === "creator-trade") {
-    contract = new CreatorTradeContract(signer);
+    contract = sonicEnabled
+      ? new CreatorTradeForSonicContract(signer)
+      : new CreatorTradeContract(signer);
   } else if (contractType === "hashtag-trade") {
     contract = referralEnabled
       ? new HashtagTradeWithReferralContract(signer)
