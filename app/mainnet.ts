@@ -25,7 +25,7 @@ await initialize({
   contractAddresses: {
     fantom: { // fantom mainnet
       [ContractType.CreatorTrade]: "0x92f0B3c9542F48E1c01E5c7fd1020fF7683a4a69",
-      [ContractType.HashtagTrade]: "0x0Ffb883ebe6dB8186D610F09F31378943713E9C8",
+      [ContractType.HashtagTrade]: "0xEf92f2611Aa4730e31496DFaE40519d70a07185E",
     },
   },
 

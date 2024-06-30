@@ -19,4 +19,12 @@ export default class HashtagTradeWithReferralContract
       ClaimHolderFee: this.ethersContract.filters.ClaimHolderFee(),
     };
   }
+
+  public async referralFeePercent() {
+    return await this.ethersContract.referralFeePercent();
+  }
+
+  public async signingNonce() {
+    return await this.ethersContract.signingNonce();
+  }
 }

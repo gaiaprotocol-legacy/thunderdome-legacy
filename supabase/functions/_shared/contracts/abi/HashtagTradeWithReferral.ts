@@ -29,9 +29,10 @@ export interface HashtagTradeWithReferralInterface extends Interface {
       | "batchClaimHolderFees"
       | "batchClaimableHolderFees"
       | "buy"
-      | "calculateFees"
       | "claimHolderFee"
       | "claimableHolderFee"
+      | "endMigration"
+      | "forceBatchClaimHolderFees"
       | "getBuyPrice"
       | "getBuyPriceAfterFee"
       | "getPrice"
@@ -41,28 +42,36 @@ export interface HashtagTradeWithReferralInterface extends Interface {
       | "holderFeePercent"
       | "holders"
       | "initialize"
+      | "migrate"
+      | "migrated"
       | "oracleAddress"
       | "owner"
       | "protocolFeeDestination"
       | "protocolFeePercent"
+      | "referralFeePercent"
       | "renounceOwnership"
       | "sell"
       | "setHolderFeePercent"
       | "setOracleAddress"
       | "setProtocolFeeDestination"
       | "setProtocolFeePercent"
+      | "setReferralFeePercent"
+      | "signingNonce"
       | "transferOwnership"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
       | "ClaimHolderFee"
+      | "EndMigration"
       | "Initialized"
+      | "MigrateHolder"
       | "OwnershipTransferred"
       | "SetHolderFeePercent"
       | "SetOracleAddress"
       | "SetProtocolFeeDestination"
       | "SetProtocolFeePercent"
+      | "SetReferralFeePercent"
       | "Trade"
   ): EventFragment;
 
@@ -76,11 +85,7 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "buy",
-    values: [BytesLike, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "calculateFees",
-    values: [BigNumberish, BytesLike]
+    values: [BytesLike, BigNumberish, BigNumberish, AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "claimHolderFee",
@@ -89,6 +94,14 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   encodeFunctionData(
     functionFragment: "claimableHolderFee",
     values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "endMigration",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "forceBatchClaimHolderFees",
+    values: [BytesLike[], AddressLike[][]]
   ): string;
   encodeFunctionData(
     functionFragment: "getBuyPrice",
@@ -121,8 +134,20 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [BigNumberish, AddressLike, BigNumberish, BigNumberish]
+    values: [
+      BigNumberish,
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      AddressLike,
+      BigNumberish
+    ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "migrate",
+    values: [BytesLike[], AddressLike[][], BigNumberish[][]]
+  ): string;
+  encodeFunctionData(functionFragment: "migrated", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "oracleAddress",
     values?: undefined
@@ -137,12 +162,16 @@ export interface HashtagTradeWithReferralInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "referralFeePercent",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "sell",
-    values: [BytesLike, BigNumberish, BytesLike]
+    values: [BytesLike, BigNumberish, BigNumberish, AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setHolderFeePercent",
@@ -161,6 +190,14 @@ export interface HashtagTradeWithReferralInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setReferralFeePercent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "signingNonce",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
@@ -175,15 +212,19 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "calculateFees",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "claimHolderFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "claimableHolderFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "endMigration",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "forceBatchClaimHolderFees",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -210,6 +251,8 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "holders", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "migrate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "migrated", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "oracleAddress",
     data: BytesLike
@@ -221,6 +264,10 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "protocolFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "referralFeePercent",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -242,6 +289,14 @@ export interface HashtagTradeWithReferralInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setProtocolFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setReferralFeePercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "signingNonce",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -268,11 +323,39 @@ export namespace ClaimHolderFeeEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace EndMigrationEvent {
+  export type InputTuple = [];
+  export type OutputTuple = [];
+  export interface OutputObject {}
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace InitializedEvent {
   export type InputTuple = [version: BigNumberish];
   export type OutputTuple = [version: bigint];
   export interface OutputObject {
     version: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MigrateHolderEvent {
+  export type InputTuple = [
+    hashtag: BytesLike,
+    holder: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [hashtag: string, holder: string, amount: bigint];
+  export interface OutputObject {
+    hashtag: string;
+    holder: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -330,6 +413,18 @@ export namespace SetProtocolFeeDestinationEvent {
 }
 
 export namespace SetProtocolFeePercentEvent {
+  export type InputTuple = [percent: BigNumberish];
+  export type OutputTuple = [percent: bigint];
+  export interface OutputObject {
+    percent: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace SetReferralFeePercentEvent {
   export type InputTuple = [percent: BigNumberish];
   export type OutputTuple = [percent: bigint];
   export interface OutputObject {
@@ -443,21 +538,15 @@ export interface HashtagTradeWithReferral extends BaseContract {
   >;
 
   buy: TypedContractMethod<
-    [hashtag: BytesLike, amount: BigNumberish, oracleSignature: BytesLike],
+    [
+      hashtag: BytesLike,
+      amount: BigNumberish,
+      additionalFeePercent: BigNumberish,
+      referrer: AddressLike,
+      oracleSignature: BytesLike
+    ],
     [void],
     "payable"
-  >;
-
-  calculateFees: TypedContractMethod<
-    [price: BigNumberish, oracleSignature: BytesLike],
-    [
-      [bigint, string, bigint] & {
-        additionalFee: bigint;
-        referrer: string;
-        referrerFee: bigint;
-      }
-    ],
-    "view"
   >;
 
   claimHolderFee: TypedContractMethod<
@@ -470,6 +559,14 @@ export interface HashtagTradeWithReferral extends BaseContract {
     [hashtag: BytesLike, holder: AddressLike],
     [bigint],
     "view"
+  >;
+
+  endMigration: TypedContractMethod<[], [void], "nonpayable">;
+
+  forceBatchClaimHolderFees: TypedContractMethod<
+    [_hashtags: BytesLike[], _holders: AddressLike[][]],
+    [void],
+    "nonpayable"
   >;
 
   getBuyPrice: TypedContractMethod<
@@ -521,11 +618,25 @@ export interface HashtagTradeWithReferral extends BaseContract {
       _baseDivider: BigNumberish,
       _protocolFeeDestination: AddressLike,
       _protocolFeePercent: BigNumberish,
-      _holderFeePercent: BigNumberish
+      _holderFeePercent: BigNumberish,
+      _oracleAddress: AddressLike,
+      _referralFeePercent: BigNumberish
     ],
     [void],
     "nonpayable"
   >;
+
+  migrate: TypedContractMethod<
+    [
+      _hashtags: BytesLike[],
+      allHolders: AddressLike[][],
+      allAmounts: BigNumberish[][]
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  migrated: TypedContractMethod<[], [boolean], "view">;
 
   oracleAddress: TypedContractMethod<[], [string], "view">;
 
@@ -535,10 +646,18 @@ export interface HashtagTradeWithReferral extends BaseContract {
 
   protocolFeePercent: TypedContractMethod<[], [bigint], "view">;
 
+  referralFeePercent: TypedContractMethod<[], [bigint], "view">;
+
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   sell: TypedContractMethod<
-    [hashtag: BytesLike, amount: BigNumberish, oracleSignature: BytesLike],
+    [
+      hashtag: BytesLike,
+      amount: BigNumberish,
+      additionalFeeRatio: BigNumberish,
+      referrer: AddressLike,
+      oracleSignature: BytesLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -567,6 +686,14 @@ export interface HashtagTradeWithReferral extends BaseContract {
     "nonpayable"
   >;
 
+  setReferralFeePercent: TypedContractMethod<
+    [_feePercent: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  signingNonce: TypedContractMethod<[], [bigint], "view">;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -590,22 +717,15 @@ export interface HashtagTradeWithReferral extends BaseContract {
   getFunction(
     nameOrSignature: "buy"
   ): TypedContractMethod<
-    [hashtag: BytesLike, amount: BigNumberish, oracleSignature: BytesLike],
+    [
+      hashtag: BytesLike,
+      amount: BigNumberish,
+      additionalFeePercent: BigNumberish,
+      referrer: AddressLike,
+      oracleSignature: BytesLike
+    ],
     [void],
     "payable"
-  >;
-  getFunction(
-    nameOrSignature: "calculateFees"
-  ): TypedContractMethod<
-    [price: BigNumberish, oracleSignature: BytesLike],
-    [
-      [bigint, string, bigint] & {
-        additionalFee: bigint;
-        referrer: string;
-        referrerFee: bigint;
-      }
-    ],
-    "view"
   >;
   getFunction(
     nameOrSignature: "claimHolderFee"
@@ -616,6 +736,16 @@ export interface HashtagTradeWithReferral extends BaseContract {
     [hashtag: BytesLike, holder: AddressLike],
     [bigint],
     "view"
+  >;
+  getFunction(
+    nameOrSignature: "endMigration"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "forceBatchClaimHolderFees"
+  ): TypedContractMethod<
+    [_hashtags: BytesLike[], _holders: AddressLike[][]],
+    [void],
+    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "getBuyPrice"
@@ -676,11 +806,27 @@ export interface HashtagTradeWithReferral extends BaseContract {
       _baseDivider: BigNumberish,
       _protocolFeeDestination: AddressLike,
       _protocolFeePercent: BigNumberish,
-      _holderFeePercent: BigNumberish
+      _holderFeePercent: BigNumberish,
+      _oracleAddress: AddressLike,
+      _referralFeePercent: BigNumberish
     ],
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "migrate"
+  ): TypedContractMethod<
+    [
+      _hashtags: BytesLike[],
+      allHolders: AddressLike[][],
+      allAmounts: BigNumberish[][]
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "migrated"
+  ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
     nameOrSignature: "oracleAddress"
   ): TypedContractMethod<[], [string], "view">;
@@ -694,12 +840,21 @@ export interface HashtagTradeWithReferral extends BaseContract {
     nameOrSignature: "protocolFeePercent"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "referralFeePercent"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "sell"
   ): TypedContractMethod<
-    [hashtag: BytesLike, amount: BigNumberish, oracleSignature: BytesLike],
+    [
+      hashtag: BytesLike,
+      amount: BigNumberish,
+      additionalFeeRatio: BigNumberish,
+      referrer: AddressLike,
+      oracleSignature: BytesLike
+    ],
     [void],
     "nonpayable"
   >;
@@ -716,6 +871,12 @@ export interface HashtagTradeWithReferral extends BaseContract {
     nameOrSignature: "setProtocolFeePercent"
   ): TypedContractMethod<[_feePercent: BigNumberish], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "setReferralFeePercent"
+  ): TypedContractMethod<[_feePercent: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "signingNonce"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
 
@@ -727,11 +888,25 @@ export interface HashtagTradeWithReferral extends BaseContract {
     ClaimHolderFeeEvent.OutputObject
   >;
   getEvent(
+    key: "EndMigration"
+  ): TypedContractEvent<
+    EndMigrationEvent.InputTuple,
+    EndMigrationEvent.OutputTuple,
+    EndMigrationEvent.OutputObject
+  >;
+  getEvent(
     key: "Initialized"
   ): TypedContractEvent<
     InitializedEvent.InputTuple,
     InitializedEvent.OutputTuple,
     InitializedEvent.OutputObject
+  >;
+  getEvent(
+    key: "MigrateHolder"
+  ): TypedContractEvent<
+    MigrateHolderEvent.InputTuple,
+    MigrateHolderEvent.OutputTuple,
+    MigrateHolderEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -769,6 +944,13 @@ export interface HashtagTradeWithReferral extends BaseContract {
     SetProtocolFeePercentEvent.OutputObject
   >;
   getEvent(
+    key: "SetReferralFeePercent"
+  ): TypedContractEvent<
+    SetReferralFeePercentEvent.InputTuple,
+    SetReferralFeePercentEvent.OutputTuple,
+    SetReferralFeePercentEvent.OutputObject
+  >;
+  getEvent(
     key: "Trade"
   ): TypedContractEvent<
     TradeEvent.InputTuple,
@@ -788,6 +970,17 @@ export interface HashtagTradeWithReferral extends BaseContract {
       ClaimHolderFeeEvent.OutputObject
     >;
 
+    "EndMigration()": TypedContractEvent<
+      EndMigrationEvent.InputTuple,
+      EndMigrationEvent.OutputTuple,
+      EndMigrationEvent.OutputObject
+    >;
+    EndMigration: TypedContractEvent<
+      EndMigrationEvent.InputTuple,
+      EndMigrationEvent.OutputTuple,
+      EndMigrationEvent.OutputObject
+    >;
+
     "Initialized(uint8)": TypedContractEvent<
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
@@ -797,6 +990,17 @@ export interface HashtagTradeWithReferral extends BaseContract {
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
       InitializedEvent.OutputObject
+    >;
+
+    "MigrateHolder(bytes32,address,uint256)": TypedContractEvent<
+      MigrateHolderEvent.InputTuple,
+      MigrateHolderEvent.OutputTuple,
+      MigrateHolderEvent.OutputObject
+    >;
+    MigrateHolder: TypedContractEvent<
+      MigrateHolderEvent.InputTuple,
+      MigrateHolderEvent.OutputTuple,
+      MigrateHolderEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
@@ -852,6 +1056,17 @@ export interface HashtagTradeWithReferral extends BaseContract {
       SetProtocolFeePercentEvent.InputTuple,
       SetProtocolFeePercentEvent.OutputTuple,
       SetProtocolFeePercentEvent.OutputObject
+    >;
+
+    "SetReferralFeePercent(uint256)": TypedContractEvent<
+      SetReferralFeePercentEvent.InputTuple,
+      SetReferralFeePercentEvent.OutputTuple,
+      SetReferralFeePercentEvent.OutputObject
+    >;
+    SetReferralFeePercent: TypedContractEvent<
+      SetReferralFeePercentEvent.InputTuple,
+      SetReferralFeePercentEvent.OutputTuple,
+      SetReferralFeePercentEvent.OutputObject
     >;
 
     "Trade(address,bytes32,bool,uint256,uint256,uint256,uint256,uint256,address,uint256,uint256)": TypedContractEvent<
