@@ -13,6 +13,8 @@ supabase secrets set --env-file ./supabase/.env.development
 ## Edge Function 배포
 ```
 supabase functions deploy api
+supabase functions deploy export-all-topic-holders-for-upgrade
+
 supabase functions deploy analyze-user-additional-data
 supabase functions deploy store-fcm-token
 supabase functions deploy track-contract-events

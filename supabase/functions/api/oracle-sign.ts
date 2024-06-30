@@ -8,30 +8,33 @@ export async function createOracleSignature(
   referrer: string,
   referralFeeRatio: bigint,
 ): Promise<string> {
-  console.log(price, additionalFeeRatio, referrer, referralFeeRatio);
 
   const wallet = new ethers.Wallet(ORACLE_PRIVATE_KEY);
-  const hash = ethers.getBytes(ethers.solidityPackedKeccak256(
-    ["uint256", "uint256", "address", "uint256"],
-    [price, additionalFeeRatio, referrer, referralFeeRatio],
-  ));
-  const signature = await wallet.signMessage(hash);
+  const messageHash = ethers.keccak256(
+    ethers.AbiCoder.defaultAbiCoder().encode(
+      ["uint256", "uint256", "address", "uint256"],
+      [price, additionalFeeRatio, referrer, referralFeeRatio],
+    ),
+  );
 
-  // Split the signature
-  const r = signature.slice(0, 66);
-  const s = "0x" + signature.slice(66, 130);
-  const v = parseInt(signature.slice(130, 132), 16);
+  const messageHashBytes = ethers.getBytes(messageHash);
+  const signature = await wallet.signMessage(messageHashBytes);
+  const sig = ethers.Signature.from(signature);
 
-  // Combine the data
   const combinedSignature = ethers.concat([
     ethers.zeroPadValue(ethers.toBeHex(additionalFeeRatio), 32),
     ethers.zeroPadValue(referrer, 32),
     ethers.zeroPadValue(ethers.toBeHex(referralFeeRatio), 32),
-    hash,
-    ethers.toBeHex(v),
-    r.slice(2),
-    s.slice(2),
+    messageHash,
+    sig.r,
+    sig.s,
+    ethers.toBeHex(sig.v),
   ]);
 
-  return ethers.hexlify(combinedSignature);
+  /*console.log(
+    ethers.getBytes(signature).length,
+    ethers.getBytes(combinedSignature).length,
+  );*/
+
+  return combinedSignature;
 }

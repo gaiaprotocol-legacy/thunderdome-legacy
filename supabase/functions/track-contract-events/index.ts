@@ -52,6 +52,14 @@ serveWithOptions(async (req) => {
   const currentBlock = await provider.getBlockNumber();
   if (toBlock > currentBlock) toBlock = currentBlock;
 
+  const { data: savedEvents, error: savedEventError } = await supabase
+    .from("contract_events")
+    .select("chain, contract_type, block_number, log_index")
+    .eq("chain", chain)
+    .eq("contract_type", contractType)
+    .order("created_at", { ascending: false });
+  if (savedEventError) throw savedEventError;
+
   const events = await contract.getEvents(toBlock - blockPeriod * 2, toBlock);
   for (const event of events) {
     const eventName = Object.keys(contract.eventTopicFilters).find((key) =>
@@ -82,12 +90,21 @@ serveWithOptions(async (req) => {
       data.wallet_address = args[0];
     }
 
-    const { error: saveEventError } = await supabase
-      .from("contract_events")
-      .upsert(data);
-    if (saveEventError) {
-      console.error(data);
-      throw saveEventError;
+    if (
+      !savedEvents.find((savedEvent) =>
+        savedEvent.chain === data.chain &&
+        savedEvent.contract_type === data.contract_type &&
+        savedEvent.block_number === data.block_number &&
+        savedEvent.log_index === data.log_index
+      )
+    ) {
+      const { error: saveEventError } = await supabase
+        .from("contract_events")
+        .upsert(data);
+      if (saveEventError) {
+        console.error(data);
+        throw saveEventError;
+      }
     }
   }
 
