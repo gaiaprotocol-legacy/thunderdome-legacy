@@ -5388,6 +5388,11 @@ body > div > .select-modal {
   font-weight: var(--bold-weight);
   border-radius: 16px;
 }
+.point-section > p {
+  color: var(--sub-text-color);
+  font-size: 12px;
+  padding: 0 16px;
+}
 .point-section > .referral-link {
   padding: 0 16px;
 }
@@ -5505,6 +5510,16 @@ body > div > .select-modal {
 .referee-list-item > .created-at {
   font-size: 12px;
   color: var(--sub-text-color);
+}
+.referee-list-item > .reward {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background-color: var(--contained-button-bg-color);
+  color: var(--contained-button-text-color);
+  font-weight: var(--bold-weight);
+  border-radius: 16px;
 }
 .marketplace-modal > header > .title {
   font-size: 18px;
