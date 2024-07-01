@@ -3,9 +3,7 @@ import {
   AuthUtil,
   BodyNode,
   BrowserInfo,
-  Confirm,
   el,
-  NewRouter,
   PolyfillUtil,
   Router,
   SplashLoader,
@@ -14,7 +12,6 @@ import {
 import { AndroidFcmNotification, FCM, SEnv } from "@common-module/social";
 import {
   BlockTimeManager,
-  BuyCreatorPopup,
   CoinbaseWalletManager,
   inject_fsesf_msg,
   LinkWalletPopup,
@@ -173,19 +170,4 @@ export default async function initialize(config: AppConfig) {
 
   if (BrowserInfo.isWindows) BodyNode.addClass("windows");
   PolyfillUtil.fixMSWindowsEmojiDisplay();
-
-  SFSignedUserManager.on("walletLinked", () => {
-    const walletAddress = SFSignedUserManager.user?.wallet_address;
-    if (walletAddress) {
-      new Confirm({
-        title: "Purchase Your Tickets",
-        message:
-          "Your wallet is now linked and your tickets are ready for purchase. Would you like to buy your tickets now?",
-      }, () => {
-        new BuyCreatorPopup(walletAddress, undefined);
-      });
-    }
-  });
-
-  console.log(NewRouter);
 }

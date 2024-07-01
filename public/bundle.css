@@ -3608,6 +3608,32 @@ body > div > .select-modal {
 .creator-metric-section > button {
   border-radius: 15px;
 }
+.first-creator-purchase-popup {
+  max-width: 420px !important;
+}
+.first-creator-purchase-popup > header {
+  display: flex;
+  justify-content: center;
+}
+.first-creator-purchase-popup > header > h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: var(--bold-weight);
+  text-transform: capitalize;
+}
+.first-creator-purchase-popup > main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px;
+  padding-bottom: 20px;
+}
+.first-creator-purchase-popup > main > img {
+  width: 128px;
+  margin: auto;
+}
 .buy-creator-popup {
   max-width: 500px !important;
 }
