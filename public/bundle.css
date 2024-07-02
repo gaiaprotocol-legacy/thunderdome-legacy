@@ -1,3 +1,6 @@
+/*!***********************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!../app-module/style/reset.css ***!
+  \***********************************************************************************************************/
 /***
     The new CSS reset - version 1.8.4 (last updated 14.2.2023)
     GitHub page: https://github.com/elad2412/the-new-css-reset
@@ -98,6 +101,9 @@ meter {
 :where(dialog:modal) {
     all: revert;
 }
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/less-loader/dist/cjs.js!./public/style/main.less ***!
+  \*********************************************************************************************************************************************/
 :root {
   --primary-color: #C1A87D;
   --line-color: #252527;
@@ -2401,31 +2407,37 @@ body > div > .select-modal {
   font-weight: var(--bold-weight);
   text-transform: capitalize;
 }
-.claim-hashtag-holder-fee-popup > main {
+.claim-hashtag-holder-fee-popup > main > .table-container {
   padding: 20px;
 }
-.claim-hashtag-holder-fee-popup > main > table {
+.claim-hashtag-holder-fee-popup > main > .table-container:has(.hidden) {
+  display: none;
+}
+.claim-hashtag-holder-fee-popup > main > .table-container > table {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
   border: 1px solid var(--line-color);
 }
-.claim-hashtag-holder-fee-popup > main > table thead > tr > th {
+.claim-hashtag-holder-fee-popup > main > .table-container > table.hidden {
+  display: none;
+}
+.claim-hashtag-holder-fee-popup > main > .table-container > table thead > tr > th {
   color: var(--title-text-color);
 }
-.claim-hashtag-holder-fee-popup > main > table tr > th {
+.claim-hashtag-holder-fee-popup > main > .table-container > table tr > th {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
   font-weight: var(--bold-weight);
 }
-.claim-hashtag-holder-fee-popup > main > table tr > td {
+.claim-hashtag-holder-fee-popup > main > .table-container > table tr > td {
   padding: 8px 10px;
   border: 1px solid var(--line-color);
 }
-.claim-hashtag-holder-fee-popup > main > table .total > th {
+.claim-hashtag-holder-fee-popup > main > .table-container > table .total > th {
   color: var(--title-text-color);
 }
-.claim-hashtag-holder-fee-popup > main > table .total > td {
+.claim-hashtag-holder-fee-popup > main > .table-container > table .total > td {
   font-weight: var(--bold-weight);
 }
 .hashtag-room {
@@ -5303,6 +5315,58 @@ body > div > .select-modal {
 }
 .community-member-requirement-panel > main > button.reconfirm-membership {
   height: 42px;
+}
+.claim-holder-fee-event-list {
+  overflow-x: auto;
+}
+.claim-holder-fee-event-list > table {
+  width: 100%;
+  color: #ccc;
+}
+.claim-holder-fee-event-list > table > thead > tr > th {
+  border-bottom: 1px solid var(--line-color);
+  padding: 12px;
+  font-weight: var(--bold-weight);
+  color: #fff;
+}
+.claim-holder-fee-event-list > table > tbody:empty::before {
+  display: block;
+  content: attr(data-empty-message);
+  color: var(--disable-color);
+  padding: 24px 12px;
+}
+.claim-holder-fee-event-list > table > tbody > tr > td {
+  border-bottom: 1px solid var(--line-color);
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+.claim-holder-fee-event-list > table > tbody > tr > td > .asset-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line-color);
+  border-radius: 19px;
+  padding: 5px 14px 5px 5px;
+}
+.claim-holder-fee-event-list > table > tbody > tr > td > .asset-info > .asset-image {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background-color: #252527;
+  background-size: cover;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+.claim-holder-fee-event-list > table > tbody > tr > td > .asset-info > .asset-image.loading {
+  background-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.1) 8%, rgba(255, 255, 255, 0.3) 18%, rgba(255, 255, 255, 0.1) 33%);
+  background-size: 120px 100%;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: loading-content-animation;
+  animation-timing-function: linear;
 }
 .point-section {
   padding: 20px 0 80px;
