@@ -14,7 +14,7 @@ await initialize({
       symbol: "FTM",
       blockTime: 2,
 
-      rpc: "https://rpc.ankr.com/fantom/",
+      rpc: "https://rpcapi.fantom.network",
       explorerUrl: "https://ftmscan.com",
 
       assetBaseDivider: 4n,
